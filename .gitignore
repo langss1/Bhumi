@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Environment variables (CRITICAL: DO NOT UPLOAD)
+.env
+.env.local
+.env.production
+.env*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Foundry / Solidity
+foundry/out/
+foundry/cache/
+
+# OS files
+.DS_Store
+Thumbs.db

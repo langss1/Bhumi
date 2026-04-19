@@ -1,0 +1,195 @@
+{
+  "assets": [
+    {
+      "id": 1,
+      "name": "tanah",
+      "category": "Property",
+      "valuation": 432,
+      "status": "Archived",
+      "documentHash": "",
+      "documentUrl": "",
+      "date": "19/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "cumlodstd@gmail.com",
+      "txHash": ""
+    },
+    {
+      "id": 2,
+      "name": "ingat ini",
+      "category": "Property",
+      "valuation": 430,
+      "status": "Archived",
+      "documentHash": "a6f80210165fccf0c9010aea94dcf75684f599463f8ea5408a03d570274dd88f",
+      "documentUrl": "https://gateway.pinata.cloud/ipfs/Qmab1z82Tvis65xpMg6mWmRW5VhedSfVUyi5meTudgGBMM",
+      "date": "19/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "cumlodstd@gmail.com",
+      "txHash": ""
+    },
+    {
+      "id": 3,
+      "name": "Villa Di Daguy",
+      "category": "Property",
+      "valuation": 230,
+      "status": "Verified",
+      "documentHash": "",
+      "documentUrl": "",
+      "date": "19/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "cumlodstd@gmail.com",
+      "txHash": ""
+    },
+    {
+      "id": 4,
+      "name": "mobil gweh",
+      "category": "Vehicle",
+      "valuation": 4342,
+      "status": "Verified",
+      "documentHash": "",
+      "documentUrl": "",
+      "date": "19/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "cumlodstd@gmail.com",
+      "txHash": ""
+    },
+    {
+      "id": 5,
+      "name": "villa bojongsoang",
+      "category": "Property",
+      "valuation": 124,
+      "status": "Pending",
+      "documentHash": "ebcac37be563ca48e04100c96c4d1184178b09d1136dd14cb0a712980427ea52",
+      "documentUrl": "https://gateway.pinata.cloud/ipfs/QmP4GnSQnpmYtEAfFwGdENci7XKE3MwKtJLjLJekpJuYez",
+      "date": "19/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "cumlodstd@gmail.com",
+      "txHash": "0xd3b0e67ccf3c30f43cf155dc9b17cb6d8df5a58177331d7ff395bca09462cee8"
+    }
+  ],
+  "logs": [
+    {
+      "id": 1776609103481,
+      "assetId": 1,
+      "assetName": "tanah",
+      "action": "Verified",
+      "timestamp": "19/4/2026, 21.31.43",
+      "fee": "0.0008 ETH",
+      "proofHash": "00079cee5a3c1ddf21b56bfb63fa7a1b068a3112e71bd3e5702c13db5fdd06ab",
+      "nonce": 3007,
+      "txHash": ""
+    },
+    {
+      "id": 1776613401545,
+      "assetId": 2,
+      "assetName": "ingat ini",
+      "action": "Verified",
+      "timestamp": "19/4/2026, 22.43.21",
+      "fee": "0.0008 ETH",
+      "proofHash": "000ebb0fe68b051954ea9e83427c2e0bf883790ccf9c9b6ab9d71661c34074e8",
+      "nonce": 1634,
+      "txHash": ""
+    },
+    {
+      "id": 1776613890571,
+      "assetId": 3,
+      "assetName": "Villa Di Daguy",
+      "action": "Verified",
+      "timestamp": "19/4/2026, 22.51.30",
+      "fee": "0.0008 ETH",
+      "proofHash": "000618efa6421dfd07e26ab8a408b5364eaf8014cb8605236bef146ab2d53194",
+      "nonce": 8054,
+      "txHash": "",
+      "verificator": "0x20ed1746344c8b8aa2f0afd757ad3142038cd134",
+      "institution": "BPN"
+    },
+    {
+      "id": 1776613917659,
+      "assetId": 4,
+      "assetName": "mobil gweh",
+      "action": "Verified",
+      "timestamp": "19/4/2026, 22.51.57",
+      "fee": "0.0008 ETH",
+      "proofHash": "000f6b74c2883f888b507cd46600a7d8425ceaa99de0fa760cc7887c290577aa",
+      "nonce": 8506,
+      "txHash": "",
+      "verificator": "0x175f66f4cdc260d7e5962edd86a65c4023bc872a",
+      "institution": "Samsat"
+    }
+  ],
+  "verificators": [
+    {
+      "username": "bpn",
+      "name": "lang",
+      "wallet": "0x20ed1746344c8b8aa2f0afd757ad3142038cd134",
+      "institution": "BPN",
+      "passwordHash": "ff6404071971b29e866cdf8d7600a32c82f4095024d4716efe02ecef91940903",
+      "status": "approved",
+      "registeredAt": "2026-04-19T15:12:45.572Z"
+    },
+    {
+      "username": "bpn",
+      "name": "lang",
+      "wallet": "0x20ed1746344c8b8aa2f0afd757ad3142038cd134",
+      "institution": "BPN",
+      "passwordHash": "ff6404071971b29e866cdf8d7600a32c82f4095024d4716efe02ecef91940903",
+      "status": "pending",
+      "registeredAt": "2026-04-19T15:12:47.589Z"
+    },
+    {
+      "username": "bpn",
+      "name": "lang",
+      "wallet": "0xb62ef45c18e79d08333c84fd97e0cb6931781016",
+      "institution": "BPN",
+      "passwordHash": "ff6404071971b29e866cdf8d7600a32c82f4095024d4716efe02ecef91940903",
+      "status": "pending",
+      "registeredAt": "2026-04-19T15:17:29.998Z"
+    },
+    {
+      "username": "samsat",
+      "passwordHash": "ff6404071971b29e866cdf8d7600a32c82f4095024d4716efe02ecef91940903",
+      "wallet": "0x175f66f4cdc260d7e5962edd86a65c4023bc872a",
+      "name": "Mbud",
+      "institution": "Samsat",
+      "status": "approved",
+      "registeredAt": "2026-04-19T15:46:25.412Z"
+    }
+  ],
+  "pending_verificators": [],
+  "active_verificators": [
+    {
+      "wallet": "0xb62ef45c18e79d08333c84fd97e0cb6931781016",
+      "name": "lang",
+      "institution": "BPN",
+      "appointedAt": "19/4/2026",
+      "verifiedCount": 0
+    },
+    {
+      "wallet": "0x175f66f4cdc260d7e5962edd86a65c4023bc872a",
+      "name": "Mbud",
+      "institution": "Samsat",
+      "appointedAt": "19/4/2026",
+      "verifiedCount": 0
+    }
+  ],
+  "verificator_whitelist": {
+    "0x6e83b678f3933f6a7dec316125d666d3e2c42881": false,
+    "0xa31202ac6812611a99850ae310289b4a062d170b": false,
+    "0xb62ef45c18e79d08333c84fd97e0cb6931781016": true,
+    "0x175f66f4cdc260d7e5962edd86a65c4023bc872a": true
+  },
+  "users": [
+    {
+      "email": "cumlodstd@gmail.com",
+      "password": "anjas12",
+      "name": "bud",
+      "wallet": "0x3531e71102b9f7fa6126b40d3196d26cdcd74d3a"
+    },
+    {
+      "email": "a@gmail.com",
+      "password": "budi123",
+      "name": "Budi Ajah",
+      "wallet": "0x3c81e76145ea6e28df883acfbfe3e32597ea70f0"
+    }
+  ],
+  "undefined": []
+}
