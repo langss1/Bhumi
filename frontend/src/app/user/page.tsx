@@ -62,7 +62,7 @@ interface Asset {
   date: string;
   documentHash: string;
   owner: string;
-  ownerEmail: string;
+  ownerEmail?: string;
   valuationUpdatePending?: boolean;
   pendingValuation?: number;
 }
