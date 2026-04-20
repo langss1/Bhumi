@@ -53,7 +53,7 @@ async function getFileFromIDB(hash: string): Promise<{ name: string; type: strin
 }
 
 // ─── Status ────────────────────────────────────────────────────────────────────
-type AssetState = 'Pending' | 'Selesai' | 'Arsip';
+type AssetState = 'Pending' | 'Verified' | 'Selesai' | 'Rejected' | 'Archived' | 'Arsip';
 
 interface QueueItem {
   id: number;
