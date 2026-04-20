@@ -29,6 +29,50 @@ const TABLE_MAP: Record<string, string> = {
   'active_verificators': 'verificator_accounts',  // Filtered by status
 };
 
+// Helper to map frontend payload to Supabase schema
+function mapToSupabase(table: string, payload: any) {
+  const sbTable = TABLE_MAP[table];
+  if (!sbTable) return { table: null, payload: null };
+
+  let sbPayload: any = {};
+  if (sbTable === 'users') {
+    if (payload.wallet) sbPayload.wallet_address = payload.wallet;
+    if (payload.wallet_address) sbPayload.wallet_address = payload.wallet_address;
+    if (payload.name)   sbPayload.display_name = payload.name;
+    if (payload.email)  sbPayload.email = payload.email;
+    if (payload.avatar_url) sbPayload.avatar_url = payload.avatar_url;
+    // Add password support if columns exist (ignoring if not)
+    if (payload.password) sbPayload.password = payload.password;
+  } else if (sbTable === 'asset_metadata') {
+    if (payload.id)           sbPayload.asset_id = payload.id;
+    if (payload.asset_id)     sbPayload.asset_id = payload.asset_id;
+    if (payload.name)         sbPayload.asset_name = payload.name;
+    if (payload.asset_name)   sbPayload.asset_name = payload.asset_name;
+    if (payload.category)     sbPayload.category = payload.category;
+    if (payload.status)       sbPayload.status = payload.status;
+    if (payload.valuation)    sbPayload.valuation = payload.valuation;
+    if (payload.ownerEmail)   sbPayload.owner_email = payload.ownerEmail;
+    if (payload.owner_email)  sbPayload.owner_email = payload.owner_email;
+    if (payload.owner)        sbPayload.owner_wallet = payload.owner;
+    if (payload.owner_wallet) sbPayload.owner_wallet = payload.owner_wallet;
+    if (payload.documentHash) sbPayload.document_hash = payload.documentHash;
+    if (payload.document_hash) sbPayload.document_hash = payload.document_hash;
+    if (payload.documentUrl)  sbPayload.document_url = payload.documentUrl;
+    if (payload.document_url) sbPayload.document_url = payload.document_url;
+    if (payload.txHash)       sbPayload.tx_hash = payload.txHash;
+    if (payload.date)         sbPayload.created_at = payload.date;
+  } else {
+    sbPayload = { ...payload };
+  }
+  return { table: sbTable, payload: sbPayload };
+}
+
+function getSbKey(sbTable: string, key: string) {
+  if (sbTable === 'asset_metadata' && key === 'id') return 'asset_id';
+  if (sbTable === 'users' && (key === 'wallet' || key === 'wallet_address')) return 'wallet_address';
+  return key;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const table = url.searchParams.get('table');
@@ -37,25 +81,27 @@ export async function GET(request: Request) {
     const sbTable = TABLE_MAP[table];
     let query = supabase.from(sbTable).select('*');
     
-    // Specical handling for status-based tables
     if (table === 'pending_verificators') query = query.eq('status', 'pending');
     if (table === 'active_verificators') query = query.eq('status', 'approved');
 
     const { data, error } = await query;
     if (!error && data) {
-      // Map back to frontend expected keys
       const mappedData = data.map((item: any) => {
         const newItem = { ...item };
         if (item.asset_id) { newItem.id = item.asset_id; delete newItem.asset_id; }
+        if (item.asset_name) { newItem.name = item.asset_name; delete newItem.asset_name; }
+        if (item.owner_wallet) { newItem.owner = item.owner_wallet; delete newItem.owner_wallet; }
+        if (item.owner_email) { newItem.ownerEmail = item.owner_email; delete newItem.owner_email; }
+        if (item.document_hash) { newItem.documentHash = item.document_hash; delete newItem.document_hash; }
+        if (item.document_url) { newItem.documentUrl = item.document_url; delete newItem.document_url; }
         if (item.wallet_address) { newItem.wallet = item.wallet_address; delete newItem.wallet_address; }
+        if (item.display_name) { newItem.name = item.display_name; delete newItem.display_name; }
         return newItem;
       });
       return NextResponse.json(mappedData);
     }
-    console.error(`Supabase error fetching ${table}:`, error);
   }
 
-  // Fallback to Local JSON
   initDB();
   const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
   if (table) return NextResponse.json(data[table] || []);
@@ -70,19 +116,18 @@ export async function POST(request: Request) {
     try {
       if (action === 'batch') {
         const ops = payload.map(async (op: any) => {
-          const sbTable = TABLE_MAP[op.table];
+          const { table: sbTable, payload: sbPayload } = mapToSupabase(op.table, op.payload);
           if (!sbTable) return;
 
-          if (op.action === 'insert') return supabase.from(sbTable).insert(op.payload);
+          if (op.action === 'insert') return supabase.from(sbTable).insert(sbPayload);
           if (op.action === 'update') {
              const key = op.payload.id ? 'id' : (op.payload.wallet ? 'wallet' : (op.payload.username ? 'username' : (op.payload.email ? 'email' : 'id')));
-             // Fix for assets mapping: asset_id vs id
-             const sbKey = (sbTable === 'asset_metadata' && key === 'id') ? 'asset_id' : (sbTable === 'users' && key === 'wallet' ? 'wallet_address' : key);
-             return supabase.from(sbTable).update(op.payload).eq(sbKey, op.payload[key]);
+             const sbKey = getSbKey(sbTable, key);
+             return supabase.from(sbTable).update(sbPayload).eq(sbKey, op.payload[key]);
           }
           if (op.action === 'delete') {
              const key = Object.keys(op.payload)[0];
-             const sbKey = (sbTable === 'asset_metadata' && key === 'id') ? 'asset_id' : (sbTable === 'users' && (key === 'wallet' || key === 'wallet_address') ? 'wallet_address' : key);
+             const sbKey = getSbKey(sbTable, key);
              return supabase.from(sbTable).delete().eq(sbKey, op.payload[key]);
           }
         });
@@ -90,41 +135,30 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true });
       }
 
-      const sbTable = TABLE_MAP[table];
+      const { table: sbTable, payload: sbPayload } = mapToSupabase(table, payload);
       if (sbTable) {
-        // Map payload keys to match Supabase schema
-        let sbPayload = { ...payload };
-        if (sbTable === 'asset_metadata' && payload.id) {
-          sbPayload.asset_id = payload.id;
-          delete (sbPayload as any).id;
-        }
-        if (sbTable === 'users' && payload.wallet) {
-          sbPayload.wallet_address = payload.wallet;
-          delete (sbPayload as any).wallet;
-        }
-
         if (action === 'insert') {
           const { error } = await supabase.from(sbTable).insert(sbPayload);
           if (!error) return NextResponse.json({ success: true });
-          console.error("Insert error:", error);
+          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
         if (action === 'update') {
           const key = payload.id ? 'id' : (payload.wallet ? 'wallet' : (payload.username ? 'username' : (payload.email ? 'email' : 'id')));
-          const sbKey = (sbTable === 'asset_metadata' && key === 'id') ? 'asset_id' : (sbTable === 'users' && key === 'wallet' ? 'wallet_address' : key);
+          const sbKey = getSbKey(sbTable, key);
           const { error } = await supabase.from(sbTable).update(sbPayload).eq(sbKey, payload[key]);
           if (!error) return NextResponse.json({ success: true });
-          console.error("Update error:", error);
+          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
         if (action === 'delete') {
           const key = Object.keys(payload)[0];
-          const sbKey = (sbTable === 'asset_metadata' && key === 'id') ? 'asset_id' : (sbTable === 'users' && (key === 'wallet' || key === 'wallet_address') ? 'wallet_address' : key);
+          const sbKey = getSbKey(sbTable, key);
           const { error } = await supabase.from(sbTable).delete().eq(sbKey, payload[key]);
           if (!error) return NextResponse.json({ success: true });
-          console.error("Delete error:", error);
+          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } catch (e) {
-      console.error("Supabase POST error:", e);
+    } catch (e: any) {
+      return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
   }
 
