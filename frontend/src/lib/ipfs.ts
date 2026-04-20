@@ -127,8 +127,9 @@ export async function uploadDocument(
     });
 
   // Jika file sudah ada (duplicate upload = file sama = hash sama), itu OK
-  if (error && !error.message?.includes('already exists')) {
-    throw new Error(`Gagal upload dokumen: ${error.message}`);
+  const err = error as any;
+  if (err && !err.message?.includes('already exists')) {
+    throw new Error(`Gagal upload dokumen: ${err.message}`);
   }
 
   // 4) Ambil public URL
