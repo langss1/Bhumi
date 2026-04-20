@@ -81,6 +81,7 @@ interface MiningState {
 }
 
 interface VerifyLog {
+  id: number;
   assetId: number;
   assetName: string;
   action: 'Verified' | 'Rejected';
