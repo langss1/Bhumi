@@ -67,7 +67,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || '';
-const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON || '';
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export const SUPABASE_READY = !!(SUPABASE_URL && SUPABASE_ANON && !SUPABASE_URL.includes('your-project'));
 

@@ -64,6 +64,34 @@
       "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
       "ownerEmail": "cumlodstd@gmail.com",
       "txHash": "0xd3b0e67ccf3c30f43cf155dc9b17cb6d8df5a58177331d7ff395bca09462cee8"
+    },
+    {
+      "id": 6,
+      "name": "Tanah Bintang",
+      "category": "Property",
+      "valuation": 3000,
+      "status": "Verified",
+      "documentHash": "9dfd305cfebaf9515ce531a22cae3b90856a1123becfa9062952237d42c9fad2",
+      "documentUrl": "https://gateway.pinata.cloud/ipfs/QmWnbccxv9Rh4UaBHXQQLCYt5cdrbsFKK6jFxjLM3h8hjM",
+      "date": "20/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "c@gmail.com",
+      "txHash": "",
+      "pendingValuation": null,
+      "valuationUpdatePending": false
+    },
+    {
+      "id": 7,
+      "name": "Mbeat Bintang",
+      "category": "Vehicle",
+      "valuation": 98,
+      "status": "Verified",
+      "documentHash": "9dfd305cfebaf9515ce531a22cae3b90856a1123becfa9062952237d42c9fad2",
+      "documentUrl": "https://gateway.pinata.cloud/ipfs/QmWnbccxv9Rh4UaBHXQQLCYt5cdrbsFKK6jFxjLM3h8hjM",
+      "date": "20/4/2026",
+      "owner": "0xb53ed80C965B902Af862Cfc39e97986881Bc9Aba",
+      "ownerEmail": "c@gmail.com",
+      "txHash": ""
     }
   ],
   "logs": [
@@ -111,6 +139,40 @@
       "fee": "0.0008 ETH",
       "proofHash": "000f6b74c2883f888b507cd46600a7d8425ceaa99de0fa760cc7887c290577aa",
       "nonce": 8506,
+      "txHash": "",
+      "verificator": "0x175f66f4cdc260d7e5962edd86a65c4023bc872a",
+      "institution": "Samsat"
+    },
+    {
+      "id": 1776666670695,
+      "assetId": 6,
+      "assetName": "Tanah Bintang",
+      "action": "Verified",
+      "timestamp": "20/4/2026, 13.31.10",
+      "fee": "0.0008 ETH",
+      "proofHash": "0007cc5470cf045c7bdc64418dcf75dfc6241cdfde473337faf446ec6e4d7b2a",
+      "nonce": 546,
+      "txHash": "",
+      "verificator": "0x20ed1746344c8b8aa2f0afd757ad3142038cd134",
+      "institution": "BPN"
+    },
+    {
+      "id": 1776666696285,
+      "assetId": 6,
+      "assetName": "Tanah Bintang",
+      "action": "Verified",
+      "timestamp": "20/4/2026, 13.31.36",
+      "fee": "Valuation Approved"
+    },
+    {
+      "id": 1776666719478,
+      "assetId": 7,
+      "assetName": "Mbeat Bintang",
+      "action": "Verified",
+      "timestamp": "20/4/2026, 13.31.59",
+      "fee": "0.0008 ETH",
+      "proofHash": "000f590c32ade056760a339dcdc94300d7b8e9dc5cdfb53367c18502e1ee24e7",
+      "nonce": 4067,
       "txHash": "",
       "verificator": "0x175f66f4cdc260d7e5962edd86a65c4023bc872a",
       "institution": "Samsat"
@@ -189,6 +251,18 @@
       "password": "budi123",
       "name": "Budi Ajah",
       "wallet": "0x3c81e76145ea6e28df883acfbfe3e32597ea70f0"
+    },
+    {
+      "email": "b@gmail.com",
+      "password": "baik12",
+      "name": "Budi ajah",
+      "wallet": "0xd78eba455c151067fbe1a18700ec75d43b463fe6"
+    },
+    {
+      "email": "c@gmail.com",
+      "password": "baik12",
+      "name": "Bintang",
+      "wallet": "0x90f5a0586f97055a45fc39546765a14259d8dd15"
     }
   ],
   "undefined": []
