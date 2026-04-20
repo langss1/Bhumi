@@ -326,7 +326,7 @@ export default function AdminDashboard() {
     const userAssets: any[] = (await (await fetch('/api/db?table=assets')).json());
     const assetsToArchive = userAssets.filter(a => a.ownerEmail === email && a.status !== 'Archived');
 
-    const ops = [
+    const ops: any[] = [
       { table: 'users', action: 'delete', payload: { email } }
     ];
 
