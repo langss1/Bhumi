@@ -59,6 +59,9 @@ export default function LandLedger() {
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getTotalLands',
+    query: {
+      refetchInterval: 5000,
+    }
   });
 
   if (isCountLoading) return <div className="p-10 text-center text-moss-500">Menghubungkan ke Blockchain...</div>;

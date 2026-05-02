@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useConnect } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { connect, connectors } = useConnect();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -106,7 +107,12 @@ export default function LoginPage() {
               <div className="w-24 h-24 bg-moss-50 rounded-full flex items-center justify-center mb-2">
                 <svg className="w-10 h-10 text-moss-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
               </div>
-              <w3m-button />
+              <button 
+                onClick={() => connect({ connector: connectors[0] })}
+                className="py-3 px-6 bg-moss-600 text-white font-bold rounded-xl hover:bg-moss-700 transition-all"
+              >
+                Connect Wallet
+              </button>
             </div>
           ) : (
             <motion.div 
