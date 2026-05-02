@@ -6,6 +6,7 @@ import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
+import LandLedger from '@/components/LandLedger';
 
 export default function BpnWilayahDashboard() {
   const [activeTab, setActiveTab] = useState('daftar');
@@ -194,10 +195,13 @@ export default function BpnWilayahDashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm text-center"
+              className="bg-white border border-moss-100 p-8 rounded-[2rem] shadow-sm"
             >
-              <h3 className="text-xl font-bold text-moss-900 mb-2">Riwayat Pendaftaran</h3>
-              <p className="text-moss-500">Anda dapat memantau sertifikat yang Anda cetak di sini.</p>
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-bold text-moss-900 mb-2">Riwayat Pendaftaran</h3>
+                <p className="text-moss-500">Anda dapat memantau sertifikat yang Anda cetak di sini.</p>
+              </div>
+              <LandLedger />
             </motion.div>
           )}
         </AnimatePresence>
