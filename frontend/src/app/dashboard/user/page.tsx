@@ -11,7 +11,7 @@ export default function UserDashboard() {
   const [warkahFile, setWarkahFile] = useState<File | null>(null);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedHashes, setUploadedHashes] = useState<{warkah?: string, foto?: string}>({});
+  const [uploadedHashes, setUploadedHashes] = useState<Record<string, string>>({});
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'warkah' | 'foto') => {
     if (e.target.files && e.target.files[0]) {
@@ -174,6 +174,8 @@ export default function UserDashboard() {
                   )}
                 </div>
               </div>
+            </motion.div>
+          )}
 
           {/* TRANSFER TAB */}
           {activeTab === 'transfer' && (
