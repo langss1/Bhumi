@@ -2,9 +2,46 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { uploadToIPFS } from '@/lib/pinata';
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
+
+  // Form State
+  const [warkahFile, setWarkahFile] = useState<File | null>(null);
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedHashes, setUploadedHashes] = useState<{warkah?: string, foto?: string}>({});
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'warkah' | 'foto') => {
+    if (e.target.files && e.target.files[0]) {
+      if (type === 'warkah') setWarkahFile(e.target.files[0]);
+      if (type === 'foto') setFotoFile(e.target.files[0]);
+    }
+  };
+
+  const handleRegisterLand = async () => {
+    if (!warkahFile || !fotoFile) {
+      alert("Harap unggah Warkah dan Foto Batas terlebih dahulu!");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      
+      // Upload ke IPFS
+      const warkahHash = await uploadToIPFS(warkahFile);
+      const fotoHash = await uploadToIPFS(fotoFile);
+      
+      setUploadedHashes({ warkah: warkahHash, foto: fotoHash });
+      alert(`Berhasil! File diamankan di IPFS.\nHash Warkah: ${warkahHash}\nHash Foto: ${fotoHash}\n\nMenunggu BPN Wilayah untuk Validasi...`);
+      
+    } catch (error) {
+      alert("Gagal mengunggah ke IPFS. Periksa API Key Pinata Anda.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const tabs = [
     { id: 'gallery', label: 'Galeri Aset Digital' },
@@ -85,26 +122,28 @@ export default function UserDashboard() {
                 </div>
               </div>
               
-              <form className="space-y-8">
+              <div className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Warkah / Surat Ukur (PDF)</label>
-                    <div className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-moss-100 group-hover:border-olive-300">
+                    <label className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30 flex flex-col items-center">
+                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 border border-moss-100 group-hover:border-olive-300">
                         <svg className="w-5 h-5 text-moss-400 group-hover:text-olive-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                       </div>
-                      <span className="text-sm font-bold text-moss-700">Pilih Berkas Warkah</span>
-                    </div>
+                      <span className="text-sm font-bold text-moss-700">{warkahFile ? warkahFile.name : "Pilih Berkas Warkah"}</span>
+                      <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileChange(e, 'warkah')} />
+                    </label>
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Foto Batas Patok (JPG/PNG)</label>
-                    <div className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-moss-100 group-hover:border-olive-300">
+                    <label className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30 flex flex-col items-center">
+                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 border border-moss-100 group-hover:border-olive-300">
                         <svg className="w-5 h-5 text-moss-400 group-hover:text-olive-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       </div>
-                      <span className="text-sm font-bold text-moss-700">Pilih Berkas Foto</span>
-                    </div>
+                      <span className="text-sm font-bold text-moss-700">{fotoFile ? fotoFile.name : "Pilih Berkas Foto"}</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'foto')} />
+                    </label>
                   </div>
                 </div>
 
@@ -120,13 +159,21 @@ export default function UserDashboard() {
                 </div>
                 
                 <div className="pt-6">
-                  <button type="button" className="w-full py-5 bg-moss-700 hover:bg-moss-800 text-white text-base font-bold rounded-xl shadow-[0_8px_20px_rgba(138,154,91,0.3)] transition-all">
-                    Kirim & Daftarkan ke Jaringan
+                  <button 
+                    onClick={handleRegisterLand}
+                    disabled={isUploading}
+                    className="w-full py-5 bg-moss-700 hover:bg-moss-800 text-white text-base font-bold rounded-xl shadow-[0_8px_20px_rgba(138,154,91,0.3)] transition-all disabled:opacity-50"
+                  >
+                    {isUploading ? 'Menyandikan ke IPFS...' : 'Kirim & Daftarkan ke Jaringan'}
                   </button>
+                  {uploadedHashes.warkah && (
+                    <div className="mt-4 p-4 bg-olive-50 rounded-xl border border-olive-100 text-xs font-mono text-moss-700 break-all">
+                      <p>Warkah: ipfs://{uploadedHashes.warkah}</p>
+                      <p>Foto: ipfs://{uploadedHashes.foto}</p>
+                    </div>
+                  )}
                 </div>
-              </form>
-            </motion.div>
-          )}
+              </div>
 
           {/* TRANSFER TAB */}
           {activeTab === 'transfer' && (
