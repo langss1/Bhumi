@@ -46,6 +46,7 @@ contract LandRegistry is ERC721, AccessControl {
     constructor() ERC721("LandToken", "LND") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_BPN_ROLE, msg.sender);
+        _grantRole(BPN_WILAYAH_ROLE, msg.sender);
     }
 
     function mintLand(
@@ -162,5 +163,9 @@ contract LandRegistry is ERC721, AccessControl {
     
     function getLandDetails(uint256 tokenId) external view returns (Land memory) {
         return lands[tokenId];
+    }
+
+    function getTotalLands() external view returns (uint256) {
+        return _nextTokenId;
     }
 }

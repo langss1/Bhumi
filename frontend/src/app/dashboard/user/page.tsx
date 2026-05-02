@@ -2,218 +2,176 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { uploadToIPFS } from '@/lib/pinata';
+import { useAccount, useReadContract, useWriteContract } from 'wagmi';
+import { LandRegistryABI } from '@/lib/abi';
+import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
+
+function AssetCard({ tokenId }: { tokenId: number }) {
+  const { address } = useAccount();
+  const { data: land } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getLandDetails',
+    args: [BigInt(tokenId)],
+  });
+  
+  const { data: owner } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'ownerOf',
+    args: [BigInt(tokenId)],
+  });
+
+  const { writeContract: proposeTransfer, isPending: isProposing } = useWriteContract();
+  const [buyerAddress, setBuyerAddress] = useState('');
+  const [showTransfer, setShowTransfer] = useState(false);
+
+  // request data to check for active transfers
+  const { data: request } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'transferRequests',
+    args: [BigInt(tokenId)],
+  });
+
+  if (!land || owner !== address) return null;
+
+  const handlePropose = () => {
+    if (!buyerAddress) return alert("Masukkan alamat dompet pembeli!");
+    proposeTransfer({
+      address: LAND_REGISTRY_ADDRESS,
+      abi: LandRegistryABI,
+      functionName: 'proposeTransfer',
+      args: [BigInt(tokenId), buyerAddress as `0x${string}`],
+    });
+  };
+
+  return (
+    <div className="bg-white border border-moss-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div className="bg-moss-50 border border-moss-100 text-moss-900 font-black text-xs px-3 py-1.5 rounded-lg uppercase tracking-wider">NFT Token #{tokenId}</div>
+          {land.isDisputed && <span className="text-[10px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 uppercase">Sengketa</span>}
+        </div>
+        
+        <div className="space-y-4 mb-6">
+          <div>
+            <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest">NIB Sertifikat</p>
+            <p className="text-lg font-black text-moss-900">{land.nib}</p>
+          </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest">Luas</p>
+              <p className="text-sm font-bold text-moss-700">{land.area.toString()} m²</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest">Koordinat</p>
+              <p className="text-sm font-bold text-moss-700">{land.gpsCoordinates}</p>
+            </div>
+          </div>
+        </div>
+
+        {request && request[6] ? (
+          <div className="bg-olive-50 border border-olive-100 p-4 rounded-xl text-center">
+            <p className="text-xs font-bold text-olive-700 mb-1">Transfer Aktif</p>
+            <p className="text-[10px] font-mono text-olive-600 truncate">Buyer: {request[1] as string}</p>
+          </div>
+        ) : (
+          <button 
+            onClick={() => setShowTransfer(!showTransfer)}
+            className="w-full py-3 bg-moss-900 text-white text-xs font-bold rounded-xl hover:bg-moss-800 transition-colors"
+          >
+            Pindahkan Kepemilikan (Jual Beli)
+          </button>
+        )}
+
+        <AnimatePresence>
+          {showTransfer && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+              <div className="mt-4 pt-4 border-t border-moss-50 space-y-3">
+                <input 
+                  type="text" 
+                  value={buyerAddress}
+                  onChange={(e) => setBuyerAddress(e.target.value)}
+                  placeholder="Alamat Dompet Pembeli (0x...)" 
+                  className="w-full p-3 bg-moss-50 border border-moss-200 rounded-lg text-[11px] font-mono"
+                />
+                <button onClick={handlePropose} disabled={isProposing} className="w-full py-3 bg-olive-500 text-white text-[11px] font-black rounded-lg hover:bg-olive-600 uppercase tracking-widest shadow-lg shadow-olive-500/20 transition-all">
+                  {isProposing ? 'Memproses...' : 'Kirim Proposal Jual Beli'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
+  const { address } = useAccount();
 
-  // Form State
-  const [warkahFile, setWarkahFile] = useState<File | null>(null);
-  const [fotoFile, setFotoFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedHashes, setUploadedHashes] = useState<Record<string, string>>({});
+  const { data: totalLands } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getTotalLands',
+  });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'warkah' | 'foto') => {
-    if (e.target.files && e.target.files[0]) {
-      if (type === 'warkah') setWarkahFile(e.target.files[0]);
-      if (type === 'foto') setFotoFile(e.target.files[0]);
-    }
-  };
-
-  const handleRegisterLand = async () => {
-    if (!warkahFile || !fotoFile) {
-      alert("Harap unggah Warkah dan Foto Batas terlebih dahulu!");
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-      
-      // Upload ke IPFS
-      const warkahHash = await uploadToIPFS(warkahFile);
-      const fotoHash = await uploadToIPFS(fotoFile);
-      
-      setUploadedHashes({ warkah: warkahHash, foto: fotoHash });
-      alert(`Berhasil! File diamankan di IPFS.\nHash Warkah: ${warkahHash}\nHash Foto: ${fotoHash}\n\nMenunggu BPN Wilayah untuk Validasi...`);
-      
-    } catch (error) {
-      alert("Gagal mengunggah ke IPFS. Periksa API Key Pinata Anda.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const total = Number(totalLands || 0);
 
   const tabs = [
-    { id: 'gallery', label: 'Galeri Aset Digital' },
-    { id: 'daftar', label: 'Daftar Tanah Baru' },
-    { id: 'transfer', label: 'Pengajuan Jual Beli' }
+    { id: 'gallery', label: 'Galeri Aset Digital Saya' },
+    { id: 'transfer', label: 'Konfirmasi Pembelian' }
   ];
 
   return (
     <div className="h-full flex flex-col">
-      {/* Top Navigation Tabs */}
       <div className="flex gap-4 mb-10 border-b border-moss-100 pb-px">
         {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`relative px-6 py-4 text-sm font-bold tracking-wide transition-colors ${
-              activeTab === tab.id ? 'text-moss-900' : 'text-moss-400 hover:text-moss-700'
-            }`}
-          >
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`relative px-6 py-4 text-sm font-bold tracking-wide transition-colors ${activeTab === tab.id ? 'text-moss-900' : 'text-moss-400 hover:text-moss-700'}`}>
             {tab.label}
-            {activeTab === tab.id && (
-              <motion.div
-                layoutId="userTab"
-                className="absolute bottom-0 left-0 right-0 h-1 bg-olive-500 rounded-t-full"
-              />
-            )}
+            {activeTab === tab.id && <motion.div layoutId="userTab" className="absolute bottom-0 left-0 right-0 h-1 bg-olive-500 rounded-t-full" />}
           </button>
         ))}
       </div>
 
       <div className="flex-1">
         <AnimatePresence mode="wait">
-          {/* GALERI TAB */}
           {activeTab === 'gallery' && (
-            <motion.div 
-              key="gallery"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm min-h-[500px]"
-            >
-              <div className="flex items-center justify-between mb-12">
-                <div>
-                  <h3 className="text-2xl font-black text-moss-900">Aset Tanah Saya</h3>
-                  <p className="text-sm text-moss-600 mt-2">Sertifikat Hak Milik dalam bentuk ERC-721 NFT</p>
-                </div>
-                <span className="bg-moss-50 text-olive-600 text-sm font-black px-5 py-2.5 rounded-full border border-moss-100">0 Aset Ditemukan</span>
+            <motion.div key="gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[500px]">
+              <div className="mb-10">
+                <h3 className="text-2xl font-black text-moss-900">Sertifikat Tanah Digital</h3>
+                <p className="text-sm text-moss-500 mt-2">Daftar aset lahan yang terdaftar secara sah atas nama dompet Anda di Blockchain.</p>
               </div>
               
-              <div className="border-2 border-dashed border-moss-200 bg-moss-50/50 rounded-3xl p-24 text-center flex flex-col items-center justify-center">
-                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-8 border border-moss-100">
-                  <svg className="w-12 h-12 text-moss-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+              {total === 0 ? (
+                <div className="border-2 border-dashed border-moss-200 bg-moss-50/50 rounded-3xl p-24 text-center">
+                  <p className="text-moss-400 font-bold italic">Belum ada aset terdaftar di jaringan untuk alamat dompet ini.</p>
                 </div>
-                <h4 className="text-xl font-bold text-moss-900 mb-3">Belum Ada Aset Terdaftar</h4>
-                <p className="text-base text-moss-500 max-w-md">Silakan daftarkan tanah baru Anda melalui menu "Daftar Tanah Baru" dan tunggu validasi BPN.</p>
-              </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} />)}
+                </div>
+              )}
             </motion.div>
           )}
 
-          {/* DAFTAR TANAH BARU TAB */}
-          {activeTab === 'daftar' && (
-            <motion.div 
-              key="daftar"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl"
-            >
-              <div className="flex items-center gap-5 mb-10">
-                <div className="w-16 h-16 bg-olive-50 rounded-2xl flex items-center justify-center border border-olive-100">
-                  <svg className="w-8 h-8 text-olive-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-moss-900">Pendaftaran Aset Tanah</h3>
-                  <p className="text-sm text-moss-600 mt-2">Unggah dokumen ke IPFS (InterPlanetary File System) untuk desentralisasi data.</p>
-                </div>
-              </div>
-              
-              <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Warkah / Surat Ukur (PDF)</label>
-                    <label className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30 flex flex-col items-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 border border-moss-100 group-hover:border-olive-300">
-                        <svg className="w-5 h-5 text-moss-400 group-hover:text-olive-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                      </div>
-                      <span className="text-sm font-bold text-moss-700">{warkahFile ? warkahFile.name : "Pilih Berkas Warkah"}</span>
-                      <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileChange(e, 'warkah')} />
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Foto Batas Patok (JPG/PNG)</label>
-                    <label className="border-2 border-dashed border-moss-200 rounded-2xl p-8 hover:bg-moss-50 hover:border-moss-300 transition-all cursor-pointer text-center group bg-moss-50/30 flex flex-col items-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 border border-moss-100 group-hover:border-olive-300">
-                        <svg className="w-5 h-5 text-moss-400 group-hover:text-olive-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                      </div>
-                      <span className="text-sm font-bold text-moss-700">{fotoFile ? fotoFile.name : "Pilih Berkas Foto"}</span>
-                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'foto')} />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Koordinat GPS</label>
-                    <input type="text" placeholder="-6.200, 106.816" className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 focus:border-olive-500 text-sm font-mono text-moss-900 transition-all" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Luas Tanah (M²)</label>
-                    <input type="number" placeholder="Contoh: 150" className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 focus:border-olive-500 text-sm font-mono text-moss-900 transition-all" />
-                  </div>
-                </div>
-                
-                <div className="pt-6">
-                  <button 
-                    onClick={handleRegisterLand}
-                    disabled={isUploading}
-                    className="w-full py-5 bg-moss-700 hover:bg-moss-800 text-white text-base font-bold rounded-xl shadow-[0_8px_20px_rgba(138,154,91,0.3)] transition-all disabled:opacity-50"
-                  >
-                    {isUploading ? 'Menyandikan ke IPFS...' : 'Kirim & Daftarkan ke Jaringan'}
-                  </button>
-                  {uploadedHashes.warkah && (
-                    <div className="mt-4 p-4 bg-olive-50 rounded-xl border border-olive-100 text-xs font-mono text-moss-700 break-all">
-                      <p>Warkah: ipfs://{uploadedHashes.warkah}</p>
-                      <p>Foto: ipfs://{uploadedHashes.foto}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* TRANSFER TAB */}
           {activeTab === 'transfer' && (
-            <motion.div 
-              key="transfer"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="bg-moss-900 p-12 rounded-[2rem] shadow-2xl relative overflow-hidden max-w-4xl border border-moss-800"
-            >
-              <div className="absolute top-0 right-0 w-96 h-96 bg-olive-500 rounded-full blur-[100px] opacity-20 -translate-y-1/2 translate-x-1/2"></div>
-              
-              <div className="relative z-10">
-                <div className="mb-10">
-                  <h3 className="text-2xl font-black text-white">Balik Nama (Jual Beli)</h3>
-                  <p className="text-base text-moss-200 mt-3 max-w-2xl leading-relaxed">Pindahkan kepemilikan aset NFT ke dompet pihak lain. Proses ini mensyaratkan mekanisme <span className="text-white font-bold">Multi-Signature</span> (Penjual, Pembeli, dan Notaris) agar sah di mata hukum dan blockchain.</p>
-                </div>
-                
-                <div className="bg-moss-950/50 border border-moss-800 p-8 rounded-2xl mb-8">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1">
-                      <label className="block text-[11px] font-bold text-moss-400 uppercase tracking-widest mb-3">ID Token (NFT)</label>
-                      <input type="text" placeholder="Contoh: 12" className="w-full p-4 bg-moss-900/50 border border-moss-700 rounded-xl focus:ring-2 focus:ring-olive-500 text-base font-mono text-white placeholder-moss-600 transition-all" />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-[11px] font-bold text-moss-400 uppercase tracking-widest mb-3">Alamat Dompet Pembeli</label>
-                      <input type="text" placeholder="0x..." className="w-full p-4 bg-moss-900/50 border border-moss-700 rounded-xl focus:ring-2 focus:ring-olive-500 text-base font-mono text-white placeholder-moss-600 transition-all" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button className="px-10 py-5 bg-olive-500 hover:bg-olive-400 text-moss-950 text-base font-black rounded-xl transition-colors shadow-[0_0_30px_rgba(107,142,35,0.4)]">
-                    Inisiasi Smart Contract
-                  </button>
-                </div>
-              </div>
+            <motion.div key="transfer" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl bg-moss-900 p-12 rounded-[2rem] border border-moss-800 text-white shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-80 h-80 bg-olive-500 rounded-full blur-[100px] opacity-10"></div>
+               <h3 className="text-2xl font-black mb-6">Konfirmasi Pembelian (Buyer Acceptance)</h3>
+               <p className="text-moss-300 text-sm mb-10">Jika seseorang mengirimkan proposal jual beli tanah kepada Anda, Anda harus menyetujuinya di sini agar Notaris dapat mengesahkan transaksi.</p>
+               
+               <div className="bg-moss-950/50 p-8 rounded-2xl border border-moss-800 space-y-6">
+                 <div>
+                   <label className="block text-[10px] font-bold text-moss-500 uppercase tracking-widest mb-3">ID Token yang Akan Dibeli</label>
+                   <div className="flex gap-4">
+                     <input type="text" placeholder="Masukkan ID Token" className="flex-1 p-4 bg-moss-900/50 border border-moss-700 rounded-xl font-mono text-white" />
+                     <button className="px-8 bg-olive-500 text-moss-950 font-black rounded-xl hover:bg-olive-400 uppercase text-xs">Approve Pembelian</button>
+                   </div>
+                 </div>
+               </div>
             </motion.div>
           )}
         </AnimatePresence>
