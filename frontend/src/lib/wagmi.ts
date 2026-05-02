@@ -1,59 +1,43 @@
 /**
- * Wagmi v2 + Viem configuration for Bang Bang Protocol
- * Supports: Base Sepolia (preferred) + Ethereum Sepolia (fallback)
- *
- * Usage in layout.tsx:
- *   <WagmiProvider config={wagmiConfig}>
- *     <QueryClientProvider client={queryClient}>
- *       {children}
- *     </QueryClientProvider>
- *   </WagmiProvider>
+ * Wagmi v2 + Viem configuration for BPN Land Registry
+ * Supports: Local IBFT 2.0 / Clique node
  */
 
 import { createConfig, http } from 'wagmi';
-import { baseSepolia, sepolia } from 'wagmi/chains';
-import { injected, walletConnect } from 'wagmi/connectors';
+import { defineChain } from 'viem';
+import { injected } from 'wagmi/connectors';
 
-// WalletConnect Project ID — get one free at https://cloud.walletconnect.com
-const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID || 'bangbang-dev-placeholder';
+export const localIBFT = defineChain({
+  id: 1337,
+  name: 'BPN Local Network',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['http://192.168.1.5:8545'] },
+    public: { http: ['http://192.168.1.5:8545'] },
+  },
+  blockExplorers: {
+    default: { name: 'BPN Explorer', url: 'http://192.168.1.5:4000' },
+  },
+});
 
 export const wagmiConfig = createConfig({
-  chains: [baseSepolia, sepolia],
+  chains: [localIBFT],
   connectors: [
-    // MetaMask / Injected wallets (Rabby, etc.)
     injected(),
-    // WalletConnect (mobile wallets)
-    walletConnect({ projectId: WC_PROJECT_ID }),
   ],
   transports: {
-    // Base Sepolia — primary testnet (cheaper gas, same EVM)
-    [baseSepolia.id]: http(
-      process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || 'https://sepolia.base.org'
-    ),
-    // Ethereum Sepolia — fallback
-    [sepolia.id]: http(
-      process.env.NEXT_PUBLIC_ETH_SEPOLIA_RPC || 'https://rpc.sepolia.org'
-    ),
+    [localIBFT.id]: http('http://192.168.1.5:8545'),
   },
-  // Enable SSR — required for Next.js App Router
   ssr: true,
 });
 
-// Chain info helpers
-export const SUPPORTED_CHAINS = [baseSepolia, sepolia];
-export const PRIMARY_CHAIN = baseSepolia;
-
-export const CHAIN_EXPLORER: Record<number, string> = {
-  [baseSepolia.id]: 'https://sepolia.basescan.org',
-  [sepolia.id]:     'https://sepolia.etherscan.io',
-};
+export const SUPPORTED_CHAINS = [localIBFT];
+export const PRIMARY_CHAIN = localIBFT;
 
 export function getTxUrl(chainId: number, txHash: string): string {
-  const base = CHAIN_EXPLORER[chainId] || 'https://sepolia.basescan.org';
-  return `${base}/tx/${txHash}`;
+  return `http://192.168.1.5:4000/tx/${txHash}`;
 }
 
 export function getAddressUrl(chainId: number, address: string): string {
-  const base = CHAIN_EXPLORER[chainId] || 'https://sepolia.basescan.org';
-  return `${base}/address/${address}`;
+  return `http://192.168.1.5:4000/address/${address}`;
 }

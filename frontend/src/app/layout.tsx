@@ -1,27 +1,23 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Navbar from '@/components/Navbar';
 import { Web3Provider } from '@/components/Web3Provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bang Bang | Decentralized Physical Asset Management',
-  description: 'Catat, validasi, dan kelola aset fisik Anda secara on-chain. RWA Protocol pada Base Sepolia.',
-  keywords: ['RWA', 'blockchain', 'real world assets', 'Base Sepolia', 'DeFi'],
+  title: 'Bhumi | Sistem Informasi Pertanahan Terdesentralisasi',
+  description: 'Digitalisasi dan tokenisasi aset tanah serta sertifikat secara aman melalui blockchain.',
+  keywords: ['RWA', 'blockchain', 'real world assets', 'Land Registry', 'BPN'],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-gray-50`}>
         {/* Web3Provider: WagmiProvider + QueryClientProvider */}
         <Web3Provider>
-          <Navbar />
-          <main className="pt-16">
-            {children}
-          </main>
+          {children}
         </Web3Provider>
       </body>
     </html>
