@@ -41,3 +41,6 @@ export function getTxUrl(chainId: number, txHash: string): string {
 export function getAddressUrl(chainId: number, address: string): string {
   return `http://192.168.1.5:4000/address/${address}`;
 }
+
+export const LAND_REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
+

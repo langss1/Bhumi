@@ -2,9 +2,47 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { LandRegistryABI } from '@/lib/abi';
+import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
+
+// Role Hashes based on LandRegistry.sol
+const ROLES = {
+  validator: "0xd8619ebc57406c13ed639e2467d02cb34a41ebf40f09b531dc14112674e2d277", // keccak256("BPN_WILAYAH_ROLE")
+  notaris: "0x35bc858485de34d3d1f3b89b88cf411516e828e833f40f7d4dc9cd82cbabdf92" // keccak256("NOTARIS_ROLE")
+};
 
 export default function BpnPusatDashboard() {
   const [activeTab, setActiveTab] = useState('account');
+
+  // Input states
+  const [roleAddress, setRoleAddress] = useState('');
+  const [selectedRole, setSelectedRole] = useState(ROLES.validator);
+  const [disputeTokenId, setDisputeTokenId] = useState('');
+
+  // Wagmi hooks
+  const { writeContract: writeRole, data: roleTxHash, isPending: isRolePending } = useWriteContract();
+  const { writeContract: writeDispute, data: disputeTxHash, isPending: isDisputePending } = useWriteContract();
+
+  const handleGrantRole = () => {
+    if (!roleAddress) return alert("Masukkan Address!");
+    writeRole({
+      address: LAND_REGISTRY_ADDRESS,
+      abi: LandRegistryABI,
+      functionName: 'grantRole',
+      args: [selectedRole as `0x${string}`, roleAddress as `0x${string}`],
+    });
+  };
+
+  const handleSetEnforcement = () => {
+    if (!disputeTokenId) return alert("Masukkan ID Token!");
+    writeDispute({
+      address: LAND_REGISTRY_ADDRESS,
+      abi: LandRegistryABI,
+      functionName: 'setEnforcement',
+      args: [BigInt(disputeTokenId), true],
+    });
+  };
 
   const tabs = [
     { id: 'account', label: 'Pendaftaran Institusi Baru' },
@@ -56,24 +94,39 @@ export default function BpnPusatDashboard() {
                 </div>
               </div>
               
-              <form className="space-y-8">
+              <div className="space-y-8">
                 <div>
                   <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Wallet Address (0x...)</label>
-                  <input type="text" placeholder="Masukkan address Institusi..." className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-mono text-moss-900 transition-all" />
+                  <input 
+                    type="text" 
+                    value={roleAddress}
+                    onChange={(e) => setRoleAddress(e.target.value)}
+                    placeholder="Masukkan address Institusi..." 
+                    className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-mono text-moss-900 transition-all" 
+                  />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-4">Pilih Otoritas Peran</label>
-                  <select className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-bold text-moss-900 cursor-pointer transition-all">
-                    <option>Kantor Pertanahan Wilayah (Validator)</option>
-                    <option>Notaris / PPAT (Signer)</option>
+                  <select 
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-bold text-moss-900 cursor-pointer transition-all"
+                  >
+                    <option value={ROLES.validator}>Kantor Pertanahan Wilayah (Validator)</option>
+                    <option value={ROLES.notaris}>Notaris / PPAT (Signer)</option>
                   </select>
                 </div>
                 <div className="pt-6">
-                  <button type="button" className="w-full py-5 bg-moss-900 hover:bg-moss-800 text-white text-base font-bold rounded-xl shadow-[0_8px_20px_rgba(38,42,25,0.3)] transition-all">
-                    Submit Transaksi ke Ledger
+                  <button 
+                    onClick={handleGrantRole}
+                    disabled={isRolePending}
+                    className="w-full py-5 bg-moss-900 hover:bg-moss-800 text-white text-base font-bold rounded-xl shadow-[0_8px_20px_rgba(38,42,25,0.3)] transition-all disabled:opacity-50"
+                  >
+                    {isRolePending ? 'Memproses Transaksi...' : 'Submit Transaksi ke Ledger'}
                   </button>
+                  {roleTxHash && <p className="text-xs mt-3 text-moss-600">Tx Hash: {roleTxHash}</p>}
                 </div>
-              </form>
+              </div>
             </motion.div>
           )}
 
@@ -99,17 +152,28 @@ export default function BpnPusatDashboard() {
                   </div>
                 </div>
                 
-                <form className="space-y-8 bg-red-950/40 p-8 rounded-2xl border border-red-500/30">
+                <div className="space-y-8 bg-red-950/40 p-8 rounded-2xl border border-red-500/30">
                   <div>
                     <label className="block text-[11px] font-bold text-red-300 uppercase tracking-widest mb-4">Target Pembekuan (ID Token / NIB)</label>
-                    <input type="text" placeholder="Masukkan ID Token" className="w-full p-4 bg-red-950/60 border border-red-500/50 rounded-xl focus:ring-2 focus:ring-red-400 text-base font-mono text-white placeholder-red-400/50 transition-all" />
+                    <input 
+                      type="text" 
+                      value={disputeTokenId}
+                      onChange={(e) => setDisputeTokenId(e.target.value)}
+                      placeholder="Masukkan ID Token" 
+                      className="w-full p-4 bg-red-950/60 border border-red-500/50 rounded-xl focus:ring-2 focus:ring-red-400 text-base font-mono text-white placeholder-red-400/50 transition-all" 
+                    />
                   </div>
                   <div className="pt-4">
-                    <button type="button" className="w-full py-5 bg-white hover:bg-red-50 text-red-800 text-base font-black rounded-xl shadow-[0_8px_25px_rgba(255,0,0,0.4)] transition-all uppercase tracking-widest">
-                      Eksekusi Pembekuan Aset
+                    <button 
+                      onClick={handleSetEnforcement}
+                      disabled={isDisputePending}
+                      className="w-full py-5 bg-white hover:bg-red-50 text-red-800 text-base font-black rounded-xl shadow-[0_8px_25px_rgba(255,0,0,0.4)] transition-all uppercase tracking-widest disabled:opacity-70"
+                    >
+                      {isDisputePending ? 'Mengeksekusi Pembekuan...' : 'Eksekusi Pembekuan Aset'}
                     </button>
+                    {disputeTxHash && <p className="text-xs mt-3 text-red-300">Tx Hash: {disputeTxHash}</p>}
                   </div>
-                </form>
+                </div>
               </div>
             </motion.div>
           )}

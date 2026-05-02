@@ -2,9 +2,29 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWriteContract } from 'wagmi';
+import { LandRegistryABI } from '@/lib/abi';
+import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 
 export default function BpnWilayahDashboard() {
   const [activeTab, setActiveTab] = useState('validation');
+  
+  const { writeContract: writeMint, data: mintTxHash, isPending: isMintPending } = useWriteContract();
+
+  const handleMint = () => {
+    writeMint({
+      address: LAND_REGISTRY_ADDRESS,
+      abi: LandRegistryABI,
+      functionName: 'mintLand',
+      args: [
+        "0x123A80507B9626b485E923E2824DDeF0c39f89bc", // to (simulated user)
+        "-6.200, 106.816", // GPS
+        BigInt(500), // area
+        "12345", // nib
+        ["QmWarkahHash123", "QmFotoPatokHash456"] // ipfs hashes
+      ],
+    });
+  };
 
   const tabs = [
     { id: 'validation', label: 'Validasi & Minting' },
@@ -106,9 +126,14 @@ export default function BpnWilayahDashboard() {
                         </div>
                       </td>
                       <td className="px-6 py-6 text-right rounded-r-2xl">
-                        <button className="px-6 py-3 bg-moss-900 hover:bg-moss-800 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-moss-900/10">
-                          Approve & Mint NFT
+                        <button 
+                          onClick={handleMint}
+                          disabled={isMintPending}
+                          className="px-6 py-3 bg-moss-900 hover:bg-moss-800 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-moss-900/10 disabled:opacity-50"
+                        >
+                          {isMintPending ? 'Memproses...' : 'Approve & Mint NFT'}
                         </button>
+                        {mintTxHash && <div className="text-[10px] text-moss-500 mt-2 truncate w-24">Tx: {mintTxHash}</div>}
                       </td>
                     </tr>
                   </tbody>
