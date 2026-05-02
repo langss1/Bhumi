@@ -8,7 +8,7 @@ import { defineChain } from 'viem';
 import { injected } from 'wagmi/connectors';
 
 export const localIBFT = defineChain({
-  id: 1337,
+  id: 31337,
   name: 'BPN Local Network',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
