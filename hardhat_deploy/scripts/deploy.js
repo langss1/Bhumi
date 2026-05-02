@@ -1,14 +1,14 @@
 import hre from "hardhat";
 
 async function main() {
-  console.log("Compiling & Deploying BangBang...");
-  const BangBang = await hre.ethers.getContractFactory("BangBang");
-  const bangBang = await BangBang.deploy("1000000000000000");
-  await bangBang.waitForDeployment();
-  const address = await bangBang.getAddress();
+  console.log("Compiling & Deploying Bhumi LandRegistry...");
+  const LandRegistry = await hre.ethers.getContractFactory("LandRegistry");
+  const landRegistry = await LandRegistry.deploy();
+  await landRegistry.waitForDeployment();
+  const address = await landRegistry.getAddress();
   
   console.log("===================================");
-  console.log("BangBang Contract Deployed to:", address);
+  console.log("LandRegistry Contract Deployed to:", address);
   console.log("===================================");
 }
 
