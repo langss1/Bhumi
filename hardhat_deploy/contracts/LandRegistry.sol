@@ -30,6 +30,19 @@ contract LandRegistry is ERC721, AccessControl {
         bool isActive;
     }
 
+    struct LandRequest {
+        address to;
+        string gpsCoordinates;
+        uint256 area;
+        string nib;
+        string[] ipfsHashes;
+        bool isProcessed;
+        bool isRejected;
+    }
+
+    uint256 private _nextRequestId;
+    mapping(uint256 => LandRequest) public landRequests;
+
     mapping(uint256 => Land) public lands;
     mapping(uint256 => TransferRequest) public transferRequests;
     
@@ -37,6 +50,9 @@ contract LandRegistry is ERC721, AccessControl {
     mapping(uint256 => address[]) public ownershipHistory;
 
     event AssetMinted(uint256 indexed tokenId, address indexed owner, string nib);
+    event LandRequested(uint256 indexed requestId, address indexed to, string nib);
+    event LandApproved(uint256 indexed requestId, uint256 indexed tokenId);
+    event LandRejected(uint256 indexed requestId);
     event TransferProposed(uint256 indexed tokenId, address indexed seller, address indexed buyer);
     event BuyerApproved(uint256 indexed tokenId, address indexed buyer);
     event NotarisApproved(uint256 indexed tokenId, address indexed notaris, string ajbIpfsHash);
@@ -49,6 +65,61 @@ contract LandRegistry is ERC721, AccessControl {
         _grantRole(BPN_WILAYAH_ROLE, msg.sender);
     }
 
+    function requestLandMinting(
+        address to,
+        string memory gpsCoordinates,
+        uint256 area,
+        string memory nib,
+        string[] memory ipfsHashes
+    ) external onlyRole(BPN_WILAYAH_ROLE) {
+        uint256 requestId = _nextRequestId++;
+        
+        landRequests[requestId] = LandRequest({
+            to: to,
+            gpsCoordinates: gpsCoordinates,
+            area: area,
+            nib: nib,
+            ipfsHashes: ipfsHashes,
+            isProcessed: false,
+            isRejected: false
+        });
+
+        emit LandRequested(requestId, to, nib);
+    }
+
+    function approveLandRequest(uint256 requestId) external onlyRole(ADMIN_BPN_ROLE) {
+        LandRequest storage req = landRequests[requestId];
+        require(!req.isProcessed, "Request already processed");
+        require(!req.isRejected, "Request already rejected");
+
+        uint256 tokenId = _nextTokenId++;
+        
+        lands[tokenId] = Land({
+            gpsCoordinates: req.gpsCoordinates,
+            area: req.area,
+            nib: req.nib,
+            ipfsHashes: req.ipfsHashes,
+            isDisputed: false
+        });
+
+        req.isProcessed = true;
+
+        _safeMint(req.to, tokenId);
+        ownershipHistory[tokenId].push(req.to);
+
+        emit AssetMinted(tokenId, req.to, req.nib);
+        emit LandApproved(requestId, tokenId);
+    }
+
+    function rejectLandRequest(uint256 requestId) external onlyRole(ADMIN_BPN_ROLE) {
+        LandRequest storage req = landRequests[requestId];
+        require(!req.isProcessed, "Request already processed");
+        require(!req.isRejected, "Request already rejected");
+
+        req.isRejected = true;
+        emit LandRejected(requestId);
+    }
+
     function mintLand(
         address to,
         string memory gpsCoordinates,
@@ -56,6 +127,7 @@ contract LandRegistry is ERC721, AccessControl {
         string memory nib,
         string[] memory ipfsHashes // Warkah, Foto batas, etc
     ) external onlyRole(BPN_WILAYAH_ROLE) {
+        // Keep this for backward compatibility if needed, or remove to force approval flow
         uint256 tokenId = _nextTokenId++;
         
         lands[tokenId] = Land({
@@ -167,5 +239,65 @@ contract LandRegistry is ERC721, AccessControl {
 
     function getTotalLands() external view returns (uint256) {
         return _nextTokenId;
+    }
+
+    function getTotalRequests() external view returns (uint256) {
+        return _nextRequestId;
+    }
+
+    function getRequestDetails(uint256 requestId) external view returns (LandRequest memory) {
+        return landRequests[requestId];
+    }
+
+    // ─── Helper: Ambil semua tokenId yang dimiliki address tertentu ─────────────
+    function getTokensByOwner(address owner) external view returns (uint256[] memory) {
+        uint256 total = _nextTokenId;
+        uint256 count = 0;
+        for (uint256 i = 0; i < total; i++) {
+            try this.ownerOf(i) returns (address tokenOwner) {
+                if (tokenOwner == owner) count++;
+            } catch {}
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 idx = 0;
+        for (uint256 i = 0; i < total; i++) {
+            try this.ownerOf(i) returns (address tokenOwner) {
+                if (tokenOwner == owner) {
+                    result[idx++] = i;
+                }
+            } catch {}
+        }
+        return result;
+    }
+
+    // ─── Helper: Cari tokenId berdasarkan NIB (untuk Auditor forensik) ──────────
+    function getTokenByNIB(string memory nib) external view returns (uint256 tokenId, bool found) {
+        uint256 total = _nextTokenId;
+        for (uint256 i = 0; i < total; i++) {
+            if (keccak256(bytes(lands[i].nib)) == keccak256(bytes(nib))) {
+                return (i, true);
+            }
+        }
+        return (0, false);
+    }
+
+    // ─── Helper: Status transfer ringkas untuk frontend ─────────────────────────
+    function getTransferStatus(uint256 tokenId) external view returns (
+        bool isActive,
+        address seller,
+        address buyer,
+        bool sellerApproved,
+        bool buyerApproved,
+        bool notarisApproved
+    ) {
+        TransferRequest storage req = transferRequests[tokenId];
+        return (
+            req.isActive,
+            req.seller,
+            req.buyer,
+            req.sellerApproved,
+            req.buyerApproved,
+            req.notarisApproved
+        );
     }
 }

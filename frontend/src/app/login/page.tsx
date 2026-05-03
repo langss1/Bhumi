@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const [simulatedRole, setSimulatedRole] = useState('bpn-pusat');
+  const [simulatedRole, setSimulatedRole] = useState('user');
 
   const handleLogin = async () => {
     if (!isConnected || !address) {
@@ -136,10 +136,11 @@ export default function LoginPage() {
                     onChange={(e) => setSimulatedRole(e.target.value)}
                     className="w-full pl-5 pr-12 py-4 border border-moss-200 rounded-xl appearance-none focus:ring-2 focus:ring-olive-500 bg-white text-gray-800 font-medium transition-all hover:border-moss-300 cursor-pointer shadow-sm"
                   >
-                    <option value="bpn-pusat">BPN Pusat (Validator Utama)</option>
-                    <option value="bpn-wilayah">BPN Wilayah (Regional Node)</option>
-                    <option value="notaris">Notaris / PPAT</option>
-                    <option value="auditor">Auditor / KPK (Read-Only)</option>
+                    <option value="user">👤 Pemilik Tanah (Masyarakat)</option>
+                    <option value="bpn-wilayah">🏢 BPN Wilayah (Data Inputter)</option>
+                    <option value="notaris">⚖️ Notaris / PPAT (Transfer Executor)</option>
+                    <option value="bpn-pusat">🛡️ BPN Pusat (Validator Utama)</option>
+                    <option value="auditor">🔍 Auditor / KPK (Read-Only)</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-moss-600">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>

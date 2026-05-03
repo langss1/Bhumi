@@ -55,7 +55,7 @@ export default function BpnWilayahDashboard() {
       const txHash = await writeContractAsync({
         address: LAND_REGISTRY_ADDRESS,
         abi: LandRegistryABI,
-        functionName: 'mintLand',
+        functionName: 'requestLandMinting',
         args: [
           walletAddress as `0x${string}`,
           gps,

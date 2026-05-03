@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Tugas Semester 6\\Blockchain\\tubes\\hardhat_deploy\\contracts\\LandRegistry.sol": {
-      "lastModificationDate": 1777714892093,
-      "contentHash": "17428686173588f1d4a508bea556ded1",
+      "lastModificationDate": 1777812560788,
+      "contentHash": "7977b3c1e443a96116328f49eae4e538",
       "sourceName": "contracts/LandRegistry.sol",
       "solcConfig": {
         "version": "0.8.24",

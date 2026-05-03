@@ -6,14 +6,16 @@ import { useWriteContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
+import PendingLandRequests from '@/components/PendingLandRequests';
 
 const ROLES = {
   validator: "0xd8619ebc57406c13ed639e2467d02cb34a41ebf40f09b531dc14112674e2d277", // BPN_WILAYAH_ROLE
-  notaris: "0x35bc858485de34d3d1f3b89b88cf411516e828e833f40f7d4dc9cd82cbabdf92" // NOTARIS_ROLE
+  notaris: "0x35bc858485de34d3d1f3b89b88cf411516e828e833f40f7d4dc9cd82cbabdf92",   // NOTARIS_ROLE
+  auditor: "0x0bff7c1b4ac6b50d6d5c363cf9d6f57f48a5d4571c3e8e5a15f636c4c657af3"    // AUDITOR_ROLE
 };
 
 export default function BpnPusatDashboard() {
-  const [activeTab, setActiveTab] = useState('ledger');
+  const [activeTab, setActiveTab] = useState('validation');
 
   const [roleAddress, setRoleAddress] = useState('');
   const [selectedRole, setSelectedRole] = useState(ROLES.validator);
@@ -43,6 +45,7 @@ export default function BpnPusatDashboard() {
   };
 
   const tabs = [
+    { id: 'validation', label: 'Validasi Pendaftaran' },
     { id: 'ledger', label: 'Master Ledger Blockchain' },
     { id: 'account', label: 'Registrasi Institusi' },
     { id: 'sengketa', label: 'Manajemen Sengketa' }
@@ -69,6 +72,16 @@ export default function BpnPusatDashboard() {
 
       <div className="flex-1">
         <AnimatePresence mode="wait">
+          {activeTab === 'validation' && (
+            <motion.div key="validation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="mb-8">
+                <h3 className="text-2xl font-black text-moss-900">Validasi Pendaftaran Tanah</h3>
+                <p className="text-sm text-moss-500 mt-2">Tinjau permohonan dari BPN Wilayah dan setujui untuk mencetak sertifikat digital.</p>
+              </div>
+              <PendingLandRequests />
+            </motion.div>
+          )}
+
           {activeTab === 'ledger' && (
             <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="mb-8">
@@ -90,8 +103,9 @@ export default function BpnPusatDashboard() {
                 <div>
                   <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Peran</label>
                   <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)} className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-bold">
-                    <option value={ROLES.validator}>BPN Wilayah (Regional Node)</option>
-                    <option value={ROLES.notaris}>Notaris (PPAT)</option>
+                    <option value={ROLES.validator}>🏢 BPN Wilayah (Data Inputter)</option>
+                    <option value={ROLES.notaris}>⚖️ Notaris / PPAT (Transfer Executor)</option>
+                    <option value={ROLES.auditor}>🔍 Auditor / KPK (Read-Only)</option>
                   </select>
                 </div>
                 <button onClick={handleGrantRole} disabled={isRolePending} className="w-full py-5 bg-moss-900 text-white font-bold rounded-xl transition-all disabled:opacity-50">
