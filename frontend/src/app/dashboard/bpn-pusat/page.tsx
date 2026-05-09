@@ -7,6 +7,7 @@ import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
 import PendingLandRequests from '@/components/PendingLandRequests';
+import PendingVerificators from '@/components/PendingVerificators';
 
 const ROLES = {
   validator: "0xd8619ebc57406c13ed639e2467d02cb34a41ebf40f09b531dc14112674e2d277", // BPN_WILAYAH_ROLE
@@ -16,23 +17,9 @@ const ROLES = {
 
 export default function BpnPusatDashboard() {
   const [activeTab, setActiveTab] = useState('validation');
-
-  const [roleAddress, setRoleAddress] = useState('');
-  const [selectedRole, setSelectedRole] = useState(ROLES.validator);
   const [disputeTokenId, setDisputeTokenId] = useState('');
 
-  const { writeContract: writeRole, isPending: isRolePending } = useWriteContract();
   const { writeContract: writeDispute, isPending: isDisputePending } = useWriteContract();
-
-  const handleGrantRole = () => {
-    if (!roleAddress) return alert("Masukkan Address!");
-    writeRole({
-      address: LAND_REGISTRY_ADDRESS,
-      abi: LandRegistryABI,
-      functionName: 'grantRole',
-      args: [selectedRole as `0x${string}`, roleAddress as `0x${string}`],
-    });
-  };
 
   const handleSetEnforcement = (isDisputed: boolean) => {
     if (!disputeTokenId) return alert("Masukkan ID Token!");
@@ -45,9 +32,9 @@ export default function BpnPusatDashboard() {
   };
 
   const tabs = [
-    { id: 'validation', label: 'Validasi Pendaftaran' },
+    { id: 'validation', label: 'Validasi Pendaftaran Tanah' },
+    { id: 'account', label: 'Verifikasi Pejabat / Institusi' },
     { id: 'ledger', label: 'Master Ledger Blockchain' },
-    { id: 'account', label: 'Registrasi Institusi' },
     { id: 'sengketa', label: 'Manajemen Sengketa' }
   ];
 
@@ -82,6 +69,16 @@ export default function BpnPusatDashboard() {
             </motion.div>
           )}
 
+          {activeTab === 'account' && (
+            <motion.div key="account" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="mb-8">
+                <h3 className="text-2xl font-black text-moss-900">Verifikasi Pendaftaran Pejabat</h3>
+                <p className="text-sm text-moss-500 mt-2">Tinjau SK/Dokumen Institusi yang mendaftar dan berikan hak akses Smart Contract (On-Chain).</p>
+              </div>
+              <PendingVerificators />
+            </motion.div>
+          )}
+
           {activeTab === 'ledger' && (
             <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="mb-8">
@@ -91,31 +88,6 @@ export default function BpnPusatDashboard() {
               <LandLedger />
             </motion.div>
           )}
-
-          {activeTab === 'account' && (
-            <motion.div key="account" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl">
-              <h3 className="text-2xl font-black text-moss-900 mb-6">Registrasi Node Institusi</h3>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Wallet Address</label>
-                  <input type="text" value={roleAddress} onChange={(e) => setRoleAddress(e.target.value)} placeholder="0x..." className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono" />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Peran</label>
-                  <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)} className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-bold">
-                    <option value={ROLES.validator}>🏢 BPN Wilayah (Data Inputter)</option>
-                    <option value={ROLES.notaris}>⚖️ Notaris / PPAT (Transfer Executor)</option>
-                    <option value={ROLES.auditor}>🔍 Auditor / KPK (Read-Only)</option>
-                  </select>
-                </div>
-                <button onClick={handleGrantRole} disabled={isRolePending} className="w-full py-5 bg-moss-900 text-white font-bold rounded-xl transition-all disabled:opacity-50">
-                  {isRolePending ? 'Mengirim Transaksi...' : 'Grant Role on Blockchain'}
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'sengketa' && (
             <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl">
               <h3 className="text-2xl font-black text-moss-900 mb-6">Pembekuan Aset (Dispute)</h3>
               <div className="space-y-6 p-8 bg-red-50 rounded-3xl border border-red-100">
