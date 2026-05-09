@@ -100,20 +100,23 @@ export const supabase = createClient(
 // DATABASE TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface DBVerificatorAccount {
-  username:      string;
-  name:          string;
-  wallet:        string;
-  institution:   string;
-  password_hash: string;
-  status:        'pending' | 'approved' | 'rejected';
-  registered_at: string;
+export interface DBProfile {
+  id:                  string;
+  email:               string;
+  full_name:           string | null;
+  wallet_address:      string | null;
+  role:                'BPN_PUSAT' | 'BPN_WILAYAH' | 'NOTARIS' | 'AUDITOR' | 'UMUM';
+  verification_status: string;
+  evidence_url:        string | null;
+  updated_at:          string;
 }
 
 export interface DBAssetMeta {
   asset_id:      number;
   asset_name:    string;
   category:      string;
+  status:        string;
+  valuation:     number;
   owner_email:   string | null;
   owner_wallet:  string;
   document_hash: string;   // SHA-256 hex — HARUS match on-chain documentHash
@@ -130,56 +133,38 @@ export interface DBActivity {
   timestamp:    string;
 }
 
-// Legacy alias
-export type DBUser = {
-  wallet_address: string;
-  display_name:   string | null;
-  email:          string | null;
-  avatar_url:     string | null;
-  created_at:     string;
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 // DATABASE QUERIES
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Verificator accounts ─────────────────────────────────────────────────────
+// ── Profiles ─────────────────────────────────────────────────────────────────
 
-export async function getVerificatorByUsername(
-  username: string
-): Promise<DBVerificatorAccount | null> {
+export async function getProfile(userId: string): Promise<DBProfile | null> {
   if (!SUPABASE_READY) return null;
   const { data } = await supabase
-    .from('verificator_accounts')
+    .from('profiles')
     .select('*')
-    .eq('username', username.toLowerCase())
+    .eq('id', userId)
     .single();
   return data;
 }
 
-export async function upsertVerificatorAccount(account: DBVerificatorAccount) {
-  if (!SUPABASE_READY) return null;
-  return supabase.from('verificator_accounts').upsert(account);
-}
-
-export async function updateVerificatorStatus(
-  username: string,
-  status: 'approved' | 'rejected'
-) {
+export async function updateProfile(userId: string, updates: Partial<DBProfile>) {
   if (!SUPABASE_READY) return null;
   return supabase
-    .from('verificator_accounts')
-    .update({ status })
-    .eq('username', username.toLowerCase());
+    .from('profiles')
+    .update(updates)
+    .eq('id', userId);
 }
 
-export async function getPendingVerificators(): Promise<DBVerificatorAccount[]> {
+export async function getPendingVerificators(): Promise<DBProfile[]> {
   if (!SUPABASE_READY) return [];
   const { data } = await supabase
-    .from('verificator_accounts')
+    .from('profiles')
     .select('*')
-    .eq('status', 'pending')
-    .order('registered_at', { ascending: false });
+    .eq('verification_status', 'PENDING')
+    .in('role', ['NOTARIS', 'AUDITOR'])
+    .order('updated_at', { ascending: false });
   return data || [];
 }
 
@@ -236,13 +221,6 @@ export async function getActivityByAsset(assetId: number): Promise<DBActivity[]>
 
 const BUCKET = 'documents';
 
-/**
- * Upload file dokumen ke Supabase Storage bucket 'documents'.
- * File accessible via URL publik dari browser/komputer MANA SAJA.
- *
- * Path: {sha256hash}/{safe_filename}
- * URL : {SUPABASE_URL}/storage/v1/object/public/documents/{path}
- */
 export async function uploadDocumentToStorage(
   file: File,
   sha256hash: string
@@ -259,10 +237,9 @@ export async function uploadDocumentToStorage(
     .from(BUCKET)
     .upload(path, file, {
       contentType: file.type || 'application/octet-stream',
-      upsert:      false, // hash sama = file sama, skip duplikat
+      upsert:      false, 
     });
 
-  // "already exists" bukan error — hash sama = file pasti sama (SHA-256)
   if (error && !error.message.toLowerCase().includes('already exists')) {
     console.error('[BangBang] Upload failed:', error.message);
     return null;
@@ -273,10 +250,6 @@ export async function uploadDocumentToStorage(
   return { url: data.publicUrl, path };
 }
 
-/**
- * Ambil public URL dari file yang sudah ter-upload.
- * Bisa diakses dari browser/device manapun tanpa login.
- */
 export function getStoragePublicUrl(sha256hash: string, filename: string = 'document'): string {
   if (!SUPABASE_READY || !sha256hash) return '';
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -284,23 +257,4 @@ export function getStoragePublicUrl(sha256hash: string, filename: string = 'docu
     .from(BUCKET)
     .getPublicUrl(`${sha256hash}/${safeName}`);
   return data.publicUrl;
-}
-
-// Legacy query helpers
-export async function getUserByWallet(wallet: string): Promise<DBUser | null> {
-  if (!SUPABASE_READY) return null;
-  const { data } = await supabase
-    .from('users')
-    .select('*')
-    .eq('wallet_address', wallet.toLowerCase())
-    .single();
-  return data;
-}
-
-export async function upsertUser(user: Partial<DBUser> & { wallet_address: string }) {
-  if (!SUPABASE_READY) return null;
-  return supabase.from('users').upsert({
-    ...user,
-    wallet_address: user.wallet_address.toLowerCase(),
-  });
 }
