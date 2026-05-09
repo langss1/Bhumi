@@ -6,9 +6,110 @@ import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 
+// ─── Modal Sertifikat Digital (Template Resmi BPN) ──────────────────────────────
+function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, tokenId: number, owner: string, onClose: () => void }) {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+        className="bg-[#F4F1E1] w-full max-w-[550px] max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm border-[8px] border-white relative print:border-0 custom-scrollbar"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="sticky top-0 right-0 p-4 flex justify-end z-10 print:hidden">
+          <button onClick={onClose} className="w-8 h-8 bg-black/10 hover:bg-black/20 rounded-full flex items-center justify-center transition-colors">
+            <svg className="w-5 h-5 text-moss-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div className="p-8 pt-0 text-moss-900">
+          {/* Header BPN */}
+          <div className="text-center mb-6">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/National_Emblem_of_Indonesia_Garuda_Pancasila.svg/1200px-National_Emblem_of_Indonesia_Garuda_Pancasila.svg.png" className="w-16 mx-auto mb-3" alt="Garuda" />
+            <h2 className="text-[11px] font-black leading-tight uppercase tracking-widest">Kementerian Agraria dan Tata Ruang /</h2>
+            <h2 className="text-[11px] font-black leading-tight uppercase tracking-widest border-b-2 border-moss-900 inline-block pb-1 mb-3">Badan Pertanahan Nasional</h2>
+            <h1 className="text-xl font-black uppercase tracking-[0.2em] mt-3">Sertifikat Tanah Elektronik</h1>
+          </div>
+
+          <div className="space-y-5 text-[12px]">
+            {/* Metadata Utama */}
+            <div className="grid grid-cols-2 border-y border-moss-900/20 py-3">
+              <div>
+                <p className="font-bold text-moss-500 uppercase tracking-tighter text-[9px]">Jenis Hak</p>
+                <p className="text-sm font-black">Hak Milik (HM)</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-moss-500 uppercase tracking-tighter text-[9px]">Nomor Sertifikat (Token ID)</p>
+                <p className="text-sm font-mono font-black">#{tokenId.toString().padStart(5, '0')}</p>
+              </div>
+            </div>
+
+            {/* Data Pemilik */}
+            <div className="space-y-2">
+              <h3 className="font-black border-b border-moss-900/10 pb-1 uppercase tracking-wider text-moss-500 text-[10px]">Data Subjek Hukum (Pemilik Tanah)</h3>
+              <div className="grid grid-cols-[90px_1fr] gap-2">
+                <span className="font-bold text-moss-600">Alamat Wallet</span>
+                <span className="font-mono break-all text-[11px]">{owner}</span>
+              </div>
+              <div className="grid grid-cols-[90px_1fr] gap-2">
+                <span className="font-bold text-moss-600">Status</span>
+                <span className="font-bold text-emerald-700">Terverifikasi di Blockchain</span>
+              </div>
+            </div>
+
+            {/* Data Objek */}
+            <div className="space-y-2 pt-1">
+              <h3 className="font-black border-b border-moss-900/10 pb-1 uppercase tracking-wider text-moss-500 text-[10px]">Data Objek Tanah</h3>
+              <div className="grid grid-cols-[90px_1fr] gap-y-1.5">
+                <span className="font-bold text-moss-600">Nomor NIB</span>
+                <span className="font-black text-sm">{land.nib}</span>
+                
+                <span className="font-bold text-moss-600">Luas</span>
+                <span className="font-bold">{land.area.toString()} m²</span>
+                
+                <span className="font-bold text-moss-600">Koordinat GPS</span>
+                <span className="font-mono">{land.gpsCoordinates}</span>
+              </div>
+            </div>
+
+            {/* Footer Sertifikat */}
+            <div className="pt-6 flex justify-between items-end border-t border-moss-900/10">
+              <div className="text-[9px] space-y-1 max-w-[250px]">
+                <p className="font-bold">Diterbitkan Secara Elektronik oleh:</p>
+                <p className="font-black text-moss-900 uppercase">Sistem Pertanahan Bhumi (Besu IBFT 2.0)</p>
+                <p className="text-moss-500 italic">Dokumen ini merupakan salinan sah yang tersimpan di buku besar blockchain BPN.</p>
+              </div>
+              <div className="text-center">
+                <div className="w-20 h-20 bg-white p-1.5 border border-moss-200 mb-1 mx-auto">
+                  {/* Placeholder QR */}
+                  <div className="w-full h-full bg-moss-900 flex items-center justify-center p-1.5 text-white">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 3h2v2h-2v-2zm3-3h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2z" /></svg>
+                  </div>
+                </div>
+                <p className="text-[8px] font-black uppercase tracking-widest">QR Code Autentikasi</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 flex justify-center print:hidden">
+            <button onClick={() => window.print()} className="px-8 py-3 bg-moss-900 text-white text-xs font-black rounded-xl shadow-lg hover:bg-moss-800 transition-all flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+              CETAK SERTIFIKAT PDF
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ─── Kartu Aset NFT Milik User ─────────────────────────────────────────────────
 function AssetCard({ tokenId }: { tokenId: number }) {
   const { address } = useAccount();
+  const [showCertificate, setShowCertificate] = useState(false);
+  
   const { data: land } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
@@ -40,12 +141,10 @@ function AssetCard({ tokenId }: { tokenId: number }) {
   const { writeContract: proposeTransfer, isPending: isProposing } = useWriteContract();
   const [buyerAddress, setBuyerAddress] = useState('');
   const [showSellForm, setShowSellForm] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
 
   // Hanya tampilkan jika milik user ini
   if (!land || owner?.toLowerCase() !== address?.toLowerCase()) return null;
 
-  // transferReq tuple: [seller, buyer, notaris, sellerApproved, buyerApproved, notarisApproved, isActive]
   const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
 
   const handlePropose = () => {
@@ -61,128 +160,100 @@ function AssetCard({ tokenId }: { tokenId: number }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-moss-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
-    >
-      {/* NFT Header Visual */}
-      <div className="h-28 bg-gradient-to-br from-moss-800 to-moss-900 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-olive-500 rounded-full blur-[60px] opacity-20 -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-moss-400 rounded-full blur-[50px] opacity-20 translate-y-1/2 -translate-x-1/2"></div>
-        <div className="absolute inset-0 flex items-center px-6 gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-            <svg className="w-6 h-6 text-olive-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Sertifikat NFT</p>
-            <p className="text-xl font-black text-white">Token #{tokenId}</p>
-          </div>
-          {land.isDisputed && (
-            <div className="ml-auto">
-              <span className="text-[10px] font-black text-red-400 bg-red-900/50 px-3 py-1.5 rounded-full border border-red-500/30 uppercase">⚠ Sengketa</span>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white border border-moss-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
+      >
+        {/* NFT Header Visual */}
+        <div className="h-28 bg-gradient-to-br from-moss-800 to-moss-900 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-olive-500 rounded-full blur-[60px] opacity-20 -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-moss-400 rounded-full blur-[50px] opacity-20 translate-y-1/2 -translate-x-1/2"></div>
+          <div className="absolute inset-0 flex items-center px-6 gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-olive-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+              </svg>
             </div>
-          )}
-        </div>
-      </div>
-
-      <div className="p-6">
-        <div className="space-y-3 mb-5">
-          <div>
-            <p className="text-[10px] text-moss-400 font-black uppercase tracking-widest">NIB Sertifikat</p>
-            <p className="text-lg font-black text-moss-900">{land.nib}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-moss-50 rounded-xl p-3 border border-moss-100">
-              <p className="text-[9px] text-moss-400 font-black uppercase tracking-widest mb-0.5">Luas</p>
-              <p className="text-sm font-bold text-moss-800">{land.area.toString()} m²</p>
-            </div>
-            <div className="bg-moss-50 rounded-xl p-3 border border-moss-100">
-              <p className="text-[9px] text-moss-400 font-black uppercase tracking-widest mb-0.5">GPS</p>
-              <p className="text-xs font-mono text-moss-800 truncate">{land.gpsCoordinates}</p>
+            <div>
+              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Sertifikat NFT</p>
+              <p className="text-xl font-black text-white">Token #{tokenId}</p>
             </div>
           </div>
-
-          {history && history.length > 1 && (
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-olive-600 bg-olive-50 px-2.5 py-1 rounded-full border border-olive-100">
-                {history.length} Pemilik Sebelumnya
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Dokumen IPFS */}
-        {land.ipfsHashes?.length > 0 && (
-          <div className="mb-5 flex gap-2 flex-wrap">
-            {land.ipfsHashes.map((hash: string, idx: number) => (
-              <a
-                key={idx}
-                href={`https://gateway.pinata.cloud/ipfs/${hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-bold text-olive-600 bg-olive-50 hover:bg-olive-100 px-3 py-1.5 rounded-lg border border-olive-100 transition-colors"
+        <div className="p-6">
+          <div className="space-y-3 mb-5">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] text-moss-400 font-black uppercase tracking-widest">NIB Sertifikat</p>
+                <p className="text-lg font-black text-moss-900">{land.nib}</p>
+              </div>
+              <button 
+                onClick={() => setShowCertificate(true)}
+                className="bg-olive-50 text-olive-700 p-2 rounded-xl border border-olive-100 hover:bg-olive-100 transition-all shadow-sm"
+                title="Lihat Sertifikat Resmi"
               >
-                📄 {idx === 0 ? 'Warkah' : idx === 1 ? 'Foto Patok' : `AJB-${idx - 1}`}
-              </a>
-            ))}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-moss-50 rounded-xl p-3 border border-moss-100">
+                <p className="text-[9px] text-moss-400 font-black uppercase tracking-widest mb-0.5">Luas</p>
+                <p className="text-sm font-bold text-moss-800">{land.area.toString()} m²</p>
+              </div>
+              <div className="bg-moss-50 rounded-xl p-3 border border-moss-100">
+                <p className="text-[9px] text-moss-400 font-black uppercase tracking-widest mb-0.5">GPS</p>
+                <p className="text-xs font-mono text-moss-800 truncate">{land.gpsCoordinates}</p>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Action Area */}
-        {land.isDisputed ? (
-          <div className="p-4 bg-red-50 rounded-2xl border border-red-100 text-center">
-            <p className="text-sm font-bold text-red-600">🚫 Tanah dalam status sengketa.</p>
-            <p className="text-xs text-red-400 mt-1">Transfer diblokir oleh BPN Pusat.</p>
-          </div>
-        ) : hasActiveTransfer ? (
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-            <p className="text-xs font-black text-amber-700 mb-1">⏳ Transfer Sedang Berlangsung</p>
-            <p className="text-[10px] font-mono text-amber-600 truncate">Kepada: {transferReq[1] as string}</p>
-            <p className="text-[10px] text-amber-500 mt-1">Menunggu konfirmasi pembeli & notaris...</p>
-          </div>
-        ) : (
-          <div>
-            <button
-              onClick={() => setShowSellForm(!showSellForm)}
-              className="w-full py-3 bg-moss-900 hover:bg-moss-800 text-white text-xs font-black rounded-2xl transition-colors uppercase tracking-wide"
-            >
-              Ajukan Jual Beli (Propose Transfer)
-            </button>
+          {/* Action Area */}
+          {hasActiveTransfer ? (
+            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+              <p className="text-xs font-black text-amber-700 mb-1 text-center italic">⏳ Transfer Sedang Berlangsung</p>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSellForm(!showSellForm)}
+                className="flex-1 py-3 bg-moss-900 hover:bg-moss-800 text-white text-[11px] font-black rounded-xl transition-colors uppercase tracking-wide"
+              >
+                Ajukan Jual Beli
+              </button>
+            </div>
+          )}
 
-            <AnimatePresence>
-              {showSellForm && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-4 pt-4 border-t border-moss-100 space-y-3">
-                    <input
-                      type="text"
-                      value={buyerAddress}
-                      onChange={(e) => setBuyerAddress(e.target.value)}
-                      placeholder="Alamat Dompet Pembeli (0x...)"
-                      className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono focus:ring-2 focus:ring-olive-500"
-                    />
-                    <button
-                      onClick={handlePropose}
-                      disabled={isProposing}
-                      className="w-full py-3 bg-olive-500 hover:bg-olive-600 text-white text-[11px] font-black rounded-xl uppercase tracking-widest shadow-lg shadow-olive-500/20 transition-all disabled:opacity-50"
-                    >
-                      {isProposing ? 'Memproses...' : '✍️ Kirim Proposal Jual Beli'}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <AnimatePresence>
+            {showSellForm && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                <div className="mt-4 pt-4 border-t border-moss-100 space-y-3">
+                  <input type="text" value={buyerAddress} onChange={(e) => setBuyerAddress(e.target.value)} placeholder="Wallet Pembeli (0x...)" className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono" />
+                  <button onClick={handlePropose} disabled={isProposing} className="w-full py-3 bg-olive-500 text-white text-[11px] font-black rounded-xl uppercase tracking-widest">
+                    {isProposing ? 'Memproses...' : 'Kirim Proposal'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Modal Sertifikat */}
+      <AnimatePresence>
+        {showCertificate && (
+          <DigitalCertificate 
+            land={land} 
+            tokenId={tokenId} 
+            owner={owner || ''} 
+            onClose={() => setShowCertificate(false)} 
+          />
         )}
-      </div>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -316,6 +387,71 @@ function BuyerApprovalPanel() {
   );
 }
 
+// ─── Komponen Pelacakan Status Pendaftaran ─────────────────────────────────────
+function RequestStatusCard({ requestId }: { requestId: number }) {
+  const { data: request } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getRequestDetails',
+    args: [BigInt(requestId)],
+  });
+
+  const { address } = useAccount();
+
+  if (!request || request.to.toLowerCase() !== address?.toLowerCase()) return null;
+
+  const isApproved = request.isProcessed;
+  const isRejected = request.isRejected;
+  const isPending = !isApproved && !isRejected;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="bg-white border border-moss-100 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+    >
+      <div className="flex items-center gap-4">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${
+          isApproved ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 
+          isRejected ? 'bg-red-50 border-red-100 text-red-600' : 
+          'bg-amber-50 border-amber-100 text-amber-600'
+        }`}>
+          {isApproved ? (
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          ) : isRejected ? (
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          ) : (
+            <svg className="w-7 h-7 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          )}
+        </div>
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-black text-moss-400 uppercase tracking-widest">Request #{requestId}</span>
+            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase ${
+              isApproved ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+              isRejected ? 'bg-red-100 text-red-700 border-red-200' :
+              'bg-amber-100 text-amber-700 border-amber-200'
+            }`}>
+              {isApproved ? 'Disetujui' : isRejected ? 'Ditolak' : 'Proses Verifikasi'}
+            </span>
+          </div>
+          <h4 className="text-base font-black text-moss-900">Pendaftaran Tanah NIB: {request.nib}</h4>
+          <p className="text-xs text-moss-500 mt-0.5">Luas: {request.area.toString()} m² • GPS: {request.gpsCoordinates}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-end gap-2">
+        <p className="text-[10px] font-bold text-moss-400 uppercase tracking-wider">Update Terakhir</p>
+        <p className="text-xs font-medium text-moss-700 bg-moss-50 px-3 py-1.5 rounded-lg border border-moss-100 italic">
+          {isApproved ? 'Sertifikat telah dicetak ke Blockchain' : 
+           isRejected ? 'Berkas ditolak oleh BPN Pusat' : 
+           'Menunggu validasi BPN Pusat'}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Main Dashboard User ───────────────────────────────────────────────────────
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
@@ -325,13 +461,22 @@ export default function UserDashboard() {
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getTotalLands',
-    query: { refetchInterval: 8000 },
+    query: { refetchInterval: 5000 },
+  });
+
+  const { data: totalRequests } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getTotalRequests',
+    query: { refetchInterval: 5000 },
   });
 
   const total = Number(totalLands || 0);
+  const totalReq = Number(totalRequests || 0);
 
   const tabs = [
     { id: 'gallery', label: '🏡 Galeri Aset Saya' },
+    { id: 'tracking', label: '⏳ Pelacakan Status' },
     { id: 'transfer', label: '🤝 Konfirmasi Pembelian' },
   ];
 
@@ -346,7 +491,7 @@ export default function UserDashboard() {
         </div>
         <div>
           <p className="font-black text-moss-900">Masyarakat Pemilik Tanah</p>
-          <p className="text-xs text-moss-500 mt-0.5">Read-Only (lihat aset) + Write terbatas (ajukan/setujui transfer kepemilikan)</p>
+          <p className="text-xs text-moss-500 mt-0.5">Kelola aset tanah digital Anda secara langsung dan aman</p>
         </div>
         {address && (
           <div className="ml-auto text-right hidden sm:block">
@@ -398,6 +543,27 @@ export default function UserDashboard() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} />)}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === 'tracking' && (
+            <motion.div key="tracking" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div className="mb-10">
+                <h3 className="text-2xl font-black text-moss-900">Pelacakan Status Berkas</h3>
+                <p className="text-sm text-moss-500 mt-2">
+                  Pantau status verifikasi pendaftaran tanah Anda yang diajukan oleh BPN Wilayah ke BPN Pusat.
+                </p>
+              </div>
+
+              {totalReq === 0 ? (
+                <div className="p-12 text-center bg-moss-50/50 border border-dashed border-moss-200 rounded-3xl">
+                  <p className="text-moss-400 font-bold italic">Belum ada pengajuan pendaftaran untuk dompet ini.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {[...Array(totalReq)].map((_, i) => <RequestStatusCard key={i} requestId={i} />)}
                 </div>
               )}
             </motion.div>
