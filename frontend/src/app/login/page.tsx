@@ -183,7 +183,7 @@ export default function LoginPage() {
               onClick={() => { setLoginMethod('traditional'); setError(''); }}
               className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginMethod === 'traditional' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
             >
-              Username
+              Email & Password
             </button>
             <button
               onClick={() => { setLoginMethod('web3'); setError(''); }}
