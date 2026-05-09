@@ -3,9 +3,9 @@ import "@nomicfoundation/hardhat-toolbox";
 /** @type import('hardhat/config').HardhatUserConfig */
 export default {
   solidity: {
-    version: "0.8.24",
+    version: "0.8.19",
     settings: {
-      evmVersion: "cancun",
+      evmVersion: "paris",
       optimizer: {
         enabled: true,
         runs: 200,
@@ -31,8 +31,8 @@ export default {
     // di alloc genesis.json
     besu: {
       url: "http://127.0.0.1:8545",
-      chainId: 1337,
-      gasPrice: 1000000000,
+      chainId: 31337,
+      gasPrice: 0,
       accounts: [
         // Hardhat Test Account #0 — sudah pre-funded di genesis.json oleh 0_SETUP_LAPTOP1.ps1
         // Address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266

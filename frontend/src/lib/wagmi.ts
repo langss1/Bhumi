@@ -30,7 +30,7 @@ const RPC_URL =
 
 // ─── Bhumi Besu IBFT 2.0 Network (Chain ID: 1337) ────────────────────────────
 export const localIBFT = defineChain({
-  id: 1337,
+  id: 31337,
   name: 'Bhumi Besu Network',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {

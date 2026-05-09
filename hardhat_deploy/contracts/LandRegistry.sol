@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -10,13 +10,14 @@ contract LandRegistry is ERC721, AccessControl {
     bytes32 public constant NOTARIS_ROLE = keccak256("NOTARIS_ROLE");
     bytes32 public constant AUDITOR_ROLE = keccak256("AUDITOR_ROLE");
 
-    uint256 private _nextTokenId;
+    uint256 private _tokenIdCounter;
+    uint256 private _requestIdCounter;
 
     struct Land {
         string gpsCoordinates;
         uint256 area;
         string nib;
-        string[] ipfsHashes; // Index 0: Warkah, 1: Foto Batas, 2+ : AJB
+        string[] ipfsHashes;
         bool isDisputed;
     }
 
@@ -40,13 +41,9 @@ contract LandRegistry is ERC721, AccessControl {
         bool isRejected;
     }
 
-    uint256 private _nextRequestId;
     mapping(uint256 => LandRequest) public landRequests;
-
     mapping(uint256 => Land) public lands;
     mapping(uint256 => TransferRequest) public transferRequests;
-    
-    // Track ownership history for traceability
     mapping(uint256 => address[]) public ownershipHistory;
 
     event AssetMinted(uint256 indexed tokenId, address indexed owner, string nib);
@@ -72,7 +69,7 @@ contract LandRegistry is ERC721, AccessControl {
         string memory nib,
         string[] memory ipfsHashes
     ) external onlyRole(BPN_WILAYAH_ROLE) {
-        uint256 requestId = _nextRequestId++;
+        uint256 requestId = _requestIdCounter++;
         
         landRequests[requestId] = LandRequest({
             to: to,
@@ -92,7 +89,7 @@ contract LandRegistry is ERC721, AccessControl {
         require(!req.isProcessed, "Request already processed");
         require(!req.isRejected, "Request already rejected");
 
-        uint256 tokenId = _nextTokenId++;
+        uint256 tokenId = _tokenIdCounter++;
         
         lands[tokenId] = Land({
             gpsCoordinates: req.gpsCoordinates,
@@ -125,10 +122,9 @@ contract LandRegistry is ERC721, AccessControl {
         string memory gpsCoordinates,
         uint256 area,
         string memory nib,
-        string[] memory ipfsHashes // Warkah, Foto batas, etc
+        string[] memory ipfsHashes
     ) external onlyRole(BPN_WILAYAH_ROLE) {
-        // Keep this for backward compatibility if needed, or remove to force approval flow
-        uint256 tokenId = _nextTokenId++;
+        uint256 tokenId = _tokenIdCounter++;
         
         lands[tokenId] = Land({
             gpsCoordinates: gpsCoordinates,
@@ -181,12 +177,9 @@ contract LandRegistry is ERC721, AccessControl {
         req.notaris = msg.sender;
         req.notarisApproved = true;
         
-        // Add AJB hash to land records
         lands[tokenId].ipfsHashes.push(ajbIpfsHash);
         
         emit NotarisApproved(tokenId, msg.sender, ajbIpfsHash);
-
-        // Execute transfer
         _executeTransfer(tokenId);
     }
 
@@ -218,8 +211,6 @@ contract LandRegistry is ERC721, AccessControl {
         emit EnforcementStatusChanged(tokenId, isDisputed);
     }
 
-    // Overrides required by Solidity
-
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -238,20 +229,19 @@ contract LandRegistry is ERC721, AccessControl {
     }
 
     function getTotalLands() external view returns (uint256) {
-        return _nextTokenId;
+        return _tokenIdCounter;
     }
 
     function getTotalRequests() external view returns (uint256) {
-        return _nextRequestId;
+        return _requestIdCounter;
     }
 
     function getRequestDetails(uint256 requestId) external view returns (LandRequest memory) {
         return landRequests[requestId];
     }
 
-    // ─── Helper: Ambil semua tokenId yang dimiliki address tertentu ─────────────
     function getTokensByOwner(address owner) external view returns (uint256[] memory) {
-        uint256 total = _nextTokenId;
+        uint256 total = _tokenIdCounter;
         uint256 count = 0;
         for (uint256 i = 0; i < total; i++) {
             try this.ownerOf(i) returns (address tokenOwner) {
@@ -270,9 +260,8 @@ contract LandRegistry is ERC721, AccessControl {
         return result;
     }
 
-    // ─── Helper: Cari tokenId berdasarkan NIB (untuk Auditor forensik) ──────────
     function getTokenByNIB(string memory nib) external view returns (uint256 tokenId, bool found) {
-        uint256 total = _nextTokenId;
+        uint256 total = _tokenIdCounter;
         for (uint256 i = 0; i < total; i++) {
             if (keccak256(bytes(lands[i].nib)) == keccak256(bytes(nib))) {
                 return (i, true);
@@ -281,7 +270,6 @@ contract LandRegistry is ERC721, AccessControl {
         return (0, false);
     }
 
-    // ─── Helper: Status transfer ringkas untuk frontend ─────────────────────────
     function getTransferStatus(uint256 tokenId) external view returns (
         bool isActive,
         address seller,
