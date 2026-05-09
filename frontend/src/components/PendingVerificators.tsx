@@ -35,7 +35,12 @@ export default function PendingVerificators() {
         .neq('role', 'UMUM');
       
       console.log("Debug Pending Data:", data);
-      if (error) console.error("Supabase Error:", error);
+      if (error) {
+        console.error("Supabase Error Message:", error.message);
+        console.error("Supabase Error Details:", error.details);
+        console.error("Supabase Error Hint:", error.hint);
+        alert("Database Error: " + error.message);
+      }
       
       setPendingAccounts(data || []);
     } catch (err) {
