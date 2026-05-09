@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
-      <body className={`${inter.className} bg-gray-50`}>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${inter.className} bg-gray-50`} suppressHydrationWarning>
         {/* Web3Provider: WagmiProvider + QueryClientProvider */}
         <Web3Provider>
           {children}

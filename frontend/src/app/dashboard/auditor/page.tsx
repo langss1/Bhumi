@@ -2,31 +2,29 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useReadContract } from 'wagmi';
+import { useReadContract, usePublicClient } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
 
-// ─── Komponen Detail Token (Provenance) ────────────────────────────────────────
-function TokenProvenance({ tokenId }: { tokenId: number }) {
-  const { data: land, isLoading: isLandLoading } = useReadContract({
+// ─── Tipe data hasil pencarian ────────────────────────────────────────────────
+interface LandDetail {
+  tokenId: number;
+  nib: string;
+  gpsCoordinates: string;
+  area: bigint;
+  ipfsHashes: string[];
+  isDisputed: boolean;
+  owner: string;
+  ownershipHistory: string[];
+}
+
+// ─── Komponen cek sengketa per aset ───────────────────────────────────────────
+function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
+  const { data: land } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
-    args: [BigInt(tokenId)],
-  });
-
-  const { data: history, isLoading: isHistoryLoading } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'getOwnershipHistory',
-    args: [BigInt(tokenId)],
-  });
-
-  const { data: currentOwner } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'ownerOf',
     args: [BigInt(tokenId)],
   });
 
@@ -37,168 +35,374 @@ function TokenProvenance({ tokenId }: { tokenId: number }) {
     args: [BigInt(tokenId)],
   });
 
-  if (isLandLoading || isHistoryLoading) {
-    return (
-      <div className="p-10 text-center text-moss-500 animate-pulse">
-        Memuat data aset dari blockchain...
-      </div>
-    );
-  }
+  if (!land || !land.nib) return null;
 
-  if (!land || !land.nib) {
-    return (
-      <div className="p-8 text-center bg-red-50 rounded-2xl border border-red-100">
-        <p className="text-sm font-bold text-red-600">Token #{tokenId} tidak ditemukan di blockchain.</p>
-      </div>
-    );
-  }
-
+  const isDisputed = land.isDisputed;
   const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
+
+  // Hanya tampilkan yang bermasalah
+  if (!isDisputed && !hasActiveTransfer) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={`p-6 rounded-3xl border-2 ${isDisputed ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-xs font-black text-moss-400 uppercase tracking-widest">Token #{tokenId}</p>
+          <p className="font-black text-moss-900">NIB: {land.nib}</p>
+        </div>
+        {isDisputed && (
+          <span className="text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
+        )}
+        {hasActiveTransfer && !isDisputed && (
+          <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
+        )}
+      </div>
+      <p className="text-xs text-moss-600">Luas: {land.area.toString()} m² | GPS: {land.gpsCoordinates}</p>
+    </motion.div>
+  );
+}
+
+// ─── Kartu hasil pencarian ────────────────────────────────────────────────────
+function LandResultCard({ land }: { land: LandDetail }) {
+  const [showHistory, setShowHistory] = useState(false);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className={`bg-white border rounded-[2rem] shadow-sm overflow-hidden ${
+        land.isDisputed ? 'border-red-200 border-l-[6px] border-l-red-500' : 'border-moss-100'
+      }`}
     >
-      {/* Header Token */}
-      <div className="bg-white border border-moss-100 rounded-3xl overflow-hidden shadow-sm">
-        <div className="h-20 bg-gradient-to-r from-moss-900 to-moss-800 relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center px-8 gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-olive-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">NFT Token #{tokenId}</p>
-              <p className="text-lg font-black text-white">NIB: {land.nib}</p>
-            </div>
-            <div className="ml-auto flex gap-2">
-              {land.isDisputed && (
-                <span className="text-[10px] font-black text-red-400 bg-red-900/50 px-3 py-1 rounded-full border border-red-500/30 uppercase">⚠ Sengketa</span>
-              )}
-              {hasActiveTransfer && (
-                <span className="text-[10px] font-black text-amber-400 bg-amber-900/50 px-3 py-1 rounded-full border border-amber-500/30 uppercase">⏳ Transfer Aktif</span>
-              )}
-            </div>
+      {/* Header kartu */}
+      <div className="px-10 py-6 border-b border-moss-50 bg-[#F9FAF8] flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-4">
+          <div className="bg-moss-100 border border-moss-200 text-moss-900 font-black text-xs px-3 py-1.5 rounded-lg uppercase tracking-wider">
+            NFT Token #{land.tokenId}
           </div>
+          {land.isDisputed ? (
+            <span className="text-[10px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 uppercase tracking-wider">
+              ⚠ Sengketa Aktif
+            </span>
+          ) : (
+            <span className="text-[10px] font-black text-olive-700 bg-olive-50 px-3 py-1 rounded-full border border-olive-100 uppercase tracking-wider">
+              ✓ Terverifikasi
+            </span>
+          )}
         </div>
-
-        {/* Data Aset */}
-        <div className="p-8 grid grid-cols-3 gap-6">
-          <div>
-            <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan</p>
-            <p className="text-xl font-black text-moss-900">{land.area.toString()} <span className="text-sm font-bold text-moss-500">m²</span></p>
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Koordinat GPS</p>
-            <p className="text-sm font-bold font-mono text-moss-800">{land.gpsCoordinates}</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Pemilik Saat Ini</p>
-            <p className="text-xs font-mono text-moss-700 truncate">{currentOwner as string}</p>
-          </div>
-        </div>
+        <span className="text-[11px] font-bold text-moss-400 uppercase tracking-widest">
+          LandRegistry On-Chain
+        </span>
       </div>
 
-      {/* Ownership Provenance Chain */}
-      <div className="bg-white border border-moss-100 rounded-3xl p-8 shadow-sm">
-        <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-          <svg className="w-4 h-4 text-olive-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Silsilah Kepemilikan (Provenance Chain)
-        </h4>
+      {/* Body kartu */}
+      <div className="px-10 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div>
+          <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest mb-1">NIB Sertifikat</p>
+          <p className="text-lg font-black text-moss-900 font-mono">{land.nib}</p>
+        </div>
+        <div>
+          <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest mb-1">Koordinat GPS</p>
+          <p className="text-sm font-bold text-moss-700 font-mono">{land.gpsCoordinates}</p>
+        </div>
+        <div>
+          <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest mb-1">Luas Area</p>
+          <p className="text-sm font-bold text-moss-700">{land.area.toString()} m²</p>
+        </div>
+        <div className="lg:col-span-3">
+          <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest mb-1">Pemilik Saat Ini</p>
+          <p className="text-sm font-mono text-moss-800 bg-moss-50 border border-moss-100 px-4 py-2 rounded-lg break-all">
+            {land.owner}
+          </p>
+        </div>
 
-        {history && history.length > 0 ? (
-          <div className="space-y-3">
-            {(history as string[]).map((owner, idx) => (
-              <div key={idx} className="flex items-center gap-4">
-                <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 ${
-                    idx === 0
-                      ? 'bg-olive-100 border-olive-400 text-olive-700'
-                      : idx === (history as string[]).length - 1
-                      ? 'bg-moss-100 border-moss-400 text-moss-700'
-                      : 'bg-white border-moss-200 text-moss-500'
-                  }`}>
-                    {idx + 1}
-                  </div>
-                  {idx < (history as string[]).length - 1 && (
-                    <div className="w-px h-6 bg-moss-200 mt-1"></div>
-                  )}
-                </div>
-                <div className={`flex-1 p-4 rounded-2xl border ${
-                  idx === 0
-                    ? 'bg-olive-50 border-olive-100'
-                    : idx === (history as string[]).length - 1
-                    ? 'bg-moss-50 border-moss-200'
-                    : 'bg-white border-moss-100'
-                }`}>
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs font-mono text-moss-700 truncate max-w-[300px]">{owner}</p>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                      idx === 0
-                        ? 'bg-olive-100 text-olive-700'
-                        : idx === (history as string[]).length - 1
-                        ? 'bg-moss-100 text-moss-700'
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {idx === 0 ? 'Pemilik Pertama' : idx === (history as string[]).length - 1 ? 'Pemilik Sekarang' : `Transfer ke-${idx}`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Dokumen IPFS */}
+        {land.ipfsHashes.length > 0 && (
+          <div className="lg:col-span-3">
+            <p className="text-[10px] text-moss-400 font-bold uppercase tracking-widest mb-3">
+              Dokumen IPFS ({land.ipfsHashes.length} berkas)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {land.ipfsHashes.map((hash, idx) => (
+                <a
+                  key={idx}
+                  href={`https://gateway.pinata.cloud/ipfs/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-[11px] font-mono bg-olive-50 border border-olive-100 text-olive-700 px-3 py-1.5 rounded-lg hover:bg-olive-100 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  {idx === 0 ? 'Warkah' : idx === 1 ? 'Foto Batas' : `AJB #${idx - 1}`}
+                </a>
+              ))}
+            </div>
           </div>
-        ) : (
-          <p className="text-sm text-moss-400 italic">Riwayat kepemilikan tidak tersedia.</p>
         )}
       </div>
 
-      {/* Dokumen IPFS */}
-      {land.ipfsHashes?.length > 0 && (
-        <div className="bg-white border border-moss-100 rounded-3xl p-8 shadow-sm">
-          <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <svg className="w-4 h-4 text-olive-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      {/* Riwayat Kepemilikan */}
+      {land.ownershipHistory.length > 0 && (
+        <div className="px-10 pb-8">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center gap-2 text-[11px] font-bold text-moss-500 uppercase tracking-widest hover:text-moss-800 transition-colors"
+          >
+            <svg
+              className={`w-4 h-4 transition-transform ${showHistory ? 'rotate-90' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            Dokumen On-Chain (IPFS)
-          </h4>
-          <div className="flex flex-wrap gap-3">
-            {(land.ipfsHashes as string[]).map((hash, idx) => (
-              <a
-                key={idx}
-                href={`https://gateway.pinata.cloud/ipfs/${hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-3 bg-moss-50 hover:bg-olive-50 border border-moss-200 hover:border-olive-300 rounded-xl transition-all group"
+            Riwayat Kepemilikan ({land.ownershipHistory.length} entri)
+          </button>
+
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
               >
-                <svg className="w-4 h-4 text-moss-400 group-hover:text-olive-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <div>
-                  <p className="text-xs font-bold text-moss-800 group-hover:text-olive-700 transition-colors">
-                    {idx === 0 ? 'Warkah / Surat Ukur' : idx === 1 ? 'Foto Batas Patok' : `AJB Balik Nama ke-${idx - 1}`}
-                  </p>
-                  <p className="text-[9px] font-mono text-moss-400 truncate max-w-[150px]">{hash}</p>
+                <div className="mt-4 border border-moss-100 rounded-2xl overflow-hidden">
+                  {land.ownershipHistory.map((addr, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-4 px-6 py-4 ${
+                        idx < land.ownershipHistory.length - 1 ? 'border-b border-moss-50' : ''
+                      } ${idx === land.ownershipHistory.length - 1 ? 'bg-olive-50/50' : 'bg-white'}`}
+                    >
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                          idx === land.ownershipHistory.length - 1
+                            ? 'bg-olive-500 text-white'
+                            : 'bg-moss-100 text-moss-700'
+                        }`}
+                      >
+                        {idx + 1}
+                      </div>
+                      <p className="text-xs font-mono text-moss-700 break-all">{addr}</p>
+                      {idx === land.ownershipHistory.length - 1 && (
+                        <span className="text-[9px] font-black text-olive-700 bg-olive-100 px-2 py-0.5 rounded uppercase tracking-wider shrink-0">
+                          Pemilik Kini
+                        </span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </a>
-            ))}
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </motion.div>
   );
 }
 
+// ─── Komponen Pencarian Forensik ──────────────────────────────────────────────
+function ForensikSearch() {
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [results, setResults] = useState<LandDetail[]>([]);
+  const [searched, setSearched] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const publicClient = usePublicClient();
+
+  const { data: totalLands } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getTotalLands',
+  });
+
+  const handleSearch = async () => {
+    const q = query.trim();
+    if (!q) return;
+    if (!publicClient) {
+      setErrorMsg('Tidak dapat terhubung ke jaringan blockchain.');
+      return;
+    }
+
+    setIsSearching(true);
+    setSearched(false);
+    setResults([]);
+    setErrorMsg('');
+
+    try {
+      const total = Number(totalLands || 0);
+      if (total === 0) {
+        setSearched(true);
+        setIsSearching(false);
+        return;
+      }
+
+      const found: LandDetail[] = [];
+
+      for (let i = 0; i < total; i++) {
+        const isTokenIdMatch = q === String(i);
+
+        const land = await publicClient.readContract({
+          address: LAND_REGISTRY_ADDRESS,
+          abi: LandRegistryABI,
+          functionName: 'getLandDetails',
+          args: [BigInt(i)],
+        }) as any;
+
+        if (!land) continue;
+
+        const nibMatch = land.nib?.toLowerCase().includes(q.toLowerCase());
+
+        if (isTokenIdMatch || nibMatch) {
+          const owner = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'ownerOf',
+            args: [BigInt(i)],
+          }) as string;
+
+          const history = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'getOwnershipHistory',
+            args: [BigInt(i)],
+          }) as string[];
+
+          found.push({
+            tokenId: i,
+            nib: land.nib,
+            gpsCoordinates: land.gpsCoordinates,
+            area: land.area,
+            ipfsHashes: Array.from(land.ipfsHashes || []),
+            isDisputed: land.isDisputed,
+            owner,
+            ownershipHistory: Array.from(history || []),
+          });
+        }
+      }
+
+      setResults(found);
+    } catch (err: any) {
+      setErrorMsg(
+        'Gagal menghubungi blockchain: ' + (err.shortMessage || err.message || String(err))
+      );
+    } finally {
+      setIsSearching(false);
+      setSearched(true);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Search Box */}
+      <div className="bg-white border border-moss-100 p-10 rounded-[2rem] shadow-sm">
+        <h3 className="text-2xl font-black text-moss-900 mb-2">Pencarian Forensik</h3>
+        <p className="text-sm text-moss-500 mb-8">
+          Cari berdasarkan <span className="font-bold text-moss-700">NIB</span> atau <span className="font-bold text-moss-700">ID Token NFT</span>. Sistem akan memindai seluruh ledger blockchain ({Number(totalLands || 0)} token).
+        </p>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !isSearching && handleSearch()}
+            placeholder="Masukkan NIB (contoh: 12345) atau Token ID (contoh: 0)..."
+            className="flex-1 p-5 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-olive-500 focus:border-olive-400 outline-none transition-all"
+          />
+          <button
+            onClick={handleSearch}
+            disabled={isSearching || !query.trim()}
+            className="px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 disabled:opacity-50 transition-all flex items-center gap-3 min-w-[200px] justify-center"
+          >
+            {isSearching ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Memindai...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Cari di Blockchain
+              </>
+            )}
+          </button>
+        </div>
+
+        {errorMsg && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium">
+            ⚠ {errorMsg}
+          </div>
+        )}
+      </div>
+
+      {/* Scanning progress indicator */}
+      {isSearching && (
+        <div className="bg-olive-50 border border-olive-100 p-6 rounded-2xl flex items-center gap-4">
+          <svg className="animate-spin w-5 h-5 text-olive-600 shrink-0" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <div>
+            <p className="text-sm font-bold text-olive-800">
+              Memindai {Number(totalLands || 0)} token di Ledger Blockchain...
+            </p>
+            <p className="text-xs text-olive-600 mt-0.5">
+              Membaca data langsung dari node. Mohon tunggu.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Hasil pencarian */}
+      {searched && !isSearching && (
+        <AnimatePresence>
+          {results.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white border border-moss-100 p-16 rounded-[2rem] text-center"
+            >
+              <div className="w-16 h-16 bg-moss-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-moss-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-moss-600 font-bold text-lg">Tidak ditemukan</p>
+              <p className="text-moss-400 text-sm mt-1">
+                Tidak ada aset dengan NIB atau Token ID <span className="font-mono font-bold">"{query}"</span> di blockchain.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <p className="text-sm font-bold text-moss-500 px-1">
+                Ditemukan <span className="text-olive-700">{results.length}</span> hasil untuk "<span className="font-mono">{query}</span>"
+              </p>
+              {results.map((land) => (
+                <LandResultCard key={land.tokenId} land={land} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Auditor Dashboard ────────────────────────────────────────────────────
 export default function AuditorDashboard() {
   const [activeTab, setActiveTab] = useState('ledger');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchTokenId, setSearchTokenId] = useState<number | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -207,19 +411,6 @@ export default function AuditorDashboard() {
   });
 
   const total = Number(totalLands || 0);
-
-  // Saat search by NIB: kita scan semua token dan cocokkan
-  const handleSearch = () => {
-    const num = parseInt(searchQuery);
-    if (!isNaN(num) && num >= 0) {
-      // Jika input adalah angka -> treat as token ID
-      setSearchTokenId(num);
-    } else {
-      alert('Masukkan Token ID (angka). Pencarian by NIB akan menampilkan semua token.');
-      setSearchTokenId(null);
-    }
-    setIsSearching(true);
-  };
 
   const tabs = [
     { id: 'ledger', label: '📊 Monitoring Ledger' },
@@ -269,7 +460,6 @@ export default function AuditorDashboard() {
 
       <div className="flex-1">
         <AnimatePresence mode="wait">
-          {/* ── Tab 1: Master Ledger ── */}
           {activeTab === 'ledger' && (
             <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="mb-8">
@@ -282,50 +472,12 @@ export default function AuditorDashboard() {
             </motion.div>
           )}
 
-          {/* ── Tab 2: Forensik Silsilah ── */}
           {activeTab === 'search' && (
             <motion.div key="search" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-8">
-                <h3 className="text-2xl font-black text-moss-900">Forensik Silsilah Aset</h3>
-                <p className="text-sm text-moss-500 mt-2">
-                  Lacak provenance lengkap: "Tanah ini dicetak → dimiliki oleh → dipindahtangankan ke..." secara immutable.
-                </p>
-              </div>
-
-              <div className="bg-white border border-moss-100 p-8 rounded-[2rem] shadow-sm mb-8">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-[11px] font-black text-moss-400 uppercase tracking-widest mb-2">Token ID</label>
-                    <input
-                      type="number"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                      placeholder="Masukkan Token ID (0, 1, 2, ...)"
-                      className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-slate-500 transition-all"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      onClick={handleSearch}
-                      className="px-10 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-all text-sm"
-                    >
-                      🔍 Lacak
-                    </button>
-                  </div>
-                </div>
-                <p className="text-[10px] text-moss-400 mt-3">
-                  Tip: Total {total} token telah terdaftar (ID: 0 sampai {total - 1})
-                </p>
-              </div>
-
-              {isSearching && searchTokenId !== null && (
-                <TokenProvenance tokenId={searchTokenId} />
-              )}
+              <ForensikSearch />
             </motion.div>
           )}
 
-          {/* ── Tab 3: Deteksi Anomali ── */}
           {activeTab === 'anomaly' && (
             <motion.div key="anomaly" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <div className="mb-8">
@@ -336,7 +488,6 @@ export default function AuditorDashboard() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Scan disputed assets */}
                 {[...Array(total)].map((_, i) => (
                   <DisputedAssetChecker key={i} tokenId={i} />
                 ))}
@@ -351,52 +502,5 @@ export default function AuditorDashboard() {
         </AnimatePresence>
       </div>
     </div>
-  );
-}
-
-// ─── Komponen cek sengketa per aset ───────────────────────────────────────────
-function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
-  const { data: land } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'getLandDetails',
-    args: [BigInt(tokenId)],
-  });
-
-  const { data: transferReq } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'transferRequests',
-    args: [BigInt(tokenId)],
-  });
-
-  if (!land || !land.nib) return null;
-
-  const isDisputed = land.isDisputed;
-  const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
-
-  // Hanya tampilkan yang bermasalah
-  if (!isDisputed && !hasActiveTransfer) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={`p-6 rounded-3xl border-2 ${isDisputed ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-xs font-black text-moss-400 uppercase tracking-widest">Token #{tokenId}</p>
-          <p className="font-black text-moss-900">NIB: {land.nib}</p>
-        </div>
-        {isDisputed && (
-          <span className="text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
-        )}
-        {hasActiveTransfer && !isDisputed && (
-          <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
-        )}
-      </div>
-      <p className="text-xs text-moss-600">Luas: {land.area.toString()} m² | GPS: {land.gpsCoordinates}</p>
-    </motion.div>
   );
 }
