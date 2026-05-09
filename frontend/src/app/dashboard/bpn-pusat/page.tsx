@@ -88,6 +88,7 @@ export default function BpnPusatDashboard() {
               <LandLedger />
             </motion.div>
           )}
+          {activeTab === 'sengketa' && (
             <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl">
               <h3 className="text-2xl font-black text-moss-900 mb-6">Pembekuan Aset (Dispute)</h3>
               <div className="space-y-6 p-8 bg-red-50 rounded-3xl border border-red-100">
