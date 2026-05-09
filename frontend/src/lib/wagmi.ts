@@ -1,13 +1,19 @@
 /**
  * Wagmi v2 + Viem configuration for BPN Land Registry
  *
- * ─── Konfigurasi RPC ──────────────────────────────────────────────────────────
- * Set NEXT_PUBLIC_RPC_URL di .env.local sesuai kondisi:
+ * ─── Konfigurasi RPC (Hyperledger Besu IBFT 2.0) ─────────────────────────────
+ * Set NEXT_PUBLIC_RPC_URL di .env.local sesuai laptop:
  *
- *   Mode Testing Lokal  : NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
- *   Mode Presentasi LAN : NEXT_PUBLIC_RPC_URL=http://10.223.153.80:8545
+ *   Laptop 1 (BPN Pusat)    : NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
+ *   Laptop 2 (BPN Wilayah A): NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
+ *   Laptop 3 (BPN Wilayah B): NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
  *
- * Default: http://127.0.0.1:8545 (localhost Hardhat)
+ * Setiap laptop konek ke NODE LOKAL SENDIRI (localhost)!
+ * Ini adalah inti dari decentralisasi — tiap laptop punya salinan blockchain.
+ * Jika laptop dimatikan, laptop lain tetap punya data via node mereka sendiri.
+ *
+ * Fallback ke Laptop 1 ZeroTier jika tidak ada .env.local:
+ *   NEXT_PUBLIC_RPC_URL_FALLBACK=http://10.223.153.80:8545
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -15,19 +21,24 @@ import { createConfig, http } from 'wagmi';
 import { defineChain } from 'viem';
 import { injected } from 'wagmi/connectors';
 
-// Ambil RPC URL dari env atau default ke localhost
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
+// Setiap laptop set ke localhost agar konek ke node Besu lokal sendiri.
+// Fallback ke ZeroTier Laptop 1 jika tidak ada .env.local
+const RPC_URL =
+  process.env.NEXT_PUBLIC_RPC_URL ||
+  process.env.NEXT_PUBLIC_RPC_URL_FALLBACK ||
+  'http://127.0.0.1:8545';
 
+// ─── Bhumi Besu IBFT 2.0 Network (Chain ID: 1337) ────────────────────────────
 export const localIBFT = defineChain({
-  id: 31337,
-  name: 'BPN Local Network',
+  id: 1337,
+  name: 'Bhumi Besu Network',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
     default: { http: [RPC_URL] },
     public: { http: [RPC_URL] },
   },
   blockExplorers: {
-    default: { name: 'BPN Explorer', url: RPC_URL.replace(':8545', ':4000') },
+    default: { name: 'Bhumi Explorer', url: RPC_URL.replace(':8545', ':4000') },
   },
 });
 

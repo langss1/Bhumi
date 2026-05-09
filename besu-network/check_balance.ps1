@@ -1,0 +1,3 @@
+$body = '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", "latest"],"id":1}'
+$resp = Invoke-RestMethod -Uri "http://localhost:8545" -Method POST -Body $body -ContentType "application/json"
+$resp | ConvertTo-Json

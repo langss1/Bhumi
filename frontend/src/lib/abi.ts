@@ -792,6 +792,49 @@ export const LandRegistryABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "nib",
+        "type": "string"
+      }
+    ],
+    "name": "getTokenByNIB",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "found",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "getTokensByOwner",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getTotalLands",
     "outputs": [
@@ -812,6 +855,50 @@ export const LandRegistryABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTransferStatus",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "buyer",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "sellerApproved",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "buyerApproved",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "notarisApproved",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1359,36 +1446,5 @@ export const LandRegistryABI = [
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
-    "name": "getTokensByOwner",
-    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "string", "name": "nib", "type": "string" }],
-    "name": "getTokenByNIB",
-    "outputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "bool", "name": "found", "type": "bool" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "getTransferStatus",
-    "outputs": [
-      { "internalType": "bool", "name": "isActive", "type": "bool" },
-      { "internalType": "address", "name": "seller", "type": "address" },
-      { "internalType": "address", "name": "buyer", "type": "address" },
-      { "internalType": "bool", "name": "sellerApproved", "type": "bool" },
-      { "internalType": "bool", "name": "buyerApproved", "type": "bool" },
-      { "internalType": "bool", "name": "notarisApproved", "type": "bool" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   }
-];
+] as const;
