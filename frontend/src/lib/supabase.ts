@@ -78,17 +78,21 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  || '';
-const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()  || '';
+const SUPABASE_ANON = (process.env.NEXT_PUBLIC_SUPABASE_ANON || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)?.trim() || '';
 
 export const SUPABASE_READY = !!(SUPABASE_URL && SUPABASE_ANON && !SUPABASE_URL.includes('your-project'));
 
-if (!SUPABASE_READY && typeof window !== 'undefined') {
-  console.warn(
-    '[BangBang] Supabase belum dikonfigurasi.\n' +
-    'Set NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON di .env.local\n' +
-    'Buat project gratis di https://app.supabase.com'
-  );
+if (typeof window !== 'undefined') {
+  console.log('[Bhumi Debug] URL:', SUPABASE_URL ? 'Loaded ✅' : 'MISSING ❌');
+  console.log('[Bhumi Debug] Key:', SUPABASE_ANON ? 'Loaded ✅' : 'MISSING ❌');
+  
+  if (!SUPABASE_READY) {
+    console.warn(
+      '[Bhumi] Supabase belum dikonfigurasi dengan benar.\n' +
+      'Pastikan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di .env.local sudah benar.'
+    );
+  }
 }
 
 export const supabase = createClient(

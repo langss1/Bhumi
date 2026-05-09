@@ -27,8 +27,20 @@ export default function PendingVerificators() {
 
   const fetchPending = async () => {
     setLoading(true);
-    const data = await getPendingVerificators();
-    setPendingAccounts(data);
+    try {
+      const { data, error } = await (await import('@/lib/supabase')).supabase
+        .from('profiles')
+        .select('*')
+        .eq('verification_status', 'PENDING')
+        .neq('role', 'UMUM');
+      
+      console.log("Debug Pending Data:", data);
+      if (error) console.error("Supabase Error:", error);
+      
+      setPendingAccounts(data || []);
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    }
     setLoading(false);
   };
 
