@@ -106,20 +106,37 @@ export default function PendingVerificators() {
   const handleFinalizeApproval = async (userId: string) => {
     // 2. Transaksi blockchain sukses, update database off-chain
     try {
-      await updateProfile(userId, { verification_status: 'APPROVED' });
+      const { error } = await updateProfile(userId, { verification_status: 'APPROVED' });
+      
+      if (error) {
+        console.error("Supabase Update Error:", error);
+        alert('Blockchain sukses, tapi GAGAL update database: ' + error.message);
+        return;
+      }
+
       alert('Berhasil! Role telah ditambahkan di Blockchain dan Database diperbarui.');
       setSelectedAccount(null);
       fetchPending(); // Refresh tabel
-    } catch (error) {
+    } catch (error: any) {
       console.error("Gagal update profil:", error);
-      alert('Blockchain sukses, tapi gagal update database Supabase.');
+      alert('Terjadi kesalahan sistem: ' + (error.message || "Unknown error"));
     }
   };
 
   const handleReject = async (userId: string) => {
     if (confirm('Yakin ingin menolak pendaftaran institusi ini?')) {
-      await updateProfile(userId, { verification_status: 'REJECTED' });
-      fetchPending();
+      try {
+        const { error } = await updateProfile(userId, { verification_status: 'REJECTED' });
+        if (error) {
+          console.error("Supabase Reject Error:", error);
+          alert("Gagal menolak di database: " + error.message);
+        } else {
+          alert("Pendaftaran telah ditolak.");
+          fetchPending();
+        }
+      } catch (err: any) {
+        alert("Terjadi kesalahan: " + err.message);
+      }
     }
   };
 
