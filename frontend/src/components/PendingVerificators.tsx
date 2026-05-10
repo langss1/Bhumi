@@ -96,6 +96,7 @@ export default function PendingVerificators() {
         abi: LandRegistryABI,
         functionName: 'grantRole',
         args: [roleHash as `0x${string}`, account.wallet_address as `0x${string}`],
+        
       });
     } catch (error) {
       console.error(error);

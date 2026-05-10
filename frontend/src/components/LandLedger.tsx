@@ -11,12 +11,20 @@ interface LandRowProps {
 
 function LandRow({ tokenId }: LandRowProps) {
   const [showDetails, setShowDetails] = useState(false);
-  const { data: land, isLoading } = useReadContract({
+  const { data: landData, isLoading } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
     args: [BigInt(tokenId)],
   });
+
+  const land = landData ? {
+    gpsCoordinates: (landData as any)[0],
+    area: (landData as any)[1],
+    nib: (landData as any)[2],
+    ipfsHashes: (landData as any)[3],
+    isDisputed: (landData as any)[4],
+  } : null;
 
   const { data: owner } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,

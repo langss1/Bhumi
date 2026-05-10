@@ -28,6 +28,7 @@ export default function BpnPusatDashboard() {
       abi: LandRegistryABI,
       functionName: 'setEnforcement',
       args: [BigInt(disputeTokenId), isDisputed],
+      
     });
   };
 

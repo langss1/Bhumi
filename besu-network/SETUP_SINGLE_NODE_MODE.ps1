@@ -36,7 +36,7 @@ $addr1_clean = $addr1.TrimStart("0x")
 $genesisContent = @'
 {
   "config": {
-    "chainId": 1337,
+    "chainId": 31337,
     "homesteadBlock": 0,
     "eip150Block": 0,
     "eip155Block": 0,
@@ -49,6 +49,7 @@ $genesisContent = @'
     "londonBlock": 0,
     "shanghaiBlock": 0,
     "cancunBlock": 0,
+    "zeroBaseFee": true,
     "ibft2": {
       "blockperiodseconds": 2,
       "epochlength": 30000,

@@ -20,12 +20,20 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
     args: [BigInt(tokenId)],
   });
 
-  const { data: land } = useReadContract({
+  const { data: landData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
     args: [BigInt(tokenId)],
   });
+
+  const land = landData ? {
+    gpsCoordinates: (landData as any)[0],
+    area: (landData as any)[1],
+    nib: (landData as any)[2],
+    ipfsHashes: (landData as any)[3],
+    isDisputed: (landData as any)[4],
+  } : null;
 
   const { writeContractAsync, isPending: isExecPending } = useWriteContract();
 
@@ -54,6 +62,7 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
         abi: LandRegistryABI,
         functionName: 'approveTransferNotaris',
         args: [BigInt(tokenId), hash],
+        
       });
       alert(`✅ Transfer Token #${tokenId} berhasil dieksekusi! NFT resmi berpindah ke pembeli.`);
     } catch (err: any) {

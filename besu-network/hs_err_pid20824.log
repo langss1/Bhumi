@@ -1,0 +1,1564 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 65536 bytes. Error detail: Failed to commit metaspace.
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   This process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Zero Based Compressed Oops mode in which the Java heap is
+#     placed in the first 32GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 32GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (virtualSpaceNode.cpp:110), pid=20824, tid=32348
+#
+# JRE version: OpenJDK Runtime Environment Temurin-17.0.17+10 (17.0.17+10) (build 17.0.17+10)
+# Java VM: OpenJDK 64-Bit Server VM Temurin-17.0.17+10 (17.0.17+10, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dvertx.disableFileCPResolving=true -Dbesu.home=C:\besu\bin\.. -Dlog4j.shutdownHookEnabled=false -Dlog4j2.formatMsgNoLookups=true -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager --add-opens=java.base/sun.security.provider=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED -XX:G1ConcRefinementThreads=2 -XX:G1HeapWastePercent=15 -XX:MaxGCPauseMillis=100 org.hyperledger.besu.Besu --data-path=C:\bhumi-besu\node1\data --genesis-file=C:\bhumi-besu\genesis.json --rpc-http-enabled=true --rpc-http-api=ETH,NET,IBFT,ADMIN,DEBUG,WEB3 --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-cors-origins=* --host-allowlist=* --rpc-ws-enabled=true --rpc-ws-host=0.0.0.0 --rpc-ws-port=8646 --p2p-host=0.0.0.0 --p2p-port=30303 --nat-method=NONE --min-gas-price=0 --logging=INFO
+
+Host: 11th Gen Intel(R) Core(TM) i5-11400H @ 2.70GHz, 12 cores, 23G,  Windows 11 , 64 bit Build 26100 (10.0.26100.8246)
+Time: Sat May  9 23:31:48 2026 SE Asia Standard Time elapsed time: 207.520213 seconds (0d 0h 3m 27s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000002b8338e3310):  JavaThread "BftProcessorExecutor-IBFT-0" [_thread_in_vm, id=32348, stack(0x000000ea99200000,0x000000ea99300000)]
+
+Stack: [0x000000ea99200000,0x000000ea99300000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x683fb9]
+V  [jvm.dll+0x83a1b5]
+V  [jvm.dll+0x83bc2e]
+V  [jvm.dll+0x83c2b3]
+V  [jvm.dll+0x248eff]
+V  [jvm.dll+0x835f9d]
+V  [jvm.dll+0x628abd]
+V  [jvm.dll+0x1c0710]
+V  [jvm.dll+0x62b432]
+V  [jvm.dll+0x629476]
+V  [jvm.dll+0x63a8ba]
+V  [jvm.dll+0x63357a]
+V  [jvm.dll+0x215ec1]
+V  [jvm.dll+0x215fff]
+V  [jvm.dll+0x385db1]
+V  [jvm.dll+0x385bdd]
+C  0x000002b7cfe8c925
+
+The last pc belongs to method entry point (kind = zerolocals) (printed below).
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  org.bouncycastle.crypto.signers.ECDSASigner.createBasePointMultiplier()Lorg/bouncycastle/math/ec/ECMultiplier;+0
+j  org.bouncycastle.crypto.signers.ECDSASigner.generateSignature([B)[Ljava/math/BigInteger;+76
+J 8472 c1 org.hyperledger.besu.crypto.AbstractSECP256.sign(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature; (74 bytes) @ 0x000002b7c98290ec [0x000002b7c98289a0+0x000000000000074c]
+J 8471 c1 org.hyperledger.besu.crypto.SECP256K1.sign(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature; (21 bytes) @ 0x000002b7c982851c [0x000002b7c9828440+0x00000000000000dc]
+J 8051 c1 org.hyperledger.besu.cryptoservices.KeyPairSecurityModule.sign(Lorg/apache/tuweni/bytes/Bytes32;)Lorg/hyperledger/besu/plugin/services/securitymodule/data/Signature; (43 bytes) @ 0x000002b7c9735c14 [0x000002b7c9735b00+0x0000000000000114]
+J 8050 c1 org.hyperledger.besu.cryptoservices.NodeKey.sign(Lorg/apache/tuweni/bytes/Bytes32;)Lorg/hyperledger/besu/crypto/SECPSignature; (38 bytes) @ 0x000002b7c9734d1c [0x000002b7c9734c40+0x00000000000000dc]
+J 8325 c1 org.hyperledger.besu.consensus.ibft.payload.MessageFactory.createSignedMessage(Lorg/hyperledger/besu/consensus/common/bft/payload/Payload;)Lorg/hyperledger/besu/consensus/common/bft/payload/SignedData; (20 bytes) @ 0x000002b7c97c0ce4 [0x000002b7c97c0b60+0x0000000000000184]
+j  org.hyperledger.besu.consensus.ibft.payload.MessageFactory.createProposal(Lorg/hyperledger/besu/consensus/common/bft/ConsensusRoundIdentifier;Lorg/hyperledger/besu/ethereum/core/Block;Ljava/util/Optional;)Lorg/hyperledger/besu/consensus/ibft/messagewrappers/Proposal;+21
+j  org.hyperledger.besu.consensus.ibft.statemachine.IbftRound.updateStateWithProposalAndTransmit(Lorg/hyperledger/besu/ethereum/core/Block;Ljava/util/Optional;)V+10
+j  org.hyperledger.besu.consensus.ibft.statemachine.IbftRound.createAndSendProposalMessage(J)V+65
+j  org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManager.handleBlockTimerExpiry(Lorg/hyperledger/besu/consensus/common/bft/ConsensusRoundIdentifier;)V+43
+j  org.hyperledger.besu.consensus.common.bft.statemachine.BaseBftController.handleBlockTimerExpiry(Lorg/hyperledger/besu/consensus/common/bft/events/BlockTimerExpiry;)V+18
+j  org.hyperledger.besu.consensus.common.bft.EventMultiplexer.handleBftEvent(Lorg/hyperledger/besu/consensus/common/bft/events/BftEvent;)V+112
+j  org.hyperledger.besu.consensus.common.bft.BftProcessor$$Lambda$1079+0x000002b7ea596750.accept(Ljava/lang/Object;)V+8
+J 5240 c1 java.util.Optional.ifPresent(Ljava/util/function/Consumer;)V java.base@17.0.17 (18 bytes) @ 0x000002b7c8dce184 [0x000002b7c8dce040+0x0000000000000144]
+j  org.hyperledger.besu.consensus.common.bft.BftProcessor.run()V+25
+j  java.util.concurrent.ThreadPoolExecutor.runWorker(Ljava/util/concurrent/ThreadPoolExecutor$Worker;)V+92 java.base@17.0.17
+j  java.util.concurrent.ThreadPoolExecutor$Worker.run()V+5 java.base@17.0.17
+j  java.lang.Thread.run()V+11 java.base@17.0.17
+v  ~StubRoutines::call_stub
+method entry point (kind = zerolocals)  [0x000002b7cfe8c5c0, 0x000002b7cfe8c980]  960 bytes
+[MachCode]
+  0x000002b7cfe8c5c0: 488b 5308 | 0fb7 4a2c | 0fb7 522a | 2bd1 81fa | f501 0000 | 0f86 2500 | 0000 488b | c248 c1e0 
+  0x000002b7cfe8c5e0: 0348 83c0 | 5849 0387 | b803 0000 | 483b e00f | 870a 0000 | 0058 498b | e550 e981 | c2ff ff58 
+  0x000002b7cfe8c600: 4c8d 74cc | f885 d20f | 8e09 0000 | 0068 0000 | 0000 ffca | 7ff7 5055 | 488b ec41 | 5568 0000 
+  0x000002b7cfe8c620: 0000 4c8b | 6b08 4d8d | 6d30 5348 | 8b53 0848 | 8b52 0848 | 8b52 1848 | 8b52 7048 | 8b12 5248 
+  0x000002b7cfe8c640: 8b53 1048 | 85d2 0f84 | 0700 0000 | 4881 c208 | 0100 0052 | 488b 5308 | 488b 5208 | 488b 5210 
+  0x000002b7cfe8c660: 5241 5641 | 5568 0000 | 0000 4889 | 2424 41c6 | 8771 0300 | 0001 488b | 45d8 4885 | c00f 84a3 
+  0x000002b7cfe8c680: 0000 008b | 48fc 85c9 | 0f88 9800 | 0000 4803 | c148 8b48 | 0848 83e9 | 0248 8b54 | c810 48f7 
+  0x000002b7cfe8c6a0: da49 8b14 | d648 85d2 | 7514 48f7 | 44c8 1801 | 0000 0075 | 67f0 4883 | 4cc8 1801 | eb5e 8b52 
+  0x000002b7cfe8c6c0: 0849 ba00 | 0000 e9b7 | 0200 0049 | 03d2 4c8b | d248 3354 | c818 48f7 | c2fc ffff | ff74 3d48 
+  0x000002b7cfe8c6e0: f7c2 0200 | 0000 7534 | 4881 7cc8 | 1800 0000 | 0074 2448 | 817c c818 | 0100 0000 | 7419 498b 
+  0x000002b7cfe8c700: d248 3354 | c818 48f7 | c2fc ffff | ff74 0d48 | 834c c818 | 02eb 0548 | 8954 c818 | 4883 e902 
+  0x000002b7cfe8c720: 0f89 73ff | ffff 488b | 4310 4885 | c074 208b | 88cc 0000 | 0083 c102 | 8988 cc00 | 0000 2388 
+  0x000002b7cfe8c740: e000 0000 | 0f84 7801 | 0000 e9d1 | 0000 0048 | 8b43 1848 | 85c0 0f85 | b200 0000 | e805 0000 
+  0x000002b7cfe8c760: 00e9 9b00 | 0000 488b | d348 8d44 | 2408 4c89 | 6dc0 498b | cfc5 f877 | 4989 afa8 | 0200 0049 
+  0x000002b7cfe8c780: 8987 9802 | 0000 4883 | ec20 f7c4 | 0f00 0000 | 0f84 1a00 | 0000 4883 | ec08 49ba | a050 c7fc 
+  0x000002b7cfe8c7a0: f87f 0000 | 41ff d248 | 83c4 08e9 | 0d00 0000 | 49ba a050 | c7fc f87f | 0000 41ff | d248 83c4 
+  0x000002b7cfe8c7c0: 2049 c787 | 9802 0000 | 0000 0000 | 49c7 87a8 | 0200 0000 | 0000 0049 | c787 a002 | 0000 0000 
+  0x000002b7cfe8c7e0: 0000 c5f8 | 7749 817f | 0800 0000 | 000f 8405 | 0000 00e9 | 0847 ffff | 4c8b 6dc0 | 4c8b 75c8 
+  0x000002b7cfe8c800: c348 8b43 | 1848 85c0 | 0f84 1200 | 0000 8b48 | 0883 c102 | 8948 0823 | 4820 0f84 | a200 0000 
+  0x000002b7cfe8c820: 8984 2400 | f0ff ff89 | 8424 00e0 | ffff 8984 | 2400 d0ff | ff89 8424 | 00c0 ffff | 8984 2400 
+  0x000002b7cfe8c840: b0ff ff89 | 8424 00a0 | ffff 8984 | 2400 90ff | ff41 c687 | 7103 0000 | 0049 bad5 | c647 fdf8 
+  0x000002b7cfe8c860: 7f00 0041 | 803a 000f | 8442 0000 | 0048 8b55 | e849 8bcf | 4883 ec20 | f7c4 0f00 | 0000 0f84 
+  0x000002b7cfe8c880: 1a00 0000 | 4883 ec08 | 49ba 1099 | fdfc f87f | 0000 41ff | d248 83c4 | 08e9 0d00 | 0000 49ba 
+  0x000002b7cfe8c8a0: 1099 fdfc | f87f 0000 | 41ff d248 | 83c4 2041 | 0fb6 5d00 | 49ba 603f | 4afd f87f | 0000 41ff 
+  0x000002b7cfe8c8c0: 24da ba00 | 0000 00e8 | 0500 0000 | e998 0000 | 0048 8d44 | 2408 4c89 | 6dc0 498b | cfc5 f877 
+  0x000002b7cfe8c8e0: 4989 afa8 | 0200 0049 | 8987 9802 | 0000 4883 | ec20 f7c4 | 0f00 0000 | 0f84 1a00 | 0000 4883 
+  0x000002b7cfe8c900: ec08 49ba | c05b c7fc | f87f 0000 | 41ff d248 | 83c4 08e9 | 0d00 0000 | 49ba c05b | c7fc f87f 
+  0x000002b7cfe8c920: 0000 41ff | d248 83c4 | 2049 c787 | 9802 0000 | 0000 0000 | 49c7 87a8 | 0200 0000 | 0000 0049 
+  0x000002b7cfe8c940: c787 a002 | 0000 0000 | 0000 c5f8 | 7749 817f | 0800 0000 | 000f 8405 | 0000 00e9 | a045 ffff 
+  0x000002b7cfe8c960: 4c8b 6dc0 | 4c8b 75c8 | c348 8b5d | e8e9 aefe | ffff 660f | 1f44 0000 | 0000 0000 | 0000 0000 
+[/MachCode]
+
+Compiled method (c1) 208301 8472       3       org.hyperledger.besu.crypto.AbstractSECP256::sign (74 bytes)
+ total in heap  [0x000002b7c9828710,0x000002b7c9829a18] = 4872
+ relocation     [0x000002b7c9828870,0x000002b7c9828988] = 280
+ main code      [0x000002b7c98289a0,0x000002b7c9829520] = 2944
+ stub code      [0x000002b7c9829520,0x000002b7c98295d8] = 184
+ oops           [0x000002b7c98295d8,0x000002b7c98295e0] = 8
+ metadata       [0x000002b7c98295e0,0x000002b7c9829648] = 104
+ scopes data    [0x000002b7c9829648,0x000002b7c98297e8] = 416
+ scopes pcs     [0x000002b7c98297e8,0x000002b7c98299c8] = 480
+ dependencies   [0x000002b7c98299c8,0x000002b7c98299d8] = 16
+ nul chk table  [0x000002b7c98299d8,0x000002b7c9829a18] = 64
+
+[Constant Pool (empty)]
+
+[MachCode]
+[Entry Point]
+  # {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256'
+  # this:     rdx:rdx   = 'org/hyperledger/besu/crypto/AbstractSECP256'
+  # parm0:    r8:r8     = 'org/apache/tuweni/bytes/Bytes32'
+  # parm1:    r9:r9     = 'org/hyperledger/besu/crypto/KeyPair'
+  #           [sp+0xf0]  (sp of caller)
+  0x000002b7c98289a0: 448b 5208 | 49bb 0000 | 00e9 b702 | 0000 4d03 | d34c 3bd0 
+
+  0x000002b7c98289b4: ;   {runtime_call ic_miss_stub}
+  0x000002b7c98289b4: 0f85 c68b | 6a06 660f | 1f44 0000 
+[Verified Entry Point]
+  0x000002b7c98289c0: 8984 2400 | 90ff ff55 | 4881 ece0 | 0000 0048 | 8994 24a0 | 0000 004c | 8984 24a8 | 0000 004c 
+  0x000002b7c98289e0: 898c 2498 
+
+  0x000002b7c98289e4: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c98289e4: 0000 0048 | be58 72c5 | 2db8 0200 | 008b becc | 0000 0083 | c702 89be | cc00 0000 | 81e7 fe07 
+  0x000002b7c9828a04: 0000 83ff | 000f 84ba | 0800 0048 
+
+  0x000002b7c9828a10: ;   {metadata('org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c9828a10: 8bda 48ba | 0080 57ea | b702 0000 | 498b 8708 | 0100 0048 | 8d78 1849 | 3bbf 1801 | 0000 0f87 
+  0x000002b7c9828a30: b608 0000 | 4989 bf08 | 0100 0048 | c700 0100 | 0000 488b | ca49 ba00 | 0000 e9b7 | 0200 0049 
+  0x000002b7c9828a50: 2bca 8948 | 0848 33c9 | 8948 0c48 | 33c9 4889 | 4810 4889 | 8424 9000 | 0000 488b 
+
+  0x000002b7c9828a6c: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828a6c: d348 be58 | 72c5 2db8 | 0200 008b | 5208 49ba | 0000 00e9 | b702 0000 | 4903 d248 | 3b96 2001 
+  0x000002b7c9828a8c: 0000 750d | 4883 8628 | 0100 0001 | e966 0000 | 0048 3b96 | 3001 0000 | 750d 4883 | 8638 0100 
+  0x000002b7c9828aac: 0001 e950 | 0000 0048 | 81be 2001 | 0000 0000 | 0000 7517 | 4889 9620 | 0100 0048 | c786 2801 
+  0x000002b7c9828acc: 0000 0100 | 0000 e92c | 0000 0048 | 81be 3001 | 0000 0000 | 0000 7517 | 4889 9630 | 0100 0048 
+  0x000002b7c9828aec: c786 3801 | 0000 0100 | 0000 e908 | 0000 0048 | 8386 1001 | 0000 0148 | 8bd3 0f1f | 8000 0000 
+  0x000002b7c9828b0c: 0048 b8a8 | 971b eab7 
+
+  0x000002b7c9828b14: ;   {virtual_call}
+  0x000002b7c9828b14: 0200 00e8 
+
+  0x000002b7c9828b18: ; ImmutableOopMap {[144]=Oop [160]=Oop [168]=Oop [152]=Oop }
+                      ;*invokevirtual getKCalculator {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@5 (line 334)
+  0x000002b7c9828b18: a411 0000 | 488b 9424 | 9000 0000 
+
+  0x000002b7c9828b24: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828b24: 48be 5872 | c52d b802 | 0000 4883 | 8648 0100 
+
+  0x000002b7c9828b34: ;   {metadata(method data for {method} {0x000002b82d4a2d88} '<init>' '(Lorg/bouncycastle/crypto/signers/DSAKCalculator;)V' in 'org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c9828b34: 0001 48ba | d075 c52d | b802 0000 | 8bb2 cc00 | 0000 83c6 | 0289 b2cc | 0000 0081 | e6fe ff1f 
+  0x000002b7c9828b54: 0083 fe00 | 0f84 9907 | 0000 488b | 9424 9000 
+
+  0x000002b7c9828b64: ;   {metadata(method data for {method} {0x000002b82d4a2d88} '<init>' '(Lorg/bouncycastle/crypto/signers/DSAKCalculator;)V' in 'org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c9828b64: 0000 48be | d075 c52d | b802 0000 | 4883 8610 | 0100 0001 
+
+  0x000002b7c9828b78: ;   {metadata(method data for {method} {0x000002b7e9441638} '<init>' '()V' in 'java/lang/Object')}
+  0x000002b7c9828b78: 48ba 4070 | 002b b802 | 0000 8bb2 | cc00 0000 | 83c6 0289 | b2cc 0000 | 0081 e6fe | ff1f 0083 
+  0x000002b7c9828b98: fe00 0f84 | 7807 0000 | 410f be57 | 3883 fa00 | 488b 9c24 | 9000 0000 | 0f85 8307 | 0000 4c8b 
+  0x000002b7c9828bb8: d049 c1ea | 0344 8953 | 0c48 8bd3 | 4833 d048 | c1ea 1648 | 83fa 000f | 8583 0700 
+
+  0x000002b7c9828bd4: ;   {metadata('org/bouncycastle/crypto/params/ECPrivateKeyParameters')}
+  0x000002b7c9828bd4: 0048 bac0 | 0c24 eab7 | 0200 0049 | 8b87 0801 | 0000 488d | 7818 493b | bf18 0100 | 000f 8779 
+  0x000002b7c9828bf4: 0700 0049 | 89bf 0801 | 0000 48c7 | 0001 0000 | 0048 8bca | 49ba 0000 | 00e9 b702 | 0000 492b 
+  0x000002b7c9828c14: ca89 4808 | 4833 c989 | 480c 4833 | c948 8948 | 1048 8984 | 24b0 0000 | 004c 8b8c | 2498 0000 
+  0x000002b7c9828c34: 0049 3b01 
+
+  0x000002b7c9828c38: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828c38: 498b d148 | be58 72c5 | 2db8 0200 
+
+  0x000002b7c9828c44: ;   {metadata('org/hyperledger/besu/crypto/KeyPair')}
+  0x000002b7c9828c44: 0049 baa0 | 091b eab7 | 0200 004c | 8996 6801 | 0000 4883 | 8670 0100 | 0001 418b | 510c 48c1 
+  0x000002b7c9828c64: e203 483b | 0248 8bf2 
+
+  0x000002b7c9828c6c: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828c6c: 48bf 5872 | c52d b802 
+
+  0x000002b7c9828c74: ;   {metadata('org/hyperledger/besu/crypto/SECPPrivateKey')}
+  0x000002b7c9828c74: 0000 49ba | b025 29ea | b702 0000 | 4c89 97a0 | 0100 0048 | 8387 a801 | 0000 018b | 520c 48c1 
+  0x000002b7c9828c94: e203 483b | 0248 8bf2 
+
+  0x000002b7c9828c9c: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828c9c: 48bf 5872 | c52d b802 | 0000 8b76 | 0849 ba00 | 0000 e9b7 | 0200 0049 | 03f2 483b | b7d8 0100 
+  0x000002b7c9828cbc: 0075 0d48 | 8387 e001 | 0000 01e9 | 6600 0000 | 483b b7e8 | 0100 0075 | 0d48 8387 | f001 0000 
+  0x000002b7c9828cdc: 01e9 5000 | 0000 4881 | bfd8 0100 | 0000 0000 | 0075 1748 | 89b7 d801 | 0000 48c7 | 87e0 0100 
+  0x000002b7c9828cfc: 0001 0000 | 00e9 2c00 | 0000 4881 | bfe8 0100 | 0000 0000 | 0075 1748 | 89b7 e801 | 0000 48c7 
+  0x000002b7c9828d1c: 87f0 0100 | 0001 0000 | 00e9 0800 | 0000 4883 | 87c8 0100 | 0001 6666 | 9048 b820 | 133a eab7 
+  0x000002b7c9828d3c: ;   {virtual_call}
+  0x000002b7c9828d3c: 0200 00e8 
+
+  0x000002b7c9828d40: ; ImmutableOopMap {[160]=Oop [168]=Oop [176]=Oop [144]=Oop [152]=Oop }
+                      ;*invokeinterface toUnsignedBigInteger {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@23 (line 338)
+  0x000002b7c9828d40: 5cc6 0807 | 488b 9424 | a000 0000 | 8b5a 0c48 | c1e3 034c | 8b84 24b0 
+
+  0x000002b7c9828d58: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828d58: 0000 0048 | be58 72c5 | 2db8 0200 | 0048 8386 | 0002 0000 
+
+  0x000002b7c9828d6c: ;   {metadata(method data for {method} {0x000002b82c041908} '<init>' '(Ljava/math/BigInteger;Lorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECPrivateKeyParameters')}
+  0x000002b7c9828d6c: 0149 b828 | 77c5 2db8 | 0200 0041 | 8bb0 cc00 | 0000 83c6 | 0241 89b0 | cc00 0000 | 81e6 feff 
+  0x000002b7c9828d8c: 1f00 83fe | 000f 84f5 | 0500 004c | 8b84 24b0 
+
+  0x000002b7c9828d9c: ;   {metadata(method data for {method} {0x000002b82c041908} '<init>' '(Ljava/math/BigInteger;Lorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECPrivateKeyParameters')}
+  0x000002b7c9828d9c: 0000 0048 | be28 77c5 | 2db8 0200 | 0048 8386 | 1001 0000 
+
+  0x000002b7c9828db0: ;   {metadata(method data for {method} {0x000002b82bfb3c18} '<init>' '(ZLorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECKeyParameters')}
+  0x000002b7c9828db0: 0149 b8d0 | 78c5 2db8 | 0200 0041 | 8bb0 cc00 | 0000 83c6 | 0241 89b0 | cc00 0000 | 81e6 feff 
+  0x000002b7c9828dd0: 1f00 83fe | 000f 84d2 | 0500 004c | 8b84 24b0 
+
+  0x000002b7c9828de0: ;   {metadata(method data for {method} {0x000002b82bfb3c18} '<init>' '(ZLorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECKeyParameters')}
+  0x000002b7c9828de0: 0000 0048 | bed0 78c5 | 2db8 0200 | 0048 8386 | 1001 0000 
+
+  0x000002b7c9828df4: ;   {metadata(method data for {method} {0x000002b82bfa6a10} '<init>' '(Z)V' in 'org/bouncycastle/crypto/params/AsymmetricKeyParameter')}
+  0x000002b7c9828df4: 0149 b870 | 7ac5 2db8 | 0200 0041 | 8bb0 cc00 | 0000 83c6 | 0241 89b0 | cc00 0000 | 81e6 feff 
+  0x000002b7c9828e14: 1f00 83fe | 000f 84af | 0500 004c | 8b84 24b0 
+
+  0x000002b7c9828e24: ;   {metadata(method data for {method} {0x000002b82bfa6a10} '<init>' '(Z)V' in 'org/bouncycastle/crypto/params/AsymmetricKeyParameter')}
+  0x000002b7c9828e24: 0000 0048 | be70 7ac5 | 2db8 0200 | 0048 8386 | 1001 0000 
+
+  0x000002b7c9828e38: ;   {metadata(method data for {method} {0x000002b7e9441638} '<init>' '()V' in 'java/lang/Object')}
+  0x000002b7c9828e38: 0149 b840 | 7000 2bb8 | 0200 0041 | 8bb0 cc00 | 0000 83c6 | 0241 89b0 | cc00 0000 | 81e6 feff 
+  0x000002b7c9828e58: 1f00 83fe | 000f 848c | 0500 0048 | 8bb4 24b0 | 0000 00c6 | 460c 0148 
+
+  0x000002b7c9828e70: ;   {metadata(method data for {method} {0x000002b82bfb3c18} '<init>' '(ZLorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECKeyParameters')}
+  0x000002b7c9828e70: 83fb 0049 | b8d0 78c5 | 2db8 0200 | 0048 c7c7 | 3001 0000 | 0f84 0700 | 0000 48c7 | c720 0100 
+  0x000002b7c9828e90: 0049 8b0c | 3848 8d49 | 0149 890c | 380f 8477 | 0300 0045 | 0fbe 4738 | 4183 f800 | 0f85 5e05 
+  0x000002b7c9828eb0: 0000 4c8b | d349 c1ea | 0344 8956 | 104c 8bc6 | 4c33 c349 | c1e8 1649 | 83f8 000f | 855f 0500 
+  0x000002b7c9828ed0: 0048 3b03 
+
+  0x000002b7c9828ed4: ;   {metadata(method data for {method} {0x000002b82c041908} '<init>' '(Ljava/math/BigInteger;Lorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECPrivateKeyParameters')}
+  0x000002b7c9828ed4: 4c8b c348 | bf28 77c5 | 2db8 0200 | 0045 8b40 | 0849 ba00 | 0000 e9b7 | 0200 004d | 03c2 4c3b 
+  0x000002b7c9828ef4: 8730 0100 | 0075 0d48 | 8387 3801 | 0000 01e9 | 6600 0000 | 4c3b 8740 | 0100 0075 | 0d48 8387 
+  0x000002b7c9828f14: 4801 0000 | 01e9 5000 | 0000 4881 | bf30 0100 | 0000 0000 | 0075 174c | 8987 3001 | 0000 48c7 
+  0x000002b7c9828f34: 8738 0100 | 0001 0000 | 00e9 2c00 | 0000 4881 | bf40 0100 | 0000 0000 | 0075 174c | 8987 4001 
+  0x000002b7c9828f54: 0000 48c7 | 8748 0100 | 0001 0000 | 00e9 0800 | 0000 4883 | 8720 0100 | 0001 4c8b | c048 8bd3 
+  0x000002b7c9828f74: ;   {optimized virtual_call}
+  0x000002b7c9828f74: 6666 90e8 
+
+  0x000002b7c9828f78: ; ImmutableOopMap {[168]=Oop [144]=Oop [152]=Oop [176]=Oop [160]=Oop }
+                      ;*invokevirtual validatePrivateScalar {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@9 (line 16)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c9828f78: c905 0000 | 450f be47 | 3841 83f8 | 0048 8b9c | 24b0 0000 | 000f 85ba | 0400 004c | 8bd0 49c1 
+  0x000002b7c9828f98: ea03 4489 | 5314 4c8b | c34c 33c0 | 49c1 e816 | 4983 f800 | 0f85 bb04 | 0000 488b | 8424 9000 
+  0x000002b7c9828fb8: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9828fb8: 0000 48ba | 5872 c52d | b802 0000 
+
+  0x000002b7c9828fc4: ;   {metadata('org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c9828fc4: 49ba 0080 | 57ea b702 | 0000 4c89 | 9220 0200 | 0048 8382 | 2802 0000 | 0141 b801 | 0000 004c 
+  0x000002b7c9828fe4: 8bcb 488b | 9424 9000 
+
+  0x000002b7c9828fec: ;   {optimized virtual_call}
+  0x000002b7c9828fec: 0000 90e8 
+
+  0x000002b7c9828ff0: ; ImmutableOopMap {[144]=Oop [160]=Oop [168]=Oop [152]=Oop }
+                      ;*invokevirtual init {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@41 (line 339)
+  0x000002b7c9828ff0: 6105 0000 | 4c8b 8424 | a800 0000 
+
+  0x000002b7c9828ffc: ; implicit exception: dispatches to 0x000002b7c9829485
+  0x000002b7c9828ffc: 493b 0049 
+
+  0x000002b7c9829000: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9829000: 8bd0 48be | 5872 c52d | b802 0000 | 8b52 0849 | ba00 0000 | e9b7 0200 | 0049 03d2 | 483b 9658 
+  0x000002b7c9829020: 0200 0075 | 0d48 8386 | 6002 0000 | 01e9 6600 | 0000 483b | 9668 0200 | 0075 0d48 | 8386 7002 
+  0x000002b7c9829040: 0000 01e9 | 5000 0000 | 4881 be58 | 0200 0000 | 0000 0075 | 1748 8996 | 5802 0000 | 48c7 8660 
+  0x000002b7c9829060: 0200 0001 | 0000 00e9 | 2c00 0000 | 4881 be68 | 0200 0000 | 0000 0075 | 1748 8996 | 6802 0000 
+  0x000002b7c9829080: 48c7 8670 | 0200 0001 | 0000 00e9 | 0800 0000 | 4883 8648 | 0200 0001 | 498b d066 | 9048 b890 
+  0x000002b7c98290a0: d91b eab7 
+
+  0x000002b7c98290a4: ;   {virtual_call}
+  0x000002b7c98290a4: 0200 00e8 
+
+  0x000002b7c98290a8: ; ImmutableOopMap {[144]=Oop [160]=Oop [152]=Oop [168]=Oop }
+                      ;*invokeinterface toArrayUnsafe {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@46 (line 341)
+  0x000002b7c98290a8: 142f a3ff | 4c8b 8424 | 9000 0000 
+
+  0x000002b7c98290b4: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c98290b4: 48ba 5872 | c52d b802 
+
+  0x000002b7c98290bc: ;   {metadata('org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c98290bc: 0000 49ba | 0080 57ea | b702 0000 | 4c89 9290 | 0200 0048 | 8382 9802 | 0000 014c | 8bc0 488b 
+  0x000002b7c98290dc: 9424 9000 | 0000 0f1f 
+
+  0x000002b7c98290e4: ;   {optimized virtual_call}
+  0x000002b7c98290e4: 4400 00e8 
+
+  0x000002b7c98290e8: ; ImmutableOopMap {[160]=Oop [152]=Oop [168]=Oop }
+                      ;*invokevirtual generateSignature {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@51 (line 341)
+  0x000002b7c98290e8: 8904 0000 
+
+  0x000002b7c98290ec: ; implicit exception: dispatches to 0x000002b7c982948a
+  0x000002b7c98290ec: 8178 0c00 | 0000 000f | 869b 0300 | 0044 8b40 | 1049 c1e0 | 0381 780c | 0100 0000 | 0f86 9803 
+  0x000002b7c982910c: 0000 448b | 4814 49c1 | e103 488b | bc24 9800 
+
+  0x000002b7c982911c: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c982911c: 0000 48be | 5872 c52d | b802 0000 
+
+  0x000002b7c9829128: ;   {metadata('org/hyperledger/besu/crypto/KeyPair')}
+  0x000002b7c9829128: 49ba a009 | 1bea b702 | 0000 4c89 | 96c8 0200 | 0048 8386 | d002 0000 | 0148 8b9c | 2498 0000 
+  0x000002b7c9829148: 008b 7b10 | 48c1 e703 | 488b 9424 | a000 0000 
+
+  0x000002b7c9829158: ;   {metadata(method data for {method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c9829158: 48be 5872 | c52d b802 | 0000 8b52 | 0849 ba00 | 0000 e9b7 | 0200 0049 | 03d2 483b | 9600 0300 
+  0x000002b7c9829178: 0075 0d48 | 8386 0803 | 0000 01e9 | 6600 0000 | 483b 9610 | 0300 0075 | 0d48 8386 | 1803 0000 
+  0x000002b7c9829198: 01e9 5000 | 0000 4881 | be00 0300 | 0000 0000 | 0075 1748 | 8996 0003 | 0000 48c7 | 8608 0300 
+  0x000002b7c98291b8: 0001 0000 | 00e9 2c00 | 0000 4881 | be10 0300 | 0000 0000 | 0075 1748 | 8996 1003 | 0000 48c7 
+  0x000002b7c98291d8: 8618 0300 | 0001 0000 | 00e9 0800 | 0000 4883 | 86f0 0200 | 0001 488b | b424 a800 | 0000 488b 
+  0x000002b7c98291f8: 9424 a000 
+
+  0x000002b7c98291fc: ;   {optimized virtual_call}
+  0x000002b7c98291fc: 0000 90e8 
+
+  0x000002b7c9829200: ; ImmutableOopMap {}
+                      ;*invokevirtual normaliseSignature {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@70 (line 343)
+  0x000002b7c9829200: dc61 dcff | 4881 c4e0 | 0000 005d 
+
+  0x000002b7c982920c: ;   {poll_return}
+  0x000002b7c982920c: 493b a748 | 0300 000f | 879f 0200 | 00c3 4889 | 9c24 c800 | 0000 4889 | 8424 c000 | 0000 660f 
+  0x000002b7c982922c: 1f44 0000 
+
+  0x000002b7c9829230: ;   {no_reloc}
+  0x000002b7c9829230: e9a8 0200 | 0000 0000 | 0000 498b | 8708 0100 | 0048 8d78 | 3049 3bbf | 1801 0000 | 0f87 9502 
+  0x000002b7c9829250: 0000 4989 | bf08 0100 | 0048 c700 | 0100 0000 | 488b ca49 | ba00 0000 | e9b7 0200 | 0049 2bca 
+  0x000002b7c9829270: 8948 0848 | 33c9 8948 | 0c48 33c9 | 4889 4810 | 4889 4818 | 4889 4820 | 4889 4828 
+
+  0x000002b7c982928c: ;   {metadata(method data for {method} {0x000002b82bfb3c18} '<init>' '(ZLorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECKeyParameters')}
+  0x000002b7c982928c: 488b d048 | bed0 78c5 | 2db8 0200 | 0048 8386 | 4001 0000 
+
+  0x000002b7c98292a0: ;   {oop("'parameters' cannot be null"{0x000000068a808670})}
+  0x000002b7c98292a0: 0149 b870 | 8680 8a06 | 0000 0048 | 8bd0 4889 | 8424 b800 
+
+  0x000002b7c98292b4: ;   {optimized virtual_call}
+  0x000002b7c98292b4: 0000 90e8 
+
+  0x000002b7c98292b8: ; ImmutableOopMap {[176]=Oop [168]=Oop [184]=Oop [160]=Oop [144]=Oop [192]=Oop [200]=Oop [152]=Oop }
+                      ;*invokespecial <init> {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.bouncycastle.crypto.params.ECKeyParameters::<init>@16 (line 16)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98292b8: 4488 6a06 | 488b 8424 | b800 0000 | e94a 0200 
+
+  0x000002b7c98292c8: ;   {metadata({method} {0x000002b82bdf5e70} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/AbstractSECP256')}
+  0x000002b7c98292c8: 0049 ba68 | 5edf 2bb8 | 0200 004c | 8954 2408 | 48c7 0424 | ffff ffff 
+
+  0x000002b7c98292e0: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c98292e0: e89b 5375 
+
+  0x000002b7c98292e4: ; ImmutableOopMap {rdx=Oop [160]=Oop r8=Oop [168]=Oop r9=Oop [152]=Oop }
+                      ;*synchronization entry
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@-1 (line 334)
+  0x000002b7c98292e4: 06e9 25f7 | ffff 488b 
+
+  0x000002b7c98292ec: ;   {runtime_call fast_new_instance Runtime1 stub}
+  0x000002b7c98292ec: d2e8 0ef3 
+
+  0x000002b7c98292f0: ; ImmutableOopMap {[152]=Oop [168]=Oop rbx=Oop [160]=Oop }
+                      ;*new {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@0 (line 334)
+  0x000002b7c98292f0: 7406 e96b 
+
+  0x000002b7c98292f4: ;   {metadata({method} {0x000002b82d4a2d88} '<init>' '(Lorg/bouncycastle/crypto/signers/DSAKCalculator;)V' in 'org/bouncycastle/crypto/signers/ECDSASigner')}
+  0x000002b7c98292f4: f7ff ff49 | ba80 2d4a | 2db8 0200 | 004c 8954 | 2408 48c7 | 0424 ffff 
+
+  0x000002b7c982930c: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c982930c: ffff e86d 
+
+  0x000002b7c9829310: ; ImmutableOopMap {[144]=Oop [160]=Oop [168]=Oop [152]=Oop rax=Oop }
+                      ;*synchronization entry
+                      ; - org.bouncycastle.crypto.signers.ECDSASigner::<init>@-1
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@8 (line 334)
+  0x000002b7c9829310: 5375 06e9 | 46f8 ffff 
+
+  0x000002b7c9829318: ;   {metadata({method} {0x000002b7e9441638} '<init>' '()V' in 'java/lang/Object')}
+  0x000002b7c9829318: 49ba 3016 | 44e9 b702 | 0000 4c89 | 5424 0848 | c704 24ff 
+
+  0x000002b7c982932c: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c982932c: ffff ffe8 
+
+  0x000002b7c9829330: ; ImmutableOopMap {[144]=Oop [160]=Oop [168]=Oop [152]=Oop rax=Oop }
+                      ;*synchronization entry
+                      ; - java.lang.Object::<init>@-1 (line 44)
+                      ; - org.bouncycastle.crypto.signers.ECDSASigner::<init>@1
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@8 (line 334)
+  0x000002b7c9829330: 4c53 7506 | e967 f8ff | ff8b 530c | 48c1 e203 | 4883 fa00 | 0f84 6cf8 | ffff 4889 
+
+  0x000002b7c982934c: ;   {runtime_call g1_pre_barrier_slow}
+  0x000002b7c982934c: 1424 e82d | 5d75 06e9 | 5ef8 ffff | 4883 f800 | 0f84 73f8 | ffff 4889 
+
+  0x000002b7c9829364: ;   {runtime_call g1_post_barrier_slow}
+  0x000002b7c9829364: 1c24 e815 | 6175 06e9 | 65f8 ffff 
+
+  0x000002b7c9829370: ;   {runtime_call fast_new_instance Runtime1 stub}
+  0x000002b7c9829370: 488b d2e8 
+
+  0x000002b7c9829374: ; ImmutableOopMap {[160]=Oop [168]=Oop [152]=Oop rbx=Oop [144]=Oop }
+                      ;*new {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@12 (line 336)
+  0x000002b7c9829374: 88f2 7406 | e9a8 f8ff 
+
+  0x000002b7c982937c: ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c982937c: ffe8 9ee7 
+
+  0x000002b7c9829380: ; ImmutableOopMap {[160]=Oop [168]=Oop rbx=Oop [144]=Oop rax=Oop [176]=Oop r9=Oop [152]=Oop }
+                      ;*invokevirtual getPrivateKey {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@17 (line 338)
+                      ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c9829380: 7406 e899 
+
+  0x000002b7c9829384: ; ImmutableOopMap {[160]=Oop [168]=Oop rbx=Oop [144]=Oop rax=Oop [176]=Oop r9=Oop [152]=Oop rdx=Oop }
+                      ;*invokevirtual getEncodedBytes {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@20 (line 338)
+                      ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c9829384: e774 06e8 
+
+  0x000002b7c9829388: ; ImmutableOopMap {[160]=Oop [168]=Oop rbx=Oop [144]=Oop rax=Oop [176]=Oop r9=Oop [152]=Oop rdx=Oop }
+                      ;*invokeinterface toUnsignedBigInteger {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@23 (line 338)
+  0x000002b7c9829388: 94e7 7406 
+
+  0x000002b7c982938c: ;   {metadata({method} {0x000002b82c041908} '<init>' '(Ljava/math/BigInteger;Lorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECPrivateKeyParameters')}
+  0x000002b7c982938c: 49ba 0019 | 042c b802 | 0000 4c89 | 5424 0848 | c704 24ff 
+
+  0x000002b7c98293a0: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c98293a0: ffff ffe8 
+
+  0x000002b7c98293a4: ; ImmutableOopMap {[168]=Oop [176]=Oop [144]=Oop [152]=Oop rax=Oop rdx=Oop [160]=Oop rbx=Oop }
+                      ;*synchronization entry
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@-1 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98293a4: d852 7506 | e9ea f9ff 
+
+  0x000002b7c98293ac: ;   {metadata({method} {0x000002b82bfb3c18} '<init>' '(ZLorg/bouncycastle/crypto/params/ECDomainParameters;)V' in 'org/bouncycastle/crypto/params/ECKeyParameters')}
+  0x000002b7c98293ac: ff49 ba10 | 3cfb 2bb8 | 0200 004c | 8954 2408 | 48c7 0424 | ffff ffff 
+
+  0x000002b7c98293c4: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c98293c4: e8b7 5275 
+
+  0x000002b7c98293c8: ; ImmutableOopMap {[168]=Oop [176]=Oop [144]=Oop [152]=Oop rax=Oop rdx=Oop [160]=Oop rbx=Oop }
+                      ;*synchronization entry
+                      ; - org.bouncycastle.crypto.params.ECKeyParameters::<init>@-1 (line 12)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98293c8: 06e9 0dfa 
+
+  0x000002b7c98293cc: ;   {metadata({method} {0x000002b82bfa6a10} '<init>' '(Z)V' in 'org/bouncycastle/crypto/params/AsymmetricKeyParameter')}
+  0x000002b7c98293cc: ffff 49ba | 086a fa2b | b802 0000 | 4c89 5424 | 0848 c704 | 24ff ffff 
+
+  0x000002b7c98293e4: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c98293e4: ffe8 9652 
+
+  0x000002b7c98293e8: ; ImmutableOopMap {[168]=Oop [176]=Oop [144]=Oop [152]=Oop rax=Oop rdx=Oop [160]=Oop rbx=Oop }
+                      ;*synchronization entry
+                      ; - org.bouncycastle.crypto.params.AsymmetricKeyParameter::<init>@-1 (line 12)
+                      ; - org.bouncycastle.crypto.params.ECKeyParameters::<init>@2 (line 12)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98293e8: 7506 e930 
+
+  0x000002b7c98293ec: ;   {metadata({method} {0x000002b7e9441638} '<init>' '()V' in 'java/lang/Object')}
+  0x000002b7c98293ec: faff ff49 | ba30 1644 | e9b7 0200 | 004c 8954 | 2408 48c7 | 0424 ffff 
+
+  0x000002b7c9829404: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c9829404: ffff e875 
+
+  0x000002b7c9829408: ; ImmutableOopMap {[168]=Oop [176]=Oop [144]=Oop [152]=Oop rax=Oop rdx=Oop [160]=Oop rbx=Oop }
+                      ;*synchronization entry
+                      ; - java.lang.Object::<init>@-1 (line 44)
+                      ; - org.bouncycastle.crypto.params.AsymmetricKeyParameter::<init>@1 (line 12)
+                      ; - org.bouncycastle.crypto.params.ECKeyParameters::<init>@2 (line 12)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c9829408: 5275 06e9 | 53fa ffff | 448b 4610 | 49c1 e003 | 4983 f800 | 0f84 90fa | ffff 4c89 
+
+  0x000002b7c9829424: ;   {runtime_call g1_pre_barrier_slow}
+  0x000002b7c9829424: 0424 e855 | 5c75 06e9 | 82fa ffff | 4883 fb00 | 0f84 97fa | ffff 4889 
+
+  0x000002b7c982943c: ;   {runtime_call g1_post_barrier_slow}
+  0x000002b7c982943c: 3424 e83d | 6075 06e9 | 89fa ffff 
+
+  0x000002b7c9829448: ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c9829448: e8d3 e674 
+
+  0x000002b7c982944c: ; ImmutableOopMap {[168]=Oop [144]=Oop [152]=Oop rax=Oop rbx=Oop [160]=Oop [176]=Oop }
+                      ;*invokevirtual validatePrivateScalar {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@9 (line 16)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c982944c: 0644 8b43 | 1449 c1e0 | 0349 83f8 | 000f 8434 | fbff ff4c 
+
+  0x000002b7c9829460: ;   {runtime_call g1_pre_barrier_slow}
+  0x000002b7c9829460: 8904 24e8 | 185c 7506 | e926 fbff | ff48 83f8 | 000f 843b | fbff ff48 
+
+  0x000002b7c9829478: ;   {runtime_call g1_post_barrier_slow}
+  0x000002b7c9829478: 891c 24e8 | 0060 7506 | e92d fbff 
+
+  0x000002b7c9829484: ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c9829484: ffe8 96e6 
+
+  0x000002b7c9829488: ; ImmutableOopMap {[144]=Oop [160]=Oop [152]=Oop r8=Oop [168]=Oop }
+                      ;*invokeinterface toArrayUnsafe {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@46 (line 341)
+                      ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c9829488: 7406 e891 
+
+  0x000002b7c982948c: ; ImmutableOopMap {[160]=Oop [152]=Oop [168]=Oop rax=Oop }
+                      ;*aaload {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@60 (line 343)
+                      ;   {runtime_call throw_null_pointer_exception Runtime1 stub}
+  0x000002b7c982948c: e674 06e8 
+
+  0x000002b7c9829490: ; ImmutableOopMap {[160]=Oop [152]=Oop [168]=Oop rax=Oop }
+                      ;*aaload {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@60 (line 343)
+  0x000002b7c9829490: 8ce6 7406 | 48c7 0424 | 0000 0000 | 4889 4424 
+
+  0x000002b7c98294a0: ;   {runtime_call throw_range_check_failed Runtime1 stub}
+  0x000002b7c98294a0: 08e8 7add 
+
+  0x000002b7c98294a4: ; ImmutableOopMap {[160]=Oop [152]=Oop [168]=Oop rax=Oop }
+                      ;*aaload {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@60 (line 343)
+  0x000002b7c98294a4: 7406 48c7 | 0424 0100 | 0000 4889 
+
+  0x000002b7c98294b0: ;   {runtime_call throw_range_check_failed Runtime1 stub}
+  0x000002b7c98294b0: 4424 08e8 
+
+  0x000002b7c98294b4: ; ImmutableOopMap {[160]=Oop [152]=Oop [168]=Oop rax=Oop r8=Oop }
+                      ;*aaload {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@64 (line 343)
+  0x000002b7c98294b4: 68dd 7406 
+
+  0x000002b7c98294b8: ;   {internal_word}
+  0x000002b7c98294b8: 49ba 0c92 | 82c9 b702 | 0000 4d89 | 9760 0300 
+
+  0x000002b7c98294c8: ;   {runtime_call SafepointBlob}
+  0x000002b7c98294c8: 00e9 b2fa 
+
+  0x000002b7c98294cc: ;   {metadata(NULL)}
+  0x000002b7c98294cc: 6a06 48ba | 0000 0000 | 0000 0000 | b800 0f05 
+
+  0x000002b7c98294dc: ;   {runtime_call load_klass_patching Runtime1 stub}
+  0x000002b7c98294dc: 0ae8 1e32 
+
+  0x000002b7c98294e0: ; ImmutableOopMap {[152]=Oop [168]=Oop [176]=Oop [144]=Oop [192]=Oop [200]=Oop [160]=Oop }
+                      ;*new {reexecute=1 rethrow=0 return_oop=0}
+                      ; - (reexecute) org.bouncycastle.crypto.params.ECKeyParameters::<init>@10 (line 16)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98294e0: 7506 e949 | fdff ff48 
+
+  0x000002b7c98294e8: ;   {runtime_call fast_new_instance Runtime1 stub}
+  0x000002b7c98294e8: 8bd2 e811 
+
+  0x000002b7c98294ec: ; ImmutableOopMap {[152]=Oop [168]=Oop [144]=Oop [192]=Oop [200]=Oop [160]=Oop [176]=Oop }
+                      ;*new {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.bouncycastle.crypto.params.ECKeyParameters::<init>@10 (line 16)
+                      ; - org.bouncycastle.crypto.params.ECPrivateKeyParameters::<init>@3 (line 14)
+                      ; - org.hyperledger.besu.crypto.AbstractSECP256::sign@32 (line 338)
+  0x000002b7c98294ec: f174 06e9 | 98fd ffff | 9090 498b | 87d8 0300 | 0049 c787 | d803 0000 | 0000 0000 | 49c7 87e0 
+  0x000002b7c982950c: 0300 0000 | 0000 0048 | 81c4 e000 
+
+  0x000002b7c9829518: ;   {runtime_call unwind_exception Runtime1 stub}
+  0x000002b7c9829518: 0000 5de9 | e0fc 6b06 
+[Stub Code]
+  0x000002b7c9829520: ;   {no_reloc}
+  0x000002b7c9829520: 0f1f 4400 
+
+  0x000002b7c9829524: ;   {static_stub}
+  0x000002b7c9829524: 0048 bb00 | 0000 0000 
+
+  0x000002b7c982952c: ;   {runtime_call}
+  0x000002b7c982952c: 0000 00e9 | fbff ffff 
+
+  0x000002b7c9829534: ;   {static_stub}
+  0x000002b7c9829534: 9048 bb00 | 0000 0000 
+
+  0x000002b7c982953c: ;   {runtime_call}
+  0x000002b7c982953c: 0000 00e9 | fbff ffff 
+
+  0x000002b7c9829544: ;   {static_stub}
+  0x000002b7c9829544: 9048 bbf8 | e503 2cb8 
+
+  0x000002b7c982954c: ;   {runtime_call I2C/C2I adapters}
+  0x000002b7c982954c: 0200 00e9 | 09e0 6a06 
+
+  0x000002b7c9829554: ;   {static_stub}
+  0x000002b7c9829554: 9048 bb70 | 2e4a 2db8 
+
+  0x000002b7c982955c: ;   {runtime_call I2C/C2I adapters}
+  0x000002b7c982955c: 0200 00e9 | 7dbc 6806 
+
+  0x000002b7c9829564: ;   {static_stub}
+  0x000002b7c9829564: 9048 bb00 | 0000 0000 
+
+  0x000002b7c982956c: ;   {runtime_call}
+  0x000002b7c982956c: 0000 00e9 | fbff ffff 
+
+  0x000002b7c9829574: ;   {static_stub}
+  0x000002b7c9829574: 9048 bb90 | 304a 2db8 
+
+  0x000002b7c982957c: ;   {runtime_call I2C/C2I adapters}
+  0x000002b7c982957c: 0200 00e9 | d9df 6a06 
+
+  0x000002b7c9829584: ;   {static_stub}
+  0x000002b7c9829584: 9048 bb00 | 0000 0000 
+
+  0x000002b7c982958c: ;   {runtime_call}
+  0x000002b7c982958c: 0000 00e9 | fbff ffff 
+
+  0x000002b7c9829594: ;   {static_stub}
+  0x000002b7c9829594: 9048 bb00 | 0000 0000 
+
+  0x000002b7c982959c: ;   {runtime_call}
+  0x000002b7c982959c: 0000 00e9 | fbff ffff 
+[Exception Handler]
+  0x000002b7c98295a4: ;   {runtime_call handle_exception_from_callee Runtime1 stub}
+  0x000002b7c98295a4: e857 0b75 
+
+  0x000002b7c98295a8: ;   {external_word}
+  0x000002b7c98295a8: 0648 b900 | fa21 fdf8 | 7f00 0048 
+
+  0x000002b7c98295b4: ;   {runtime_call}
+  0x000002b7c98295b4: 83e4 f049 | ba00 8fea | fcf8 7f00 | 0041 ffd2 
+
+  0x000002b7c98295c4: ;   {section_word}
+  0x000002b7c98295c4: f449 bac5 | 9582 c9b7 | 0200 0041 
+
+  0x000002b7c98295d0: ;   {runtime_call DeoptimizationBlob}
+  0x000002b7c98295d0: 52e9 4a0e | 6b06 f4f4 
+[/MachCode]
+
+
+Compiled method (c1) 208392 8471       3       org.hyperledger.besu.crypto.SECP256K1::sign (21 bytes)
+ total in heap  [0x000002b7c9828290,0x000002b7c98286b0] = 1056
+ relocation     [0x000002b7c98283f0,0x000002b7c9828440] = 80
+ main code      [0x000002b7c9828440,0x000002b7c98285c0] = 384
+ stub code      [0x000002b7c98285c0,0x000002b7c9828618] = 88
+ oops           [0x000002b7c9828618,0x000002b7c9828620] = 8
+ metadata       [0x000002b7c9828620,0x000002b7c9828630] = 16
+ scopes data    [0x000002b7c9828630,0x000002b7c9828658] = 40
+ scopes pcs     [0x000002b7c9828658,0x000002b7c98286a8] = 80
+ dependencies   [0x000002b7c98286a8,0x000002b7c98286b0] = 8
+
+[Constant Pool (empty)]
+
+[MachCode]
+[Entry Point]
+  # {method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1'
+  # this:     rdx:rdx   = 'org/hyperledger/besu/crypto/SECP256K1'
+  # parm0:    r8:r8     = 'org/apache/tuweni/bytes/Bytes32'
+  # parm1:    r9:r9     = 'org/hyperledger/besu/crypto/KeyPair'
+  #           [sp+0x40]  (sp of caller)
+  0x000002b7c9828440: 448b 5208 | 49bb 0000 | 00e9 b702 | 0000 4d03 | d34c 3bd0 
+
+  0x000002b7c9828454: ;   {runtime_call ic_miss_stub}
+  0x000002b7c9828454: 0f85 2691 | 6a06 660f | 1f44 0000 
+[Verified Entry Point]
+  0x000002b7c9828460: 8984 2400 | 90ff ff55 | 4883 ec30 
+
+  0x000002b7c982846c: ;   {metadata(method data for {method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1')}
+  0x000002b7c982846c: 48be c06c | c52d b802 | 0000 8bbe | cc00 0000 | 83c7 0289 | becc 0000 | 0081 e7fe | 0700 0083 
+  0x000002b7c982848c: ff00 0f84 | 9b00 0000 | 0fbe 7220 
+
+  0x000002b7c9828498: ;   {metadata(method data for {method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1')}
+  0x000002b7c9828498: 83fe 0048 | bec0 6cc5 | 2db8 0200 | 0048 c7c7 | 1001 0000 | 0f84 0700 | 0000 48c7 | c720 0100 
+  0x000002b7c98284b8: 0048 8b1c | 3e48 8d5b | 0148 891c | 3e48 8bf2 | 0f84 3100 
+
+  0x000002b7c98284cc: ;   {metadata(method data for {method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1')}
+  0x000002b7c98284cc: 0000 48bf | c06c c52d | b802 0000 | 4883 8730 | 0100 0001 | 0f1f 8000 
+
+  0x000002b7c98284e4: ;   {optimized virtual_call}
+  0x000002b7c98284e4: 0000 00e8 
+
+  0x000002b7c98284e8: ; ImmutableOopMap {}
+                      ;*invokevirtual signNative {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.SECP256K1::sign@10 (line 106)
+  0x000002b7c98284e8: 1496 6a06 | 4883 c430 
+
+  0x000002b7c98284f0: ;   {poll_return}
+  0x000002b7c98284f0: 5d49 3ba7 | 4803 0000 | 0f87 5200 
+
+  0x000002b7c98284fc: ;   {metadata(method data for {method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1')}
+  0x000002b7c98284fc: 0000 c348 | bfc0 6cc5 | 2db8 0200 | 0048 8387 | 6801 0000 | 0166 0f1f 
+
+  0x000002b7c9828514: ;   {optimized virtual_call}
+  0x000002b7c9828514: 4400 00e8 
+
+  0x000002b7c9828518: ; ImmutableOopMap {}
+                      ;*invokespecial sign {reexecute=0 rethrow=0 return_oop=0}
+                      ; - org.hyperledger.besu.crypto.SECP256K1::sign@17 (line 108)
+  0x000002b7c9828518: a404 0000 | 4883 c430 
+
+  0x000002b7c9828520: ;   {poll_return}
+  0x000002b7c9828520: 5d49 3ba7 | 4803 0000 | 0f87 3800 
+
+  0x000002b7c982852c: ;   {metadata({method} {0x000002b82bdf29d8} 'sign' '(Lorg/apache/tuweni/bytes/Bytes32;Lorg/hyperledger/besu/crypto/KeyPair;)Lorg/hyperledger/besu/crypto/SECPSignature;' in 'org/hyperledger/besu/crypto/SECP256K1')}
+  0x000002b7c982852c: 0000 c349 | bad0 29df | 2bb8 0200 | 004c 8954 | 2408 48c7 | 0424 ffff 
+
+  0x000002b7c9828544: ;   {runtime_call counter_overflow Runtime1 stub}
+  0x000002b7c9828544: ffff e835 
+
+  0x000002b7c9828548: ; ImmutableOopMap {rdx=Oop r8=Oop r9=Oop }
+                      ;*synchronization entry
+                      ; - org.hyperledger.besu.crypto.SECP256K1::sign@-1 (line 105)
+  0x000002b7c9828548: 6175 06e9 | 44ff ffff 
+
+  0x000002b7c9828550: ;   {internal_word}
+  0x000002b7c9828550: 49ba f184 | 82c9 b702 | 0000 4d89 | 9760 0300 
+
+  0x000002b7c9828560: ;   {runtime_call SafepointBlob}
+  0x000002b7c9828560: 00e9 1a0a 
+
+  0x000002b7c9828564: ;   {internal_word}
+  0x000002b7c9828564: 6b06 49ba | 2185 82c9 | b702 0000 | 4d89 9760 
+
+  0x000002b7c9828574: ;   {runtime_call SafepointBlob}
+  0x000002b7c9828574: 0300 00e9 | 040a 6b06 | 9090 498b | 87d8 0300 | 0049 c787 | d803 0000 | 0000 0000 | 49c7 87e0 
+  0x000002b7c9828594: 0300 0000 | 0000 0048 | 83c4 305d 
+
+  0x000002b7c98285a0: ;   {runtime_call unwind_exception Runtime1 stub}
+  0x000002b7c98285a0: e95b 0c6c | 06f4 f4f4 | f4f4 f4f4 | f4f4 f4f4 | f4f4 f4f4 | f4f4 f4f4 | f4f4 f4f4 | f4f4 f4f4 
+[Stub Code]
+  0x000002b7c98285c0: ;   {no_reloc}
+  0x000002b7c98285c0: 0f1f 4400 
+
+  0x000002b7c98285c4: ;   {static_stub}
+  0x000002b7c98285c4: 0048 bb00 | 0000 0000 
+
+  0x000002b7c98285cc: ;   {runtime_call}
+  0x000002b7c98285cc: 0000 00e9 | fbff ffff 
+
+  0x000002b7c98285d4: ;   {static_stub}
+  0x000002b7c98285d4: 9048 bb00 | 0000 0000 
+
+  0x000002b7c98285dc: ;   {runtime_call}
+  0x000002b7c98285dc: 0000 00e9 | fbff ffff 
+[Exception Handler]
+  0x000002b7c98285e4: ;   {runtime_call handle_exception_from_callee Runtime1 stub}
+  0x000002b7c98285e4: e817 1b75 
+
+  0x000002b7c98285e8: ;   {external_word}
+  0x000002b7c98285e8: 0648 b900 | fa21 fdf8 | 7f00 0048 
+
+  0x000002b7c98285f4: ;   {runtime_call}
+  0x000002b7c98285f4: 83e4 f049 | ba00 8fea | fcf8 7f00 | 0041 ffd2 
+
+  0x000002b7c9828604: ;   {section_word}
+  0x000002b7c9828604: f449 ba05 | 8682 c9b7 | 0200 0041 
+
+  0x000002b7c9828610: ;   {runtime_call DeoptimizationBlob}
+  0x000002b7c9828610: 52e9 0a1e | 6b06 f4f4 
+[/MachCode]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x000002b830981580, length=79, elements={
+0x000002b7c0df8f50, 0x000002b82a017bc0, 0x000002b82a018780, 0x000002b82a02ce30,
+0x000002b82a02d800, 0x000002b82a02f1d0, 0x000002b82a0501b0, 0x000002b82a055ed0,
+0x000002b82a061d10, 0x000002b82a067830, 0x000002b82a2f3750, 0x000002b82a2f8580,
+0x000002b8321cb910, 0x000002b831f6ea50, 0x000002b83127ad60, 0x000002b831277fd0,
+0x000002b8312789f0, 0x000002b83127b780, 0x000002b8312784e0, 0x000002b831278f00,
+0x000002b831279410, 0x000002b831279920, 0x000002b831279e30, 0x000002b83127a340,
+0x000002b8338e0a90, 0x000002b8338e14b0, 0x000002b8338e0fa0, 0x000002b8338e23e0,
+0x000002b8338e3310, 0x000002b8338e3820, 0x000002b8338e19c0, 0x000002b8338e28f0,
+0x000002b8338e3d30, 0x000002b8338e2e00, 0x000002b8338e0580, 0x000002b8338e6ac0,
+0x000002b8338e65b0, 0x000002b8338e74e0, 0x000002b8338e5680, 0x000002b8338e5b90,
+0x000002b8338e4c60, 0x000002b8338e60a0, 0x000002b8338e6fd0, 0x000002b8338e79f0,
+0x000002b8338e4240, 0x000002b8338e4750, 0x000002b8338e5170, 0x000002b82f9df6c0,
+0x000002b82f9dd350, 0x000002b82f9e00e0, 0x000002b82f9dfbd0, 0x000002b82f9dd860,
+0x000002b82f9e05f0, 0x000002b82f9df1b0, 0x000002b82f9de790, 0x000002b82f9deca0,
+0x000002b82f9e0b00, 0x000002b82f9e1520, 0x000002b82f9ddd70, 0x000002b82f9e1a30,
+0x000002b82f9e1f40, 0x000002b82f9e2450, 0x000002b82f9e2960, 0x000002b82f9e2e70,
+0x000002b82f9e4cd0, 0x000002b82f9e3380, 0x000002b82f9e3da0, 0x000002b82f9e42b0,
+0x000002b82f9e47c0, 0x000002b830d63a20, 0x000002b830d63510, 0x000002b830d63f30,
+0x000002b830d64440, 0x000002b830d62af0, 0x000002b830d64950, 0x000002b830d64e60,
+0x000002b830d63000, 0x000002b830d65370, 0x000002b830d65880
+}
+
+Java Threads: ( => current thread )
+  0x000002b7c0df8f50 JavaThread "main" [_thread_blocked, id=27116, stack(0x000000ea95900000,0x000000ea95a00000)]
+  0x000002b82a017bc0 JavaThread "Reference Handler" daemon [_thread_blocked, id=44156, stack(0x000000ea96000000,0x000000ea96100000)]
+  0x000002b82a018780 JavaThread "Finalizer" daemon [_thread_blocked, id=12492, stack(0x000000ea96100000,0x000000ea96200000)]
+  0x000002b82a02ce30 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=42900, stack(0x000000ea96200000,0x000000ea96300000)]
+  0x000002b82a02d800 JavaThread "Attach Listener" daemon [_thread_blocked, id=21100, stack(0x000000ea96300000,0x000000ea96400000)]
+  0x000002b82a02f1d0 JavaThread "Service Thread" daemon [_thread_blocked, id=4052, stack(0x000000ea96400000,0x000000ea96500000)]
+  0x000002b82a0501b0 JavaThread "Monitor Deflation Thread" daemon [_thread_blocked, id=34224, stack(0x000000ea96500000,0x000000ea96600000)]
+  0x000002b82a055ed0 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=18716, stack(0x000000ea96600000,0x000000ea96700000)]
+  0x000002b82a061d10 JavaThread "C1 CompilerThread0" daemon [_thread_blocked, id=45096, stack(0x000000ea96700000,0x000000ea96800000)]
+  0x000002b82a067830 JavaThread "Sweeper thread" daemon [_thread_blocked, id=47996, stack(0x000000ea96800000,0x000000ea96900000)]
+  0x000002b82a2f3750 JavaThread "Common-Cleaner" daemon [_thread_blocked, id=23920, stack(0x000000ea96900000,0x000000ea96a00000)]
+  0x000002b82a2f8580 JavaThread "Notification Thread" daemon [_thread_blocked, id=6728, stack(0x000000ea96a00000,0x000000ea96b00000)]
+  0x000002b8321cb910 JavaThread "vertx-blocked-thread-checker" daemon [_thread_blocked, id=39788, stack(0x000000ea97900000,0x000000ea97a00000)]
+  0x000002b831f6ea50 JavaThread "Thread-1" daemon [_thread_in_native, id=45576, stack(0x000000ea97a00000,0x000000ea97b00000)]
+  0x000002b83127ad60 JavaThread "JNA Cleaner" daemon [_thread_blocked, id=47956, stack(0x000000ea97b00000,0x000000ea97c00000)]
+  0x000002b831277fd0 JavaThread "ForkJoinPool.commonPool-worker-1" daemon [_thread_blocked, id=48544, stack(0x000000ea96c00000,0x000000ea96d00000)]
+  0x000002b8312789f0 JavaThread "ForkJoinPool.commonPool-worker-2" daemon [_thread_blocked, id=25200, stack(0x000000ea98400000,0x000000ea98500000)]
+  0x000002b83127b780 JavaThread "ForkJoinPool.commonPool-worker-3" daemon [_thread_blocked, id=31944, stack(0x000000ea98500000,0x000000ea98600000)]
+  0x000002b8312784e0 JavaThread "vert.x-eventloop-thread-0" [_thread_in_native, id=5740, stack(0x000000ea98700000,0x000000ea98800000)]
+  0x000002b831278f00 JavaThread "vert.x-eventloop-thread-1" [_thread_in_native, id=12736, stack(0x000000ea98800000,0x000000ea98900000)]
+  0x000002b831279410 JavaThread "vertx-blocked-thread-checker" daemon [_thread_blocked, id=4588, stack(0x000000ea98900000,0x000000ea98a00000)]
+  0x000002b831279920 JavaThread "vert.x-eventloop-thread-2" [_thread_in_native, id=34012, stack(0x000000ea98a00000,0x000000ea98b00000)]
+  0x000002b831279e30 JavaThread "vertx-blocked-thread-checker" daemon [_thread_blocked, id=15916, stack(0x000000ea98b00000,0x000000ea98c00000)]
+  0x000002b83127a340 JavaThread "vert.x-acceptor-thread-0" [_thread_in_native, id=33716, stack(0x000000ea98c00000,0x000000ea98d00000)]
+  0x000002b8338e0a90 JavaThread "EthScheduler-Timer-0" [_thread_blocked, id=20160, stack(0x000000ea98d00000,0x000000ea98e00000)]
+  0x000002b8338e14b0 JavaThread "nioEventLoopGroup-2-1" [_thread_in_native, id=17368, stack(0x000000ea98e00000,0x000000ea98f00000)]
+  0x000002b8338e0fa0 JavaThread "pool-8-thread-1" [_thread_blocked, id=24772, stack(0x000000ea99000000,0x000000ea99100000)]
+  0x000002b8338e23e0 JavaThread "BftTimerExecutor-IBFT-0" [_thread_blocked, id=24368, stack(0x000000ea99100000,0x000000ea99200000)]
+=>0x000002b8338e3310 JavaThread "BftProcessorExecutor-IBFT-0" [_thread_in_vm, id=32348, stack(0x000000ea99200000,0x000000ea99300000)]
+  0x000002b8338e3820 JavaThread "EthScheduler-BlockCreation-0" [_thread_blocked, id=11220, stack(0x000000ea99300000,0x000000ea99400000)]
+  0x000002b8338e19c0 JavaThread "EthScheduler-Services-0" [_thread_blocked, id=17020, stack(0x000000ea99400000,0x000000ea99500000)]
+  0x000002b8338e28f0 JavaThread "vert.x-worker-thread-0" [_thread_blocked, id=46208, stack(0x000000ea99500000,0x000000ea99600000)]
+  0x000002b8338e3d30 JavaThread "vert.x-eventloop-thread-3" [_thread_in_native, id=6456, stack(0x000000ea99600000,0x000000ea99700000)]
+  0x000002b8338e2e00 JavaThread "vert.x-worker-thread-1" [_thread_blocked, id=20604, stack(0x000000ea99700000,0x000000ea99800000)]
+  0x000002b8338e0580 JavaThread "vert.x-worker-thread-2" [_thread_blocked, id=20264, stack(0x000000ea99800000,0x000000ea99900000)]
+  0x000002b8338e6ac0 JavaThread "vert.x-worker-thread-3" [_thread_blocked, id=1924, stack(0x000000ea98600000,0x000000ea98700000)]
+  0x000002b8338e65b0 JavaThread "vert.x-worker-thread-4" [_thread_blocked, id=26616, stack(0x000000ea98f00000,0x000000ea99000000)]
+  0x000002b8338e74e0 JavaThread "vert.x-worker-thread-5" [_thread_blocked, id=25332, stack(0x000000ea99900000,0x000000ea99a00000)]
+  0x000002b8338e5680 JavaThread "vert.x-worker-thread-6" [_thread_blocked, id=13504, stack(0x000000ea99a00000,0x000000ea99b00000)]
+  0x000002b8338e5b90 JavaThread "vert.x-worker-thread-7" [_thread_blocked, id=24192, stack(0x000000ea99b00000,0x000000ea99c00000)]
+  0x000002b8338e4c60 JavaThread "vert.x-worker-thread-8" [_thread_blocked, id=4436, stack(0x000000ea99c00000,0x000000ea99d00000)]
+  0x000002b8338e60a0 JavaThread "vert.x-worker-thread-9" [_thread_blocked, id=47556, stack(0x000000ea99e00000,0x000000ea99f00000)]
+  0x000002b8338e6fd0 JavaThread "vert.x-eventloop-thread-4" [_thread_in_native, id=22572, stack(0x000000ea99f00000,0x000000ea9a000000)]
+  0x000002b8338e79f0 JavaThread "vert.x-worker-thread-10" [_thread_blocked, id=18100, stack(0x000000ea99d00000,0x000000ea99e00000)]
+  0x000002b8338e4240 JavaThread "vert.x-worker-thread-11" [_thread_blocked, id=43948, stack(0x000000ea9a000000,0x000000ea9a100000)]
+  0x000002b8338e4750 JavaThread "vert.x-worker-thread-12" [_thread_blocked, id=9052, stack(0x000000ea9a100000,0x000000ea9a200000)]
+  0x000002b8338e5170 JavaThread "vert.x-worker-thread-13" [_thread_blocked, id=4336, stack(0x000000ea9a200000,0x000000ea9a300000)]
+  0x000002b82f9df6c0 JavaThread "vert.x-worker-thread-14" [_thread_blocked, id=36660, stack(0x000000ea9a300000,0x000000ea9a400000)]
+  0x000002b82f9dd350 JavaThread "vert.x-worker-thread-15" [_thread_blocked, id=25956, stack(0x000000ea9a400000,0x000000ea9a500000)]
+  0x000002b82f9e00e0 JavaThread "vert.x-worker-thread-16" [_thread_blocked, id=49104, stack(0x000000ea9a500000,0x000000ea9a600000)]
+  0x000002b82f9dfbd0 JavaThread "vert.x-worker-thread-17" [_thread_blocked, id=16888, stack(0x000000ea9a600000,0x000000ea9a700000)]
+  0x000002b82f9dd860 JavaThread "vert.x-worker-thread-18" [_thread_blocked, id=47872, stack(0x000000ea9a800000,0x000000ea9a900000)]
+  0x000002b82f9e05f0 JavaThread "vert.x-worker-thread-19" [_thread_blocked, id=3004, stack(0x000000ea9a700000,0x000000ea9a800000)]
+  0x000002b82f9df1b0 JavaThread "vert.x-eventloop-thread-5" [_thread_in_native, id=32580, stack(0x000000ea9a900000,0x000000ea9aa00000)]
+  0x000002b82f9de790 JavaThread "EthScheduler-Transactions-0" [_thread_blocked, id=14984, stack(0x000000ea9ab00000,0x000000ea9ac00000)]
+  0x000002b82f9deca0 JavaThread "ForkJoinPool.commonPool-worker-4" daemon [_thread_blocked, id=39236, stack(0x000000ea9aa00000,0x000000ea9ab00000)]
+  0x000002b82f9e0b00 JavaThread "ForkJoinPool.commonPool-worker-5" daemon [_thread_blocked, id=48836, stack(0x000000ea9ae00000,0x000000ea9af00000)]
+  0x000002b82f9e1520 JavaThread "ForkJoinPool.commonPool-worker-6" daemon [_thread_blocked, id=1728, stack(0x000000ea9af00000,0x000000ea9b000000)]
+  0x000002b82f9ddd70 JavaThread "vert.x-eventloop-thread-6" [_thread_in_native, id=35480, stack(0x000000ea9ac00000,0x000000ea9ad00000)]
+  0x000002b82f9e1a30 JavaThread "vert.x-eventloop-thread-7" [_thread_in_native, id=36428, stack(0x000000ea9ad00000,0x000000ea9ae00000)]
+  0x000002b82f9e1f40 JavaThread "vert.x-eventloop-thread-8" [_thread_in_native, id=42888, stack(0x000000ea9b000000,0x000000ea9b100000)]
+  0x000002b82f9e2450 JavaThread "vert.x-eventloop-thread-9" [_thread_in_native, id=35720, stack(0x000000ea9b100000,0x000000ea9b200000)]
+  0x000002b82f9e2960 JavaThread "vert.x-eventloop-thread-10" [_thread_in_native, id=41216, stack(0x000000ea9b200000,0x000000ea9b300000)]
+  0x000002b82f9e2e70 JavaThread "vert.x-eventloop-thread-11" [_thread_in_native, id=2720, stack(0x000000ea9b300000,0x000000ea9b400000)]
+  0x000002b82f9e4cd0 JavaThread "vert.x-eventloop-thread-12" [_thread_in_native, id=14304, stack(0x000000ea9b400000,0x000000ea9b500000)]
+  0x000002b82f9e3380 JavaThread "vert.x-eventloop-thread-13" [_thread_in_native, id=32792, stack(0x000000ea9b500000,0x000000ea9b600000)]
+  0x000002b82f9e3da0 JavaThread "vert.x-eventloop-thread-14" [_thread_in_native, id=2420, stack(0x000000ea9b600000,0x000000ea9b700000)]
+  0x000002b82f9e42b0 JavaThread "vert.x-eventloop-thread-15" [_thread_in_native, id=39316, stack(0x000000ea95600000,0x000000ea95700000)]
+  0x000002b82f9e47c0 JavaThread "EthScheduler-Computation-0" [_thread_blocked, id=47220, stack(0x000000ea95700000,0x000000ea95800000)]
+  0x000002b830d63a20 JavaThread "vert.x-eventloop-thread-16" [_thread_in_native, id=28720, stack(0x000000ea95800000,0x000000ea95900000)]
+  0x000002b830d63510 JavaThread "ForkJoinPool.commonPool-worker-7" daemon [_thread_blocked, id=40048, stack(0x000000ea9b700000,0x000000ea9b800000)]
+  0x000002b830d63f30 JavaThread "vert.x-eventloop-thread-17" [_thread_in_native, id=42212, stack(0x000000ea9b800000,0x000000ea9b900000)]
+  0x000002b830d64440 JavaThread "vert.x-eventloop-thread-18" [_thread_in_native, id=22256, stack(0x000000ea9b900000,0x000000ea9ba00000)]
+  0x000002b830d62af0 JavaThread "vert.x-eventloop-thread-19" [_thread_in_native, id=44348, stack(0x000000ea9ba00000,0x000000ea9bb00000)]
+  0x000002b830d64950 JavaThread "vert.x-eventloop-thread-20" [_thread_in_native, id=31024, stack(0x000000ea9bb00000,0x000000ea9bc00000)]
+  0x000002b830d64e60 JavaThread "ForkJoinPool.commonPool-worker-8" daemon [_thread_blocked, id=30116, stack(0x000000ea9bc00000,0x000000ea9bd00000)]
+  0x000002b830d63000 JavaThread "vert.x-eventloop-thread-21" [_thread_in_native, id=48428, stack(0x000000ea9bd00000,0x000000ea9be00000)]
+  0x000002b830d65370 JavaThread "vert.x-eventloop-thread-22" [_thread_in_native, id=48676, stack(0x000000ea9be00000,0x000000ea9bf00000)]
+  0x000002b830d65880 JavaThread "vert.x-eventloop-thread-23" [_thread_in_native, id=17268, stack(0x000000ea9bf00000,0x000000ea9c000000)]
+
+Other Threads:
+  0x000002b82a00f1b0 VMThread "VM Thread" [stack: 0x000000ea95f00000,0x000000ea96000000] [id=9256]
+  0x000002b82a2f9080 WatcherThread [stack: 0x000000ea96b00000,0x000000ea96c00000] [id=34656]
+  0x000002b7c0e81ed0 GCTaskThread "GC Thread#0" [stack: 0x000000ea95a00000,0x000000ea95b00000] [id=45032]
+  0x000002b82f2ac7f0 GCTaskThread "GC Thread#1" [stack: 0x000000ea96d00000,0x000000ea96e00000] [id=21640]
+  0x000002b82f2603e0 GCTaskThread "GC Thread#2" [stack: 0x000000ea96e00000,0x000000ea96f00000] [id=47524]
+  0x000002b82f2aebb0 GCTaskThread "GC Thread#3" [stack: 0x000000ea96f00000,0x000000ea97000000] [id=23608]
+  0x000002b82f2aee70 GCTaskThread "GC Thread#4" [stack: 0x000000ea97000000,0x000000ea97100000] [id=8248]
+  0x000002b82f2af130 GCTaskThread "GC Thread#5" [stack: 0x000000ea97100000,0x000000ea97200000] [id=19356]
+  0x000002b82f47e610 GCTaskThread "GC Thread#6" [stack: 0x000000ea97200000,0x000000ea97300000] [id=32000]
+  0x000002b82f47f690 GCTaskThread "GC Thread#7" [stack: 0x000000ea97300000,0x000000ea97400000] [id=7804]
+  0x000002b82f47e090 GCTaskThread "GC Thread#8" [stack: 0x000000ea97400000,0x000000ea97500000] [id=39016]
+  0x000002b82f47e350 GCTaskThread "GC Thread#9" [stack: 0x000000ea97600000,0x000000ea97700000] [id=27184]
+  0x000002b7c0e8ebf0 ConcurrentGCThread "G1 Main Marker" [stack: 0x000000ea95b00000,0x000000ea95c00000] [id=18104]
+  0x000002b7e60213a0 ConcurrentGCThread "G1 Conc#0" [stack: 0x000000ea95c00000,0x000000ea95d00000] [id=36520]
+  0x000002b82f47f3d0 ConcurrentGCThread "G1 Conc#1" [stack: 0x000000ea97700000,0x000000ea97800000] [id=9804]
+  0x000002b83145fe30 ConcurrentGCThread "G1 Conc#2" [stack: 0x000000ea97800000,0x000000ea97900000] [id=33564]
+  0x000002b7e60e33b0 ConcurrentGCThread "G1 Refine#0" [stack: 0x000000ea95d00000,0x000000ea95e00000] [id=43004]
+  0x000002b7e60e3c80 ConcurrentGCThread "G1 Service" [stack: 0x000000ea95e00000,0x000000ea95f00000] [id=18616]
+
+Threads with active compile tasks:
+
+VM state: not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x000002b7c0df3550] Metaspace_lock - owner thread: 0x000002b8338e3310
+[0x000002b7c0df5e90] MethodData_lock - owner thread: 0x000002b8338e3310
+
+Heap address: 0x0000000684400000, size: 6076 MB, Compressed Oops mode: Zero based, Oop shift amount: 3
+
+CDS archive(s) mapped at: [0x000002b7e9000000-0x000002b7e9bb0000-0x000002b7e9bb0000), size 12255232, SharedBaseAddress: 0x000002b7e9000000, ArchiveRelocationMode: 1.
+Compressed class space mapped at: 0x000002b7ea000000-0x000002b82a000000, reserved size: 1073741824
+Narrow klass base: 0x000002b7e9000000, Narrow klass shift: 0, Narrow klass range: 0x100000000
+
+GC Precious Log:
+ CPUs: 12 total, 12 available
+ Memory: 24298M
+ Large Page Support: Disabled
+ NUMA Support: Disabled
+ Compressed Oops: Enabled (Zero based)
+ Heap Region Size: 4M
+ Heap Min Capacity: 8M
+ Heap Initial Capacity: 380M
+ Heap Max Capacity: 6076M
+ Pre-touch: Disabled
+ Parallel Workers: 10
+ Concurrent Workers: 3
+ Concurrent Refinement Workers: 2
+ Periodic GC: Disabled
+
+Heap:
+ garbage-first heap   total 253952K, used 140777K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 27 young (110592K), 1 survivors (4096K)
+ Metaspace       used 51026K, committed 51520K, reserved 1114112K
+  class space    used 6245K, committed 6464K, reserved 1048576K
+
+Heap Regions: E=young(eden), S=young(survivor), O=old, HS=humongous(starts), HC=humongous(continues), CS=collection set, F=free, OA=open archive, CA=closed archive, TAMS=top-at-mark-start (previous, next)
+|   0|0x0000000684400000, 0x0000000684800000, 0x0000000684800000|100%| O|  |TAMS 0x0000000684800000, 0x0000000684400000| Untracked 
+|   1|0x0000000684800000, 0x0000000684c00000, 0x0000000684c00000|100%| O|  |TAMS 0x0000000684c00000, 0x0000000684800000| Untracked 
+|   2|0x0000000684c00000, 0x0000000685000000, 0x0000000685000000|100%| O|  |TAMS 0x0000000684c00000, 0x0000000684c00000| Untracked 
+|   3|0x0000000685000000, 0x0000000685400000, 0x0000000685400000|100%| O|  |TAMS 0x0000000685400000, 0x0000000685000000| Untracked 
+|   4|0x0000000685400000, 0x0000000685800000, 0x0000000685800000|100%| O|  |TAMS 0x0000000685800000, 0x0000000685400000| Untracked 
+|   5|0x0000000685800000, 0x000000068593bc00, 0x0000000685c00000| 30%| O|  |TAMS 0x0000000685800000, 0x0000000685800000| Untracked 
+|   6|0x0000000685c00000, 0x0000000686000000, 0x0000000686000000|100%| O|  |TAMS 0x0000000685c00000, 0x0000000685c00000| Untracked 
+|   7|0x0000000686000000, 0x0000000686400000, 0x0000000686400000|100%| O|  |TAMS 0x0000000686000000, 0x0000000686000000| Untracked 
+|   8|0x0000000686400000, 0x0000000686800000, 0x0000000686800000|100%|HS|  |TAMS 0x0000000686400000, 0x0000000686400000| Complete 
+|   9|0x0000000686800000, 0x0000000686c00000, 0x0000000686c00000|100%|HC|  |TAMS 0x0000000686800000, 0x0000000686800000| Complete 
+|  10|0x0000000686c00000, 0x0000000686c00000, 0x0000000687000000|  0%| F|  |TAMS 0x0000000686c00000, 0x0000000686c00000| Untracked 
+|  11|0x0000000687000000, 0x0000000687000000, 0x0000000687400000|  0%| F|  |TAMS 0x0000000687000000, 0x0000000687000000| Untracked 
+|  12|0x0000000687400000, 0x0000000687400000, 0x0000000687800000|  0%| F|  |TAMS 0x0000000687400000, 0x0000000687400000| Untracked 
+|  13|0x0000000687800000, 0x0000000687800000, 0x0000000687c00000|  0%| F|  |TAMS 0x0000000687800000, 0x0000000687800000| Untracked 
+|  14|0x0000000687c00000, 0x0000000687c00000, 0x0000000688000000|  0%| F|  |TAMS 0x0000000687c00000, 0x0000000687c00000| Untracked 
+|  15|0x0000000688000000, 0x0000000688000000, 0x0000000688400000|  0%| F|  |TAMS 0x0000000688000000, 0x0000000688000000| Untracked 
+|  16|0x0000000688400000, 0x0000000688400000, 0x0000000688800000|  0%| F|  |TAMS 0x0000000688400000, 0x0000000688400000| Untracked 
+|  17|0x0000000688800000, 0x0000000688800000, 0x0000000688c00000|  0%| F|  |TAMS 0x0000000688800000, 0x0000000688800000| Untracked 
+|  18|0x0000000688c00000, 0x0000000688c00000, 0x0000000689000000|  0%| F|  |TAMS 0x0000000688c00000, 0x0000000688c00000| Untracked 
+|  19|0x0000000689000000, 0x0000000689000000, 0x0000000689400000|  0%| F|  |TAMS 0x0000000689000000, 0x0000000689000000| Untracked 
+|  20|0x0000000689400000, 0x0000000689400000, 0x0000000689800000|  0%| F|  |TAMS 0x0000000689400000, 0x0000000689400000| Untracked 
+|  21|0x0000000689800000, 0x0000000689800000, 0x0000000689c00000|  0%| F|  |TAMS 0x0000000689800000, 0x0000000689800000| Untracked 
+|  22|0x0000000689c00000, 0x0000000689c00000, 0x000000068a000000|  0%| F|  |TAMS 0x0000000689c00000, 0x0000000689c00000| Untracked 
+|  23|0x000000068a000000, 0x000000068a000000, 0x000000068a400000|  0%| F|  |TAMS 0x000000068a000000, 0x000000068a000000| Untracked 
+|  24|0x000000068a400000, 0x000000068a400000, 0x000000068a800000|  0%| F|  |TAMS 0x000000068a400000, 0x000000068a400000| Untracked 
+|  25|0x000000068a800000, 0x000000068a83ea00, 0x000000068ac00000|  6%| S|CS|TAMS 0x000000068a800000, 0x000000068a800000| Complete 
+|  26|0x000000068ac00000, 0x000000068ac00000, 0x000000068b000000|  0%| F|  |TAMS 0x000000068ac00000, 0x000000068ac00000| Untracked 
+|  27|0x000000068b000000, 0x000000068b000000, 0x000000068b400000|  0%| F|  |TAMS 0x000000068b000000, 0x000000068b000000| Untracked 
+|  28|0x000000068b400000, 0x000000068b400000, 0x000000068b800000|  0%| F|  |TAMS 0x000000068b400000, 0x000000068b400000| Untracked 
+|  29|0x000000068b800000, 0x000000068b800000, 0x000000068bc00000|  0%| F|  |TAMS 0x000000068b800000, 0x000000068b800000| Untracked 
+|  30|0x000000068bc00000, 0x000000068bc00000, 0x000000068c000000|  0%| F|  |TAMS 0x000000068bc00000, 0x000000068bc00000| Untracked 
+|  31|0x000000068c000000, 0x000000068c000000, 0x000000068c400000|  0%| F|  |TAMS 0x000000068c000000, 0x000000068c000000| Untracked 
+|  32|0x000000068c400000, 0x000000068c400000, 0x000000068c800000|  0%| F|  |TAMS 0x000000068c400000, 0x000000068c400000| Untracked 
+|  33|0x000000068c800000, 0x000000068c800000, 0x000000068cc00000|  0%| F|  |TAMS 0x000000068c800000, 0x000000068c800000| Untracked 
+|  34|0x000000068cc00000, 0x000000068cc00000, 0x000000068d000000|  0%| F|  |TAMS 0x000000068cc00000, 0x000000068cc00000| Untracked 
+|  35|0x000000068d000000, 0x000000068d000000, 0x000000068d400000|  0%| F|  |TAMS 0x000000068d000000, 0x000000068d000000| Untracked 
+|  36|0x000000068d400000, 0x000000068d61df90, 0x000000068d800000| 52%| E|  |TAMS 0x000000068d400000, 0x000000068d400000| Complete 
+|  37|0x000000068d800000, 0x000000068dc00000, 0x000000068dc00000|100%| E|CS|TAMS 0x000000068d800000, 0x000000068d800000| Complete 
+|  38|0x000000068dc00000, 0x000000068e000000, 0x000000068e000000|100%| E|CS|TAMS 0x000000068dc00000, 0x000000068dc00000| Complete 
+|  39|0x000000068e000000, 0x000000068e400000, 0x000000068e400000|100%| E|CS|TAMS 0x000000068e000000, 0x000000068e000000| Complete 
+|  40|0x000000068e400000, 0x000000068e800000, 0x000000068e800000|100%| E|CS|TAMS 0x000000068e400000, 0x000000068e400000| Complete 
+|  41|0x000000068e800000, 0x000000068ec00000, 0x000000068ec00000|100%| E|CS|TAMS 0x000000068e800000, 0x000000068e800000| Complete 
+|  42|0x000000068ec00000, 0x000000068f000000, 0x000000068f000000|100%| E|CS|TAMS 0x000000068ec00000, 0x000000068ec00000| Complete 
+|  43|0x000000068f000000, 0x000000068f400000, 0x000000068f400000|100%| E|CS|TAMS 0x000000068f000000, 0x000000068f000000| Complete 
+|  44|0x000000068f400000, 0x000000068f800000, 0x000000068f800000|100%| E|CS|TAMS 0x000000068f400000, 0x000000068f400000| Complete 
+|  45|0x000000068f800000, 0x000000068fc00000, 0x000000068fc00000|100%| E|CS|TAMS 0x000000068f800000, 0x000000068f800000| Complete 
+|  46|0x000000068fc00000, 0x0000000690000000, 0x0000000690000000|100%| E|CS|TAMS 0x000000068fc00000, 0x000000068fc00000| Complete 
+|  47|0x0000000690000000, 0x0000000690400000, 0x0000000690400000|100%| E|CS|TAMS 0x0000000690000000, 0x0000000690000000| Complete 
+|  48|0x0000000690400000, 0x0000000690800000, 0x0000000690800000|100%| E|CS|TAMS 0x0000000690400000, 0x0000000690400000| Complete 
+|  49|0x0000000690800000, 0x0000000690c00000, 0x0000000690c00000|100%| E|CS|TAMS 0x0000000690800000, 0x0000000690800000| Complete 
+|  50|0x0000000690c00000, 0x0000000691000000, 0x0000000691000000|100%| E|CS|TAMS 0x0000000690c00000, 0x0000000690c00000| Complete 
+|  51|0x0000000691000000, 0x0000000691400000, 0x0000000691400000|100%| E|CS|TAMS 0x0000000691000000, 0x0000000691000000| Complete 
+|  52|0x0000000691400000, 0x0000000691800000, 0x0000000691800000|100%| E|CS|TAMS 0x0000000691400000, 0x0000000691400000| Complete 
+|  53|0x0000000691800000, 0x0000000691c00000, 0x0000000691c00000|100%| E|CS|TAMS 0x0000000691800000, 0x0000000691800000| Complete 
+|  54|0x0000000691c00000, 0x0000000692000000, 0x0000000692000000|100%| E|CS|TAMS 0x0000000691c00000, 0x0000000691c00000| Complete 
+|  55|0x0000000692000000, 0x0000000692400000, 0x0000000692400000|100%| E|CS|TAMS 0x0000000692000000, 0x0000000692000000| Complete 
+|  56|0x0000000692400000, 0x0000000692800000, 0x0000000692800000|100%| E|CS|TAMS 0x0000000692400000, 0x0000000692400000| Complete 
+|  57|0x0000000692800000, 0x0000000692c00000, 0x0000000692c00000|100%| E|CS|TAMS 0x0000000692800000, 0x0000000692800000| Complete 
+|  58|0x0000000692c00000, 0x0000000693000000, 0x0000000693000000|100%| E|CS|TAMS 0x0000000692c00000, 0x0000000692c00000| Complete 
+|  59|0x0000000693000000, 0x0000000693400000, 0x0000000693400000|100%| E|CS|TAMS 0x0000000693000000, 0x0000000693000000| Complete 
+|  60|0x0000000693400000, 0x0000000693800000, 0x0000000693800000|100%| E|CS|TAMS 0x0000000693400000, 0x0000000693400000| Complete 
+|  94|0x000000069bc00000, 0x000000069c000000, 0x000000069c000000|100%| E|CS|TAMS 0x000000069bc00000, 0x000000069bc00000| Complete 
+
+Card table byte_map: [0x000002b7d8a80000,0x000002b7d9660000] _byte_map_base: 0x000002b7d565e000
+
+Marking Bits (Prev, Next): (CMBitMap*) 0x000002b7c0e824f0, (CMBitMap*) 0x000002b7c0e82530
+ Prev Bits: [0x000002b7da240000, 0x000002b7e0130000)
+ Next Bits: [0x000002b7e0130000, 0x000002b7e6020000)
+
+Polling page: 0x000002b7bef60000
+
+Metaspace:
+
+Usage:
+  Non-class:     43.73 MB used.
+      Class:      6.10 MB used.
+       Both:     49.83 MB used.
+
+Virtual space:
+  Non-class space:       64.00 MB reserved,      44.00 MB ( 69%) committed,  1 nodes.
+      Class space:        1.00 GB reserved,       6.31 MB ( <1%) committed,  1 nodes.
+             Both:        1.06 GB reserved,      50.31 MB (  5%) committed. 
+
+Chunk freelists:
+   Non-Class:  3.55 MB
+       Class:  9.59 MB
+        Both:  13.14 MB
+
+MaxMetaspaceSize: unlimited
+CompressedClassSpaceSize: 1.00 GB
+Initial GC threshold: 21.00 MB
+Current GC threshold: 59.06 MB
+CDS: on
+MetaspaceReclaimPolicy: balanced
+ - commit_granule_bytes: 65536.
+ - commit_granule_words: 8192.
+ - virtual_space_node_default_size: 8388608.
+ - enlarge_chunks_in_place: 1.
+ - new_chunks_are_fully_committed: 0.
+ - uncommit_free_chunks: 1.
+ - use_allocation_guard: 0.
+ - handle_deallocations: 1.
+
+
+Internal statistics:
+
+num_allocs_failed_limit: 6.
+num_arena_births: 708.
+num_arena_deaths: 0.
+num_vsnodes_births: 2.
+num_vsnodes_deaths: 0.
+num_space_committed: 804.
+num_space_uncommitted: 0.
+num_chunks_returned_to_freelist: 6.
+num_chunks_taken_from_freelist: 2587.
+num_chunk_merges: 6.
+num_chunk_splits: 1726.
+num_chunks_enlarged: 1268.
+num_inconsistent_stats: 0.
+
+CodeHeap 'non-profiled nmethods': size=120000Kb used=4730Kb max_used=4730Kb free=115269Kb
+ bounds [0x000002b7d0420000, 0x000002b7d08c0000, 0x000002b7d7950000]
+CodeHeap 'profiled nmethods': size=120000Kb used=15776Kb max_used=15776Kb free=104223Kb
+ bounds [0x000002b7c8950000, 0x000002b7c98c0000, 0x000002b7cfe80000]
+CodeHeap 'non-nmethods': size=5760Kb used=1460Kb max_used=1539Kb free=4299Kb
+ bounds [0x000002b7cfe80000, 0x000002b7d00f0000, 0x000002b7d0420000]
+ total_blobs=8772 nmethods=7967 adapters=716
+ compilation: enabled
+              stopped_count=0, restarted_count=0
+ full_count=0
+
+Compilation events (20 events):
+Event: 203.288 Thread 0x000002b82a061d10 8710       3       java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue::add (9 bytes)
+Event: 203.288 Thread 0x000002b82a061d10 nmethod 8710 0x000002b7c98b3e10 code [0x000002b7c98b3fc0, 0x000002b7c98b4288]
+Event: 203.288 Thread 0x000002b82a061d10 8711       3       java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue::add (6 bytes)
+Event: 203.288 Thread 0x000002b82a061d10 nmethod 8711 0x000002b7c98b4390 code [0x000002b7c98b4540, 0x000002b7c98b4688]
+Event: 203.344 Thread 0x000002b82a061d10 8712       3       java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask::isPeriodic (15 bytes)
+Event: 203.344 Thread 0x000002b82a061d10 nmethod 8712 0x000002b7c98b4710 code [0x000002b7c98b48a0, 0x000002b7c98b4a18]
+Event: 203.623 Thread 0x000002b82a055ed0 8713       4       java.lang.invoke.VarHandleGuards::guard_LII_Z (86 bytes)
+Event: 203.623 Thread 0x000002b82a061d10 8714       3       java.util.concurrent.CompletableFuture::newIncompleteFuture (8 bytes)
+Event: 203.623 Thread 0x000002b82a061d10 nmethod 8714 0x000002b7c98b4a90 code [0x000002b7c98b4c40, 0x000002b7c98b4e58]
+Event: 203.626 Thread 0x000002b82a055ed0 nmethod 8713 0x000002b7d08bd890 code [0x000002b7d08bda40, 0x000002b7d08bdd38]
+Event: 204.308 Thread 0x000002b82a055ed0 8715       4       java.util.concurrent.atomic.AtomicInteger::getAndIncrement (12 bytes)
+Event: 204.308 Thread 0x000002b82a055ed0 nmethod 8715 0x000002b7d08be110 code [0x000002b7d08be280, 0x000002b7d08be2f8]
+Event: 204.818 Thread 0x000002b82a055ed0 8716       4       io.netty.util.concurrent.DefaultPromise::isSuccess (29 bytes)
+Event: 204.819 Thread 0x000002b82a055ed0 nmethod 8716 0x000002b7d08be410 code [0x000002b7d08be5a0, 0x000002b7d08be678]
+Event: 205.171 Thread 0x000002b82a061d10 8717       3       java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue::take (5 bytes)
+Event: 205.171 Thread 0x000002b82a061d10 nmethod 8717 0x000002b7c98b4f90 code [0x000002b7c98b5140, 0x000002b7c98b5288]
+Event: 205.171 Thread 0x000002b82a061d10 8718   !   3       java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue::take (203 bytes)
+Event: 205.172 Thread 0x000002b82a061d10 nmethod 8718 0x000002b7c98b5310 code [0x000002b7c98b56c0, 0x000002b7c98b6f88]
+Event: 207.168 Thread 0x000002b82a061d10 8719       3       org.bouncycastle.crypto.signers.HMacDSAKCalculator::<init> (43 bytes)
+Event: 207.322 Thread 0x000002b82a061d10 nmethod 8719 0x000002b7c98b7a90 code [0x000002b7c98b7c80, 0x000002b7c98b81d8]
+
+GC Heap History (20 events):
+Event: 157.192 GC heap before
+{Heap before GC invocations=46 (full 0):
+ garbage-first heap   total 253952K, used 185585K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50880K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 157.193 GC heap after
+{Heap after GC invocations=47 (full 0):
+ garbage-first heap   total 253952K, used 38152K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50880K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 163.359 GC heap before
+{Heap before GC invocations=47 (full 0):
+ garbage-first heap   total 253952K, used 185608K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50911K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 163.360 GC heap after
+{Heap after GC invocations=48 (full 0):
+ garbage-first heap   total 253952K, used 38185K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50911K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 167.329 GC heap before
+{Heap before GC invocations=48 (full 0):
+ garbage-first heap   total 253952K, used 185641K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50918K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 167.331 GC heap after
+{Heap after GC invocations=49 (full 0):
+ garbage-first heap   total 253952K, used 38207K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50918K, committed 51392K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 173.504 GC heap before
+{Heap before GC invocations=49 (full 0):
+ garbage-first heap   total 253952K, used 185663K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50937K, committed 51456K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 173.505 GC heap after
+{Heap after GC invocations=50 (full 0):
+ garbage-first heap   total 253952K, used 38215K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50937K, committed 51456K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 177.617 GC heap before
+{Heap before GC invocations=50 (full 0):
+ garbage-first heap   total 253952K, used 185671K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50953K, committed 51456K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 177.619 GC heap after
+{Heap after GC invocations=51 (full 0):
+ garbage-first heap   total 253952K, used 38254K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50953K, committed 51456K, reserved 1114112K
+  class space    used 6239K, committed 6464K, reserved 1048576K
+}
+Event: 183.355 GC heap before
+{Heap before GC invocations=51 (full 0):
+ garbage-first heap   total 253952K, used 185710K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50968K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 183.356 GC heap after
+{Heap after GC invocations=52 (full 0):
+ garbage-first heap   total 253952K, used 38279K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50968K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 187.340 GC heap before
+{Heap before GC invocations=52 (full 0):
+ garbage-first heap   total 253952K, used 185735K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50968K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 187.341 GC heap after
+{Heap after GC invocations=53 (full 0):
+ garbage-first heap   total 253952K, used 38296K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50968K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 193.200 GC heap before
+{Heap before GC invocations=53 (full 0):
+ garbage-first heap   total 253952K, used 185752K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50976K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 193.201 GC heap after
+{Heap after GC invocations=54 (full 0):
+ garbage-first heap   total 253952K, used 38324K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50976K, committed 51456K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 199.180 GC heap before
+{Heap before GC invocations=54 (full 0):
+ garbage-first heap   total 253952K, used 185780K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 50996K, committed 51520K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 199.181 GC heap after
+{Heap after GC invocations=55 (full 0):
+ garbage-first heap   total 253952K, used 38350K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 50996K, committed 51520K, reserved 1114112K
+  class space    used 6242K, committed 6464K, reserved 1048576K
+}
+Event: 203.212 GC heap before
+{Heap before GC invocations=55 (full 0):
+ garbage-first heap   total 253952K, used 185806K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 37 young (151552K), 1 survivors (4096K)
+ Metaspace       used 51015K, committed 51520K, reserved 1114112K
+  class space    used 6245K, committed 6464K, reserved 1048576K
+}
+Event: 203.213 GC heap after
+{Heap after GC invocations=56 (full 0):
+ garbage-first heap   total 253952K, used 38377K [0x0000000684400000, 0x0000000800000000)
+  region size 4096K, 1 young (4096K), 1 survivors (4096K)
+ Metaspace       used 51015K, committed 51520K, reserved 1114112K
+  class space    used 6245K, committed 6464K, reserved 1048576K
+}
+
+Dll operation events (13 events):
+Event: 0.006 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\java.dll
+Event: 0.020 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\jsvml.dll
+Event: 0.088 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\net.dll
+Event: 0.090 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\nio.dll
+Event: 0.093 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\zip.dll
+Event: 0.188 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\verify.dll
+Event: 0.225 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\jimage.dll
+Event: 0.383 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\management.dll
+Event: 0.384 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\management_ext.dll
+Event: 1.017 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\sunmscapi.dll
+Event: 1.090 Loaded shared library C:\Users\ASUS\AppData\Local\Temp\jna-2018896\jna6564001235279256869.dll
+Event: 1.410 Loaded shared library C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\extnet.dll
+Event: 2.274 Loaded shared library C:\Users\ASUS\AppData\Local\Temp\librocksdbjni16704219936529692536.dll
+
+Deoptimization events (20 events):
+Event: 89.527 Thread 0x000002b8338e5b90 Uncommon trap: trap_request=0xffffffd6 fr.pc=0x000002b7d0817d1c relative=0x000000000000017c
+Event: 89.527 Thread 0x000002b8338e5b90 Uncommon trap: reason=array_check action=maybe_recompile pc=0x000002b7d0817d1c method=org.hyperledger.besu.evm.internal.FlexStack.push(Ljava/lang/Object;)V @ 55 c2
+Event: 89.527 Thread 0x000002b8338e5b90 DEOPT PACKING pc=0x000002b7d0817d1c sp=0x000000ea99bfdbe0
+Event: 89.527 Thread 0x000002b8338e5b90 DEOPT UNPACKING pc=0x000002b7cfeda1a3 sp=0x000000ea99bfdb88 mode 2
+Event: 89.527 Thread 0x000002b8338e5b90 Uncommon trap: trap_request=0xffffffd6 fr.pc=0x000002b7d0817d1c relative=0x000000000000017c
+Event: 89.527 Thread 0x000002b8338e5b90 Uncommon trap: reason=array_check action=maybe_recompile pc=0x000002b7d0817d1c method=org.hyperledger.besu.evm.internal.FlexStack.push(Ljava/lang/Object;)V @ 55 c2
+Event: 89.527 Thread 0x000002b8338e5b90 DEOPT PACKING pc=0x000002b7d0817d1c sp=0x000000ea99bfdc30
+Event: 89.527 Thread 0x000002b8338e5b90 DEOPT UNPACKING pc=0x000002b7cfeda1a3 sp=0x000000ea99bfdbd8 mode 2
+Event: 109.173 Thread 0x000002b8338e3310 DEOPT PACKING pc=0x000002b7c941404d sp=0x000000ea992fea50
+Event: 109.173 Thread 0x000002b8338e3310 DEOPT UNPACKING pc=0x000002b7cfedace3 sp=0x000000ea992fdef0 mode 0
+Event: 133.846 Thread 0x000002b8338e60a0 DEOPT PACKING pc=0x000002b7c9294a30 sp=0x000000ea99efdc50
+Event: 133.846 Thread 0x000002b8338e60a0 DEOPT UNPACKING pc=0x000002b7cfedace3 sp=0x000000ea99efd280 mode 0
+Event: 176.179 Thread 0x000002b831278f00 Uncommon trap: trap_request=0xffffff45 fr.pc=0x000002b7d0442b84 relative=0x0000000000000664
+Event: 176.179 Thread 0x000002b831278f00 Uncommon trap: reason=unstable_if action=reinterpret pc=0x000002b7d0442b84 method=java.lang.AbstractStringBuilder.append(Ljava/lang/String;)Ljava/lang/AbstractStringBuilder; @ 1 c2
+Event: 176.179 Thread 0x000002b831278f00 DEOPT PACKING pc=0x000002b7d0442b84 sp=0x000000ea988fe090
+Event: 176.180 Thread 0x000002b831278f00 DEOPT UNPACKING pc=0x000002b7cfeda1a3 sp=0x000000ea988fe068 mode 2
+Event: 187.570 Thread 0x000002b8338e19c0 Uncommon trap: trap_request=0xffffff45 fr.pc=0x000002b7d07d1ca4 relative=0x0000000000002644
+Event: 187.570 Thread 0x000002b8338e19c0 Uncommon trap: reason=unstable_if action=reinterpret pc=0x000002b7d07d1ca4 method=java.math.MutableBigInteger.divideMagnitude(Ljava/math/MutableBigInteger;Ljava/math/MutableBigInteger;Z)Ljava/math/MutableBigInteger; @ 63 c2
+Event: 187.570 Thread 0x000002b8338e19c0 DEOPT PACKING pc=0x000002b7d07d1ca4 sp=0x000000ea994feac0
+Event: 187.570 Thread 0x000002b8338e19c0 DEOPT UNPACKING pc=0x000002b7cfeda1a3 sp=0x000000ea994fea38 mode 2
+
+Classes loaded (20 events):
+Event: 13.183 Loading class java/util/concurrent/locks/ReentrantReadWriteLock$Sync$HoldCounter
+Event: 13.183 Loading class java/util/concurrent/locks/ReentrantReadWriteLock$Sync$HoldCounter done
+Event: 13.229 Loading class java/util/AbstractMap$2
+Event: 13.231 Loading class java/util/AbstractMap$2 done
+Event: 13.231 Loading class java/util/AbstractMap$2$1
+Event: 13.231 Loading class java/util/AbstractMap$2$1 done
+Event: 13.231 Loading class java/util/TreeMap$NavigableSubMap$SubMapEntryIterator
+Event: 13.231 Loading class java/util/TreeMap$NavigableSubMap$SubMapEntryIterator done
+Event: 52.099 Loading class sun/reflect/generics/tree/IntSignature
+Event: 52.099 Loading class sun/reflect/generics/tree/IntSignature done
+Event: 52.099 Loading class sun/reflect/generics/tree/BooleanSignature
+Event: 52.099 Loading class sun/reflect/generics/tree/BooleanSignature done
+Event: 63.156 Loading class java/util/concurrent/CompletableFuture$AsyncSupply
+Event: 63.156 Loading class java/util/concurrent/CompletableFuture$AsyncSupply done
+Event: 70.124 Loading class java/util/concurrent/LinkedBlockingDeque$Node
+Event: 70.124 Loading class java/util/concurrent/LinkedBlockingDeque$Node done
+Event: 145.256 Loading class jdk/internal/misc/ScopedMemoryAccess$Scope$Handle
+Event: 145.256 Loading class jdk/internal/misc/ScopedMemoryAccess$Scope$Handle done
+Event: 183.310 Loading class sun/net/ConnectionResetException
+Event: 183.315 Loading class sun/net/ConnectionResetException done
+
+Classes unloaded (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (20 events):
+Event: 8.250 Thread 0x000002b8338e0a90 Exception <a 'java/lang/NoSuchMethodError'{0x000000068cb04208}: 'java.lang.Object java.lang.invoke.Invokers$Holder.linkToTargetMethod(long, java.lang.Object, java.lang.Object)'> (0x000000068cb04208) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 8.251 Thread 0x000002b8338e0a90 Exception <a 'java/lang/ClassNotFoundException'{0x000000068cb11078}: sun/misc/SharedSecrets> (0x000000068cb11078) 
+thrown [s\src\hotspot\share\classfile\systemDictionary.cpp, line 256]
+Event: 11.567 Thread 0x000002b8338e6ac0 Exception <a 'java/lang/NoSuchMethodError'{0x000000068e6b4cb0}: 'long java.lang.invoke.DirectMethodHandle$Holder.invokeInterface(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x000000068e6b4cb0) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 11.567 Thread 0x000002b8338e6ac0 Exception <a 'java/lang/IncompatibleClassChangeError'{0x000000068e6b8610}: Found class java.lang.Object, but interface was expected> (0x000000068e6b8610) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 826]
+Event: 11.568 Thread 0x000002b8338e6ac0 Exception <a 'java/lang/NoSuchMethodError'{0x000000068e6d4850}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, java.lang.Object, int, int)'> (0x000000068e6d4850) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 11.568 Thread 0x000002b8338e6ac0 Exception <a 'java/lang/NoSuchMethodError'{0x000000068e6d8280}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeStaticInit(java.lang.Object, java.lang.Object, int, int)'> (0x000000068e6d8280) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 11.571 Thread 0x000002b8338e6ac0 Exception <a 'java/lang/IncompatibleClassChangeError'{0x000000068e6fdc28}: Found class java.lang.Object, but interface was expected> (0x000000068e6fdc28) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 826]
+Event: 11.602 Thread 0x000002b8338e5b90 Exception <a 'java/lang/NoSuchMethodError'{0x000000069263b028}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.newInvokeSpecial(java.lang.Object, int, java.lang.Object)'> (0x000000069263b028) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 13.162 Thread 0x000002b8338e3310 Exception <a 'java/lang/NoSuchMethodError'{0x000000068ee87840}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, long, int, long, int, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x000000068ee87840) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 13.162 Thread 0x000002b8338e3310 Exception <a 'java/lang/NoSuchMethodError'{0x000000068ee8bb60}: 'java.lang.Object java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, long, int, long, int, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x000000068ee8bb60) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 13.181 Thread 0x000002b8338e3820 Exception <a 'java/lang/IncompatibleClassChangeError'{0x000000068dcf7288}: Found class java.lang.Object, but interface was expected> (0x000000068dcf7288) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 826]
+Event: 13.203 Thread 0x000002b8338e3310 Exception <a 'java/lang/IncompatibleClassChangeError'{0x000000068ce080e0}: Found class java.lang.Object, but interface was expected> (0x000000068ce080e0) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 826]
+Event: 63.157 Thread 0x000002b82f9e47c0 Exception <a 'java/lang/NoSuchMethodError'{0x00000006912a1b48}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, long, int)'> (0x00000006912a1b48) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 63.157 Thread 0x000002b82f9e47c0 Exception <a 'java/lang/NoSuchMethodError'{0x00000006912a8a38}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.newInvokeSpecial(java.lang.Object, java.lang.Object, long, int)'> (0x00000006912a8a38) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 63.158 Thread 0x000002b82f9e47c0 Exception <a 'java/lang/NoSuchMethodError'{0x00000006912ac810}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, java.lang.Object, long, int)'> (0x00000006912ac810) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 63.158 Thread 0x000002b82f9e47c0 Exception <a 'java/lang/NoSuchMethodError'{0x00000006912b0030}: 'java.lang.Object java.lang.invoke.Invokers$Holder.linkToTargetMethod(java.lang.Object, long, int, java.lang.Object)'> (0x00000006912b0030) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 87.373 Thread 0x000002b830d63510 Implicit null exception at 0x000002b7d076d5dc to 0x000002b7d076df08
+Event: 87.381 Thread 0x000002b831278f00 Exception <a 'java/lang/NoSuchMethodError'{0x00000006907a66c8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual(java.lang.Object, java.lang.Object, int)'> (0x00000006907a66c8) 
+thrown [s\src\hotspot\share\interpreter\linkResolver.cpp, line 759]
+Event: 176.179 Thread 0x000002b831278f00 Implicit null exception at 0x000002b7d0442552 to 0x000002b7d0442b6c
+Event: 183.315 Thread 0x000002b831278f00 Exception <a 'sun/net/ConnectionResetException'{0x000000068c22ef90}: Connection reset> (0x000000068c22ef90) 
+thrown [s\src\hotspot\share\prims\jni.cpp, line 535]
+
+VM Operations (20 events):
+Event: 186.375 Executing VM operation: Cleanup
+Event: 186.375 Executing VM operation: Cleanup done
+Event: 187.340 Executing VM operation: G1CollectForAllocation
+Event: 187.341 Executing VM operation: G1CollectForAllocation done
+Event: 191.378 Executing VM operation: Cleanup
+Event: 191.378 Executing VM operation: Cleanup done
+Event: 193.200 Executing VM operation: G1CollectForAllocation
+Event: 193.201 Executing VM operation: G1CollectForAllocation done
+Event: 196.228 Executing VM operation: Cleanup
+Event: 196.228 Executing VM operation: Cleanup done
+Event: 199.180 Executing VM operation: G1CollectForAllocation
+Event: 199.181 Executing VM operation: G1CollectForAllocation done
+Event: 200.184 Executing VM operation: Cleanup
+Event: 200.184 Executing VM operation: Cleanup done
+Event: 203.212 Executing VM operation: G1CollectForAllocation
+Event: 203.213 Executing VM operation: G1CollectForAllocation done
+Event: 204.225 Executing VM operation: Cleanup
+Event: 204.225 Executing VM operation: Cleanup done
+Event: 206.235 Executing VM operation: Cleanup
+Event: 206.235 Executing VM operation: Cleanup done
+
+Memory protections (0 events):
+No events
+
+Nmethod flushes (20 events):
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90bb010
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90bc690
+Event: 3.066 Thread 0x000002b82a067830 flushing osr nmethod 0x000002b7c90c1d10
+Event: 3.066 Thread 0x000002b82a067830 flushing osr nmethod 0x000002b7c90cc390
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90d5790
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e0390
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e3710
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e6c10
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e7790
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e8090
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e8f90
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90e9d90
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90ead10
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c90f3f90
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c9144990
+Event: 3.066 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c91cc510
+Event: 87.385 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c89b9810
+Event: 87.386 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c8b79b10
+Event: 87.388 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c8f84690
+Event: 87.388 Thread 0x000002b82a067830 flushing  nmethod 0x000002b7c8fa4d10
+
+Events (20 events):
+Event: 29.183 Thread 0x000002b82f9dd860 Thread added: 0x000002b82f9e2450
+Event: 33.179 Thread 0x000002b82a061d10 Thread added: 0x000002b833af1250
+Event: 33.763 Thread 0x000002b833af1250 Thread exited: 0x000002b833af1250
+Event: 35.191 Thread 0x000002b8338e65b0 Thread added: 0x000002b82f9e2960
+Event: 39.193 Thread 0x000002b8338e0580 Thread added: 0x000002b82f9e2e70
+Event: 45.194 Thread 0x000002b8338e79f0 Thread added: 0x000002b82f9e4cd0
+Event: 51.194 Thread 0x000002b82f9e00e0 Thread added: 0x000002b82f9e3380
+Event: 55.190 Thread 0x000002b82f9dfbd0 Thread added: 0x000002b82f9e3da0
+Event: 61.200 Thread 0x000002b8338e74e0 Thread added: 0x000002b82f9e42b0
+Event: 63.156 Thread 0x000002b8338e0a90 Thread added: 0x000002b82f9e47c0
+Event: 67.189 Thread 0x000002b82f9df6c0 Thread added: 0x000002b830d63a20
+Event: 71.208 Thread 0x000002b831277fd0 Thread added: 0x000002b830d63510
+Event: 71.210 Thread 0x000002b8338e0580 Thread added: 0x000002b830d63f30
+Event: 77.202 Thread 0x000002b8338e28f0 Thread added: 0x000002b830d64440
+Event: 81.194 Thread 0x000002b82f9e05f0 Thread added: 0x000002b830d62af0
+Event: 87.199 Thread 0x000002b8338e60a0 Thread added: 0x000002b830d64950
+Event: 89.202 Thread 0x000002b82f9e1520 Thread added: 0x000002b830d64e60
+Event: 91.198 Thread 0x000002b8338e0580 Thread added: 0x000002b830d63000
+Event: 95.183 Thread 0x000002b8338e2e00 Thread added: 0x000002b830d65370
+Event: 101.187 Thread 0x000002b8338e4c60 Thread added: 0x000002b830d65880
+
+
+Dynamic libraries:
+0x00007ff74dfd0000 - 0x00007ff74dfde000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\java.exe
+0x00007ff993b00000 - 0x00007ff993d67000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ff993420000 - 0x00007ff9934e9000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ff990770000 - 0x00007ff990b64000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ff991740000 - 0x00007ff99188b000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ff985840000 - 0x00007ff98585e000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\VCRUNTIME140.dll
+0x00007ff982a20000 - 0x00007ff982a38000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\jli.dll
+0x00007ff991dc0000 - 0x00007ff991f85000 	C:\WINDOWS\System32\USER32.dll
+0x00007ff990cb0000 - 0x00007ff990cd7000 	C:\WINDOWS\System32\win32u.dll
+0x00007ff98f560000 - 0x00007ff98f7f3000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.26100.8115_none_3e075c82e3354f9c\COMCTL32.dll
+0x00007ff992b90000 - 0x00007ff992bbb000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ff9935b0000 - 0x00007ff993659000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ff991610000 - 0x00007ff99173b000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ff9906c0000 - 0x00007ff990763000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ff991fe0000 - 0x00007ff992012000 	C:\WINDOWS\System32\IMM32.DLL
+0x00007ff98c010000 - 0x00007ff98c01c000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\vcruntime140_1.dll
+0x00007ff92a660000 - 0x00007ff92a6ed000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\msvcp140.dll
+0x00007ff8fc8f0000 - 0x00007ff8fd55b000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\server\jvm.dll
+0x00007ff992ac0000 - 0x00007ff992b76000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ff9937e0000 - 0x00007ff993887000 	C:\WINDOWS\System32\sechost.dll
+0x00007ff993900000 - 0x00007ff993a18000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ff992020000 - 0x00007ff9920a0000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ff98fc30000 - 0x00007ff98fc8e000 	C:\WINDOWS\SYSTEM32\POWRPROF.dll
+0x00007ff980570000 - 0x00007ff9805a6000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ff985bf0000 - 0x00007ff985bfb000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ff98f900000 - 0x00007ff98f914000 	C:\WINDOWS\SYSTEM32\UMPDC.dll
+0x00007ff98e8c0000 - 0x00007ff98e8db000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007ff985880000 - 0x00007ff98588a000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\jimage.dll
+0x00007ff98fca0000 - 0x00007ff98fee2000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007ff991890000 - 0x00007ff991c12000 	C:\WINDOWS\System32\combase.dll
+0x00007ff9927d0000 - 0x00007ff9928a8000 	C:\WINDOWS\System32\OLEAUT32.dll
+0x00007ff98fb20000 - 0x00007ff98fb5b000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007ff990c00000 - 0x00007ff990ca5000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007ff9783f0000 - 0x00007ff978415000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\java.dll
+0x00007ff91f990000 - 0x00007ff91fa67000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\jsvml.dll
+0x00007ff992ca0000 - 0x00007ff993407000 	C:\WINDOWS\System32\SHELL32.dll
+0x00007ff9903d0000 - 0x00007ff99053a000 	C:\WINDOWS\System32\wintypes.dll
+0x00007ff990ce0000 - 0x00007ff991548000 	C:\WINDOWS\System32\windows.storage.dll
+0x00007ff9926d0000 - 0x00007ff9927c8000 	C:\WINDOWS\System32\SHCORE.dll
+0x00007ff993890000 - 0x00007ff9938f6000 	C:\WINDOWS\System32\shlwapi.dll
+0x00007ff9902f0000 - 0x00007ff990319000 	C:\WINDOWS\SYSTEM32\profapi.dll
+0x00007ff982a00000 - 0x00007ff982a1a000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\net.dll
+0x00007ff9867c0000 - 0x00007ff9868ed000 	C:\WINDOWS\SYSTEM32\WINHTTP.dll
+0x00007ff98edf0000 - 0x00007ff98ee5c000 	C:\WINDOWS\system32\mswsock.dll
+0x00007ff9783d0000 - 0x00007ff9783e6000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\nio.dll
+0x00007ff978330000 - 0x00007ff978348000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\zip.dll
+0x00007ff9783c0000 - 0x00007ff9783d0000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\verify.dll
+0x00007ff978360000 - 0x00007ff97836a000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\management.dll
+0x00007ff978320000 - 0x00007ff97832c000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\management_ext.dll
+0x00007ff992b80000 - 0x00007ff992b88000 	C:\WINDOWS\System32\PSAPI.DLL
+0x00007ff954a20000 - 0x00007ff954a38000 	C:\WINDOWS\system32\napinsp.dll
+0x00007ff98e3f0000 - 0x00007ff98e522000 	C:\WINDOWS\SYSTEM32\DNSAPI.dll
+0x00007ff98e3b0000 - 0x00007ff98e3e2000 	C:\WINDOWS\SYSTEM32\IPHLPAPI.DLL
+0x00007ff993a20000 - 0x00007ff993a2a000 	C:\WINDOWS\System32\NSI.dll
+0x00007ff954a00000 - 0x00007ff954a13000 	C:\WINDOWS\System32\winrnr.dll
+0x00007ff9549d0000 - 0x00007ff9549f2000 	C:\WINDOWS\system32\nlansp_c.dll
+0x00007ff952f00000 - 0x00007ff952f16000 	C:\WINDOWS\system32\wshbth.dll
+0x00007ff986620000 - 0x00007ff98662b000 	C:\Windows\System32\rasadhlp.dll
+0x00007ff98c190000 - 0x00007ff98c216000 	C:\WINDOWS\System32\fwpuclnt.dll
+0x00007ff9898a0000 - 0x00007ff9898bd000 	C:\WINDOWS\SYSTEM32\dhcpcsvc6.DLL
+0x00007ff989870000 - 0x00007ff989895000 	C:\WINDOWS\SYSTEM32\dhcpcsvc.DLL
+0x00007ff9780a0000 - 0x00007ff9780ae000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\sunmscapi.dll
+0x00007ff990540000 - 0x00007ff9906b7000 	C:\WINDOWS\System32\CRYPT32.dll
+0x00007ff98f520000 - 0x00007ff98f550000 	C:\WINDOWS\SYSTEM32\ncrypt.dll
+0x00007ff98f4d0000 - 0x00007ff98f50f000 	C:\WINDOWS\SYSTEM32\NTASN1.dll
+0x00007ff990010000 - 0x00007ff99002b000 	C:\WINDOWS\SYSTEM32\CRYPTSP.dll
+0x00007ff98ef30000 - 0x00007ff98ef69000 	C:\WINDOWS\system32\rsaenh.dll
+0x00007ff98eea0000 - 0x00007ff98eed3000 	C:\WINDOWS\SYSTEM32\USERENV.dll
+0x00007ff9902c0000 - 0x00007ff9902ea000 	C:\WINDOWS\SYSTEM32\bcrypt.dll
+0x00007ff98f110000 - 0x00007ff98f11c000 	C:\WINDOWS\SYSTEM32\CRYPTBASE.dll
+0x00007ff9674b0000 - 0x00007ff9674f5000 	C:\Users\ASUS\AppData\Local\Temp\jna-2018896\jna6564001235279256869.dll
+0x00007ff96abe0000 - 0x00007ff96abe8000 	C:\WINDOWS\system32\wshunix.dll
+0x00007ff978090000 - 0x00007ff978099000 	C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\extnet.dll
+0x00007ff991c20000 - 0x00007ff991db7000 	C:\WINDOWS\System32\Ole32.dll
+0x00007ff9934f0000 - 0x00007ff99359e000 	C:\WINDOWS\System32\clbcatq.dll
+0x00007ff967860000 - 0x00007ff96787d000 	C:\WINDOWS\SYSTEM32\amsi.dll
+0x00007ff965860000 - 0x00007ff965902000 	C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.26030.3011-0\MpOav.dll
+0x00007ff8f23a0000 - 0x00007ff8f2ad2000 	C:\Users\ASUS\AppData\Local\Temp\librocksdbjni16704219936529692536.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.26100.8115_none_3e075c82e3354f9c;C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin\server;C:\Users\ASUS\AppData\Local\Temp\jna-2018896;C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.26030.3011-0;C:\Users\ASUS\AppData\Local\Temp
+
+VM Arguments:
+jvm_args: -Dvertx.disableFileCPResolving=true -Dbesu.home=C:\besu\bin\.. -Dlog4j.shutdownHookEnabled=false -Dlog4j2.formatMsgNoLookups=true -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager --add-opens=java.base/sun.security.provider=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED -XX:G1ConcRefinementThreads=2 -XX:G1HeapWastePercent=15 -XX:MaxGCPauseMillis=100 
+java_command: org.hyperledger.besu.Besu --data-path=C:\bhumi-besu\node1\data --genesis-file=C:\bhumi-besu\genesis.json --rpc-http-enabled=true --rpc-http-api=ETH,NET,IBFT,ADMIN,DEBUG,WEB3 --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-cors-origins=* --host-allowlist=* --rpc-ws-enabled=true --rpc-ws-host=0.0.0.0 --rpc-ws-port=8646 --p2p-host=0.0.0.0 --p2p-port=30303 --nat-method=NONE --min-gas-price=0 --logging=INFO
+java_class_path (initial): C:\besu/lib/abi-4.11.1.jar;C:\besu/lib/animal-sniffer-annotations-1.23.jar;C:\besu/lib/annotations-13.0.jar;C:\besu/lib/annotations-4.1.1.4.jar;C:\besu/lib/antlr-runtime-3.5.3.jar;C:\besu/lib/antlr4-4.11.1.jar;C:\besu/lib/antlr4-runtime-4.11.1.jar;C:\besu/lib/arithmetic-0.8.4.jar;C:\besu/lib/asm-9.2.jar;C:\besu/lib/asm-analysis-9.2.jar;C:\besu/lib/asm-commons-9.2.jar;C:\besu/lib/asm-tree-9.2.jar;C:\besu/lib/asm-util-9.2.jar;C:\besu/lib/bcpkix-jdk18on-1.77.jar;C:\besu/lib/bcprov-jdk18on-1.77.jar;C:\besu/lib/bcutil-jdk18on-1.77.jar;C:\besu/lib/besu-24.5.2.jar;C:\besu/lib/besu-api-24.5.2.jar;C:\besu/lib/besu-blockcreation-24.5.2.jar;C:\besu/lib/besu-clique-24.5.2.jar;C:\besu/lib/besu-config-24.5.2.jar;C:\besu/lib/besu-consensus-common-24.5.2.jar;C:\besu/lib/besu-core-24.5.2.jar;C:\besu/lib/besu-crypto-24.5.2.jar;C:\besu/lib/besu-crypto-services-24.5.2.jar;C:\besu/lib/besu-datatypes-24.5.2.jar;C:\besu/lib/besu-eth-24.5.2.jar;C:\besu/lib/besu-ethereum-ethstats-24.5.2.jar;C:\besu/lib/besu-ethereum-rlp-24.5.2.jar;C:\besu/lib/besu-ethereum-stratum-24.5.2.jar;C:\besu/lib/besu-evm-24.5.2.jar;C:\besu/lib/besu-evmtool-24.5.2.jar;C:\besu/lib/besu-ibft-24.5.2.jar;C:\besu/lib/besu-kvstore-24.5.2.jar;C:\besu/lib/besu-merge-24.5.2.jar;C:\besu/lib/besu-metrics-core-24.5.2.jar;C:\besu/lib/besu-metrics-rocksdb-24.5.2.jar;C:\besu/lib/besu-nat-24.5.2.jar;C:\besu/lib/besu-p2p-24.5.2.jar;C:\besu/lib/besu-permissioning-24.5.2.jar;C:\besu/lib/besu-pipeline-24.5.2.jar;C:\besu/lib/besu-pki-24.5.2.jar;C:\besu/lib/besu-plugin-rocksdb-24.5.2.jar;C:\besu/lib/besu-qbft-24.5.2.jar;C:\besu/lib/besu-retesteth-24.5.2.jar;C:\besu/lib/besu-tasks-24.5.2.jar;C:\besu/lib/besu-trie-24.5.2.jar;C:\besu/lib/besu-util-24.5.2.jar;C:\besu/lib/blake2bf-0.8.4.jar;C:\besu/lib/bls12-381-0.8.4.jar;C:\besu/lib/caffeine-3.1.8.jar;C:\besu/lib/checker-qual-3.41.0.jar;C:\besu/lib/client-java-18.0.1.jar;C:\besu/lib/client-java-api-18.0.1.jar;C:\besu/lib/client-java-proto-18.0.1.jar;C:\besu/lib/co
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 4                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 3                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 2                                         {product} {command line}
+   size_t G1HeapRegionSize                         = 4194304                                   {product} {ergonomic}
+    uintx G1HeapWastePercent                       = 15                                        {product} {command line}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 398458880                                 {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+    uintx MaxGCPauseMillis                         = 100                                       {product} {command line}
+   size_t MaxHeapSize                              = 6371147776                                {product} {ergonomic}
+   size_t MaxNewSize                               = 3821010944                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 4194304                                   {product} {ergonomic}
+   size_t MinHeapSize                              = 8388608                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5839372                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122909434                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122909434                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+   size_t SoftMaxHeapSize                          = 6371147776                             {manageable} {ergonomic}
+     bool UseCompressedClassPointers               = true                           {product lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+
+Environment Variables:
+CLASSPATH=C:\besu/lib/*
+PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.2\bin\x64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.2\bin;C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot\bin;C:\Program Files\Eclipse Adoptium\jdk-8.0.472.8-hotspot\bin;C:\php83;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\Python311\Scripts\;C:\Program Files\Python311\;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\Try_Golang\bin;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\flutter\bin;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\composer;%NVM_HOME%;%NVM_SYMLINK%;C:\Program Files\NVIDIA Corporation\Nsight Compute 2026.1.0\;C:\Program Files (x86)\ZeroTier\One\;C:\Users\ASUS\.cargo\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\Python311\Scripts\;C:\Program Files\Python311\;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\Try_Golang\bin;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\flutter\bin;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\composer;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Prog;C:\Users\ASUS\AppData\Local\nvm;C:\nvm4w\nodejs;C:\My Program\Microsoft VS Code\bin;C:\Users\ASUS\AppData\Local\Programs\Ollama;C:\Users\ASUS\AppData\Local\Programs\Antigravity\bin;C:\besu\bin
+USERNAME=ASUS
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
+TMP=C:\Users\ASUS\AppData\Local\Temp
+TEMP=C:\Users\ASUS\AppData\Local\Temp
+
+
+
+Periodic native trim disabled
+
+
+---------------  S Y S T E M  ---------------
+
+OS:
+ Windows 11 , 64 bit Build 26100 (10.0.26100.8246)
+OS uptime: 9 days 4:24 hours
+
+CPU: total 12 (initial active 12) (6 cores per cpu, 2 threads per core) family 6 model 141 stepping 1 microcode 0x50, cx8, cmov, fxsr, ht, mmx, 3dnowpref, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, lzcnt, tsc, tscinvbit, avx, avx2, aes, erms, clmul, bmi1, bmi2, adx, avx512f, avx512dq, avx512cd, avx512bw, avx512vl, sha, fma, vzeroupper, avx512_vpopcntdq, avx512_vpclmulqdq, avx512_vaes, avx512_vnni, clflush, clflushopt, clwb, avx512_vbmi2, avx512_vbmi
+Processor Information for all 12 processors :
+  Max Mhz: 2688, Current Mhz: 2688, Mhz Limit: 2688
+
+Memory: 4k page, system-wide physical 24298M (1211M free)
+TotalPageFile size 49742M (AvailPageFile size 177M)
+current process WorkingSet (physical memory assigned to process): 455M, peak: 571M
+current process commit charge ("private bytes"): 572M, peak: 629M
+
+vm_info: OpenJDK 64-Bit Server VM (17.0.17+10) for windows-amd64 JRE (17.0.17+10), built on Oct 21 2025 23:25:32 by "admin" with unknown MS VC++:1942
+
+END.

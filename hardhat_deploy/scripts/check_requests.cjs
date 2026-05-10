@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 
 async function main() {
   // Hubungkan langsung ke Besu RPC
-  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+  const provider = new ethers.JsonRpcProvider("http://10.223.153.80:8545");
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   
   // ABI minimal untuk baca data

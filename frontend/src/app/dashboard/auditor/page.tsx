@@ -21,12 +21,20 @@ interface LandDetail {
 
 // ─── Komponen cek sengketa per aset ───────────────────────────────────────────
 function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
-  const { data: land } = useReadContract({
+  const { data: landData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
     args: [BigInt(tokenId)],
   });
+
+  const land = landData ? {
+    gpsCoordinates: (landData as any)[0],
+    area: (landData as any)[1],
+    nib: (landData as any)[2],
+    ipfsHashes: (landData as any)[3],
+    isDisputed: (landData as any)[4],
+  } : null;
 
   const { data: transferReq } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -258,7 +266,15 @@ function ForensikSearch() {
 
         if (!land) continue;
 
-        const nibMatch = land.nib?.toLowerCase().includes(q.toLowerCase());
+        const landObj = {
+          gpsCoordinates: land[0],
+          area: land[1],
+          nib: land[2],
+          ipfsHashes: land[3],
+          isDisputed: land[4]
+        };
+
+        const nibMatch = landObj.nib?.toLowerCase().includes(q.toLowerCase());
 
         if (isTokenIdMatch || nibMatch) {
           const owner = await publicClient.readContract({
@@ -277,11 +293,11 @@ function ForensikSearch() {
 
           found.push({
             tokenId: i,
-            nib: land.nib,
-            gpsCoordinates: land.gpsCoordinates,
-            area: land.area,
-            ipfsHashes: Array.from(land.ipfsHashes || []),
-            isDisputed: land.isDisputed,
+            nib: landObj.nib,
+            gpsCoordinates: landObj.gpsCoordinates,
+            area: landObj.area,
+            ipfsHashes: Array.from(landObj.ipfsHashes || []),
+            isDisputed: landObj.isDisputed,
             owner,
             ownershipHistory: Array.from(history || []),
           });

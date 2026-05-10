@@ -12,6 +12,7 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
     bytes32 public constant AUDITOR_ROLE = keccak256("AUDITOR_ROLE");
 
     uint256 private _nextTokenId;
+    uint256 private _requestCount;
 
     struct Land {
         string gpsCoordinates;
@@ -19,6 +20,16 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         string nib;
         string[] ipfsHashes; 
         bool isDisputed;
+    }
+
+    struct LandRequest {
+        address to;
+        string gpsCoordinates;
+        uint256 area;
+        string nib;
+        string[] ipfsHashes;
+        bool isProcessed;
+        bool isRejected;
     }
 
     struct TransferRequest {
@@ -32,10 +43,14 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
     }
 
     mapping(uint256 => Land) public lands;
+    mapping(uint256 => LandRequest) public landRequests;
     mapping(uint256 => TransferRequest) public transferRequests;
     mapping(uint256 => address[]) public ownershipHistory;
 
     event AssetMinted(uint256 indexed tokenId, address indexed owner, string nib);
+    event LandRequested(uint256 indexed requestId, address indexed to, string nib);
+    event LandApproved(uint256 indexed requestId, uint256 indexed tokenId);
+    event LandRejected(uint256 indexed requestId);
     event TransferProposed(uint256 indexed tokenId, address indexed seller, address indexed buyer);
     event TransferCompleted(uint256 indexed tokenId, address indexed seller, address indexed buyer);
     event TransferCancelled(uint256 indexed tokenId, address indexed seller);
@@ -44,22 +59,66 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
     constructor() ERC721("LandToken", "LND") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_BPN_ROLE, msg.sender);
-        // Tambahan: Berikan role Wilayah ke admin juga agar bisa ngetes mint langsung
         _grantRole(BPN_WILAYAH_ROLE, msg.sender);
     }
 
-    // Fungsi wajib supaya kontrak boleh menerima NFT (Holding)
     function onERC721Received(address, address, uint256, bytes calldata) external pure override returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function mintLand(
+    // --- ALUR PENDAFTARAN TANAH (REQUEST -> APPROVE) ---
+
+    function requestLandMinting(
         address to,
         string memory gpsCoordinates,
         uint256 area,
         string memory nib,
         string[] memory ipfsHashes
     ) external onlyRole(BPN_WILAYAH_ROLE) {
+        uint256 requestId = _requestCount++;
+        landRequests[requestId] = LandRequest({
+            to: to,
+            gpsCoordinates: gpsCoordinates,
+            area: area,
+            nib: nib,
+            ipfsHashes: ipfsHashes,
+            isProcessed: false,
+            isRejected: false
+        });
+        emit LandRequested(requestId, to, nib);
+    }
+
+    function approveLandRequest(uint256 requestId) external onlyRole(ADMIN_BPN_ROLE) {
+        LandRequest storage req = landRequests[requestId];
+        require(!req.isProcessed && !req.isRejected, "Request already processed");
+
+        req.isProcessed = true;
+        uint256 tokenId = _nextTokenId++;
+        
+        lands[tokenId] = Land(req.gpsCoordinates, req.area, req.nib, req.ipfsHashes, false);
+        _safeMint(req.to, tokenId);
+        ownershipHistory[tokenId].push(req.to);
+        
+        emit AssetMinted(tokenId, req.to, req.nib);
+        emit LandApproved(requestId, tokenId);
+    }
+
+    function rejectLandRequest(uint256 requestId) external onlyRole(ADMIN_BPN_ROLE) {
+        LandRequest storage req = landRequests[requestId];
+        require(!req.isProcessed && !req.isRejected, "Request already processed");
+        
+        req.isRejected = true;
+        emit LandRejected(requestId);
+    }
+
+    // Legacy / Admin Direct Mint
+    function mintLand(
+        address to,
+        string memory gpsCoordinates,
+        uint256 area,
+        string memory nib,
+        string[] memory ipfsHashes
+    ) external onlyRole(ADMIN_BPN_ROLE) {
         uint256 tokenId = _nextTokenId++;
         lands[tokenId] = Land(gpsCoordinates, area, nib, ipfsHashes, false);
         _safeMint(to, tokenId);
@@ -67,7 +126,8 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         emit AssetMinted(tokenId, to, nib);
     }
 
-    // --- LOGIK HOLDING: NFT dipindah ke kontrak semasa cadangan jualan ---
+    // --- LOGIK TRANSFER ---
+
     function proposeTransfer(uint256 tokenId, address buyer) external {
         require(ownerOf(tokenId) == msg.sender, "Bukan pemilik");
         require(!lands[tokenId].isDisputed, "Tanah dalam sengketa");
@@ -83,9 +143,7 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
             isActive: true
         });
 
-        // NFT di-hold oleh kontrak
         _transfer(msg.sender, address(this), tokenId);
-
         emit TransferProposed(tokenId, msg.sender, buyer);
     }
 
@@ -93,7 +151,6 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         TransferRequest storage req = transferRequests[tokenId];
         require(req.isActive, "Tiada permohonan aktif");
         require(req.buyer == msg.sender, "Bukan pembeli");
-        
         req.buyerApproved = true;
     }
 
@@ -116,8 +173,6 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         address seller = req.seller;
 
         req.isActive = false;
-
-        // NFT dihantar dari kontrak (holding) ke pembeli
         _transfer(address(this), buyer, tokenId);
         ownershipHistory[tokenId].push(buyer);
 
@@ -130,10 +185,7 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         require(msg.sender == req.seller || hasRole(ADMIN_BPN_ROLE, msg.sender), "Tiada autoriti");
 
         req.isActive = false;
-
-        // NFT dikembalikan kepada penjual asal
         _transfer(address(this), req.seller, tokenId);
-
         emit TransferCancelled(tokenId, req.seller);
     }
 
@@ -142,12 +194,12 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         emit EnforcementStatusChanged(tokenId, isDisputed);
     }
 
-    // Overrides required by Solidity
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
-    // Tambahan helper untuk frontend mencari token berdasarkan NIB
+    // --- HELPERS ---
+
     function getTokenByNIB(string memory nib) external view returns (uint256 tokenId, bool found) {
         for (uint256 i = 0; i < _nextTokenId; i++) {
             if (keccak256(abi.encodePacked(lands[i].nib)) == keccak256(abi.encodePacked(nib))) {
@@ -162,9 +214,7 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
     }
 
     function getTotalRequests() external view returns (uint256) {
-        // Dalam konteks ini kita asumsikan jumlah request pendaftaran bisa dilacak lewat _nextTokenId atau mapping terpisah
-        // Namun untuk kompatibilitas dashboard yang sudah ada, kita gunakan _nextTokenId
-        return _nextTokenId; 
+        return _requestCount;
     }
 
     function getLandDetails(uint256 tokenId) external view returns (
@@ -184,10 +234,14 @@ contract LandRegistry is ERC721, AccessControl, IERC721Receiver {
         uint256 area,
         string memory gpsCoordinates,
         bool isProcessed,
-        bool isRejected
+        bool isRejected,
+        string[] memory ipfsHashes
     ) {
-        // Untuk kompatibilitas dashboard user, kita mapping request pendaftaran ke data land yang sudah ada
-        Land storage land = lands[requestId];
-        return (ownerOf(requestId), land.nib, land.area, land.gpsCoordinates, true, false);
+        LandRequest storage req = landRequests[requestId];
+        return (req.to, req.nib, req.area, req.gpsCoordinates, req.isProcessed, req.isRejected, req.ipfsHashes);
+    }
+
+    function getOwnershipHistory(uint256 tokenId) external view returns (address[] memory) {
+        return ownershipHistory[tokenId];
     }
 }

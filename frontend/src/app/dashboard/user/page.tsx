@@ -110,12 +110,20 @@ function AssetCard({ tokenId }: { tokenId: number }) {
   const { address } = useAccount();
   const [showCertificate, setShowCertificate] = useState(false);
   
-  const { data: land } = useReadContract({
+  const { data: landData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
     args: [BigInt(tokenId)],
   });
+
+  const land = landData ? {
+    gpsCoordinates: (landData as any)[0],
+    area: (landData as any)[1],
+    nib: (landData as any)[2],
+    ipfsHashes: (landData as any)[3],
+    isDisputed: (landData as any)[4],
+  } : null;
 
   const { data: owner } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -156,6 +164,7 @@ function AssetCard({ tokenId }: { tokenId: number }) {
       abi: LandRegistryABI,
       functionName: 'proposeTransfer',
       args: [BigInt(tokenId), buyerAddress as `0x${string}`],
+      
     });
   };
 
@@ -270,13 +279,21 @@ function BuyerApprovalPanel() {
     query: { enabled: checkedId !== null },
   });
 
-  const { data: land } = useReadContract({
+  const { data: landData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
     args: [checkedId !== null ? BigInt(checkedId) : BigInt(0)],
     query: { enabled: checkedId !== null },
   });
+
+  const land = landData ? {
+    gpsCoordinates: (landData as any)[0],
+    area: (landData as any)[1],
+    nib: (landData as any)[2],
+    ipfsHashes: (landData as any)[3],
+    isDisputed: (landData as any)[4],
+  } : null;
 
   const { writeContract: approveBuy, isPending: isApproving } = useWriteContract();
   const { address } = useAccount();
@@ -288,6 +305,7 @@ function BuyerApprovalPanel() {
       abi: LandRegistryABI,
       functionName: 'approveTransferBuyer',
       args: [BigInt(checkedId)],
+      
     });
   };
 
@@ -389,12 +407,22 @@ function BuyerApprovalPanel() {
 
 // ─── Komponen Pelacakan Status Pendaftaran ─────────────────────────────────────
 function RequestStatusCard({ requestId }: { requestId: number }) {
-  const { data: request } = useReadContract({
+  const { data: requestData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getRequestDetails',
     args: [BigInt(requestId)],
   });
+
+  const request = requestData ? {
+    to: (requestData as any)[0],
+    nib: (requestData as any)[1],
+    area: (requestData as any)[2],
+    gpsCoordinates: (requestData as any)[3],
+    isProcessed: (requestData as any)[4],
+    isRejected: (requestData as any)[5],
+    ipfsHashes: (requestData as any)[6],
+  } : null;
 
   const { address } = useAccount();
 

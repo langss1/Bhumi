@@ -12,12 +12,22 @@ interface RequestRowProps {
 
 function RequestRow({ requestId }: RequestRowProps) {
   const [showDetails, setShowDetails] = useState(false);
-  const { data: request, isLoading } = useReadContract({
+  const { data: requestData, isLoading } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getRequestDetails',
     args: [BigInt(requestId)],
   });
+
+  const request = requestData ? {
+    to: (requestData as any)[0],
+    nib: (requestData as any)[1],
+    area: (requestData as any)[2],
+    gpsCoordinates: (requestData as any)[3],
+    isProcessed: (requestData as any)[4],
+    isRejected: (requestData as any)[5],
+    ipfsHashes: (requestData as any)[6],
+  } : null;
 
   const { writeContract, isPending: isActionPending } = useWriteContract();
 
@@ -35,6 +45,7 @@ function RequestRow({ requestId }: RequestRowProps) {
       abi: LandRegistryABI,
       functionName: 'approveLandRequest',
       args: [BigInt(requestId)],
+      
     });
   };
 
@@ -44,6 +55,7 @@ function RequestRow({ requestId }: RequestRowProps) {
       abi: LandRegistryABI,
       functionName: 'rejectLandRequest',
       args: [BigInt(requestId)],
+      
     });
   };
 

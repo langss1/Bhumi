@@ -5,130 +5,6 @@ export const LandRegistryABI = [
     "type": "constructor"
   },
   {
-    "inputs": [],
-    "name": "AccessControlBadConfirmation",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "neededRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "AccessControlUnauthorizedAccount",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721IncorrectOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ERC721InsufficientApproval",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "approver",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721InvalidApprover",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721InvalidOperator",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721InvalidOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721InvalidReceiver",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "ERC721InvalidSender",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ERC721NonexistentToken",
-    "type": "error"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -213,25 +89,6 @@ export const LandRegistryABI = [
         "type": "uint256"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "buyer",
-        "type": "address"
-      }
-    ],
-    "name": "BuyerApproved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
         "indexed": false,
         "internalType": "bool",
         "name": "isDisputed",
@@ -296,31 +153,6 @@ export const LandRegistryABI = [
       }
     ],
     "name": "LandRequested",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "notaris",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "ajbIpfsHash",
-        "type": "string"
-      }
-    ],
-    "name": "NotarisApproved",
     "type": "event"
   },
   {
@@ -421,6 +253,25 @@ export const LandRegistryABI = [
       }
     ],
     "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      }
+    ],
+    "name": "TransferCancelled",
     "type": "event"
   },
   {
@@ -662,36 +513,29 @@ export const LandRegistryABI = [
     "name": "getLandDetails",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "gpsCoordinates",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "area",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "nib",
-            "type": "string"
-          },
-          {
-            "internalType": "string[]",
-            "name": "ipfsHashes",
-            "type": "string[]"
-          },
-          {
-            "internalType": "bool",
-            "name": "isDisputed",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct LandRegistry.Land",
-        "name": "",
-        "type": "tuple"
+        "internalType": "string",
+        "name": "gpsCoordinates",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "area",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "nib",
+        "type": "string"
+      },
+      {
+        "internalType": "string[]",
+        "name": "ipfsHashes",
+        "type": "string[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "isDisputed",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -727,46 +571,39 @@ export const LandRegistryABI = [
     "name": "getRequestDetails",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "to",
-            "type": "address"
-          },
-          {
-            "internalType": "string",
-            "name": "gpsCoordinates",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "area",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "nib",
-            "type": "string"
-          },
-          {
-            "internalType": "string[]",
-            "name": "ipfsHashes",
-            "type": "string[]"
-          },
-          {
-            "internalType": "bool",
-            "name": "isProcessed",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "isRejected",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct LandRegistry.LandRequest",
-        "name": "",
-        "type": "tuple"
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "nib",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "area",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "gpsCoordinates",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isProcessed",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isRejected",
+        "type": "bool"
+      },
+      {
+        "internalType": "string[]",
+        "name": "ipfsHashes",
+        "type": "string[]"
       }
     ],
     "stateMutability": "view",
@@ -816,25 +653,6 @@ export const LandRegistryABI = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "getTokensByOwner",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getTotalLands",
     "outputs": [
@@ -855,50 +673,6 @@ export const LandRegistryABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTransferStatus",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "isActive",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "seller",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "buyer",
-        "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "sellerApproved",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "buyerApproved",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "notarisApproved",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1097,6 +871,40 @@ export const LandRegistryABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -1177,7 +985,7 @@ export const LandRegistryABI = [
       },
       {
         "internalType": "address",
-        "name": "callerConfirmation",
+        "name": "account",
         "type": "address"
       }
     ],

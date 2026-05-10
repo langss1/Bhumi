@@ -63,6 +63,7 @@ export default function BpnWilayahDashboard() {
           nib,
           [warkahHash, fotoHash]
         ],
+        
       });
 
       alert(`Transaksi dikirim ke Blockchain!\nMenunggu konfirmasi blok... TxHash: ${txHash}`);
