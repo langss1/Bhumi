@@ -100,97 +100,101 @@ function RequestRow({ requestId }: RequestRowProps) {
 
       <AnimatePresence>
         {showDetails && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/60 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full shadow-2xl relative"
-            >
-              <button 
-                onClick={() => setShowDetails(false)}
-                className="absolute top-8 right-8 text-moss-400 hover:text-moss-900 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-
-              <h3 className="text-2xl font-black text-moss-900 mb-2">Detail Pendaftaran Tanah</h3>
-              <p className="text-moss-500 mb-8 text-sm">Verifikasi data fisik dan yuridis sebelum dicetak ke Blockchain.</p>
-
-              <div className="grid grid-cols-2 gap-8 mb-8">
-                <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
-                  <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">NIB</div>
-                  <div className="font-bold text-moss-900">{request.nib}</div>
-                </div>
-                <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
-                  <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan</div>
-                  <div className="font-bold text-moss-900">{request.area.toString()} m²</div>
-                </div>
-                <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
-                  <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Koordinat GPS</div>
-                  <div className="font-mono text-sm text-moss-900 font-bold">{request.gpsCoordinates}</div>
-                </div>
-                <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
-                  <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Wallet Pemilik</div>
-                  <div className="font-mono text-xs text-moss-600 break-all">{request.to}</div>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-10">
-                <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest flex items-center gap-2">
-                  <svg className="w-4 h-4 text-olive-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                  Dokumen Pendukung (IPFS)
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <a 
-                    href={`https://gateway.pinata.cloud/ipfs/${request.ipfsHashes[0]}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 hover:shadow-md transition-all group"
-                  >
-                    <div className="w-10 h-10 bg-moss-50 rounded-lg flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-moss-900">Warkah / PDF</div>
-                      <div className="text-[10px] text-moss-400 font-mono">Buka di IPFS</div>
-                    </div>
-                  </a>
-                  <a 
-                    href={`https://gateway.pinata.cloud/ipfs/${request.ipfsHashes[1]}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 hover:shadow-md transition-all group"
-                  >
-                    <div className="w-10 h-10 bg-moss-50 rounded-lg flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-moss-900">Foto Batas</div>
-                      <div className="text-[10px] text-moss-400 font-mono">Buka di IPFS</div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => { handleApprove(); setShowDetails(false); }}
-                  disabled={isActionPending}
-                  className="flex-1 py-4 bg-moss-900 text-white font-bold rounded-2xl hover:bg-moss-950 transition-all shadow-xl shadow-moss-200"
+          <tr>
+            <td colSpan={5} className="p-0 border-none">
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/60 backdrop-blur-sm">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full shadow-2xl relative"
                 >
-                  Approve & Mint NFT
-                </button>
-                <button 
-                  onClick={() => { handleReject(); setShowDetails(false); }}
-                  disabled={isActionPending}
-                  className="flex-1 py-4 bg-white text-red-600 border-2 border-red-100 font-bold rounded-2xl hover:bg-red-50 transition-all"
-                >
-                  Reject Request
-                </button>
+                  <button 
+                    onClick={() => setShowDetails(false)}
+                    className="absolute top-8 right-8 text-moss-400 hover:text-moss-900 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+
+                  <h3 className="text-2xl font-black text-moss-900 mb-2">Detail Pendaftaran Tanah</h3>
+                  <p className="text-moss-500 mb-8 text-sm">Verifikasi data fisik dan yuridis sebelum dicetak ke Blockchain.</p>
+
+                  <div className="grid grid-cols-2 gap-8 mb-8">
+                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">NIB</div>
+                      <div className="font-bold text-moss-900">{request.nib}</div>
+                    </div>
+                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan</div>
+                      <div className="font-bold text-moss-900">{request.area.toString()} m²</div>
+                    </div>
+                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Koordinat GPS</div>
+                      <div className="font-mono text-sm text-moss-900 font-bold">{request.gpsCoordinates}</div>
+                    </div>
+                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Wallet Pemilik</div>
+                      <div className="font-mono text-xs text-moss-600 break-all">{request.to}</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-10">
+                    <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest flex items-center gap-2">
+                      <svg className="w-4 h-4 text-olive-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                      Dokumen Pendukung (IPFS)
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <a 
+                        href={`https://gateway.pinata.cloud/ipfs/${request.ipfsHashes[0]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 hover:shadow-md transition-all group"
+                      >
+                        <div className="w-10 h-10 bg-moss-50 rounded-lg flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-moss-900">Warkah / PDF</div>
+                          <div className="text-[10px] text-moss-400 font-mono">Buka di IPFS</div>
+                        </div>
+                      </a>
+                      <a 
+                        href={`https://gateway.pinata.cloud/ipfs/${request.ipfsHashes[1]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 hover:shadow-md transition-all group"
+                      >
+                        <div className="w-10 h-10 bg-moss-50 rounded-lg flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-moss-900">Foto Batas</div>
+                          <div className="text-[10px] text-moss-400 font-mono">Buka di IPFS</div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => { handleApprove(); setShowDetails(false); }}
+                      disabled={isActionPending}
+                      className="flex-1 py-4 bg-moss-900 text-white font-bold rounded-2xl hover:bg-moss-950 transition-all shadow-xl shadow-moss-200"
+                    >
+                      Approve & Mint NFT
+                    </button>
+                    <button 
+                      onClick={() => { handleReject(); setShowDetails(false); }}
+                      disabled={isActionPending}
+                      className="flex-1 py-4 bg-white text-red-600 border-2 border-red-100 font-bold rounded-2xl hover:bg-red-50 transition-all"
+                    >
+                      Reject Request
+                    </button>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
+            </td>
+          </tr>
         )}
       </AnimatePresence>
     </>

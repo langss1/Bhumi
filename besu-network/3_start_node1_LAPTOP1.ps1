@@ -1,17 +1,24 @@
 # ============================================================
-# LAPTOP 1 (BPN PUSAT) - BOOTNODE & VALIDATOR UTAMA
-# Jalankan script ini di Laptop 1
+# LAPTOP 1 (BPN PUSAT) - FULL NODE & VALIDATOR
 # ============================================================
 
 $BASE    = "C:\bhumi-besu"
 $GENESIS = "$BASE\genesis.json"
 
+# Load Konfigurasi Jaringan
+. "$PSScriptRoot\network_config.ps1"
+Write-Host "DEBUG: IP1=$IP_LAPTOP1, ENODE1=$ENODE_1" -ForegroundColor Gray
+
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host " LAPTOP 1 - BPN PUSAT (BOOTNODE)     " -ForegroundColor Cyan
+Write-Host " LAPTOP 1 - BPN PUSAT (NODE 1)       " -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "RPC  : http://0.0.0.0:8545" -ForegroundColor Yellow
-Write-Host "P2P  : 0.0.0.0:30303" -ForegroundColor Yellow
-Write-Host "`nStarting node... (Ctrl+C untuk stop)`n" -ForegroundColor Green
+Write-Host "My IP  : $IP_LAPTOP1" -ForegroundColor Yellow
+Write-Host "RPC    : http://0.0.0.0:8545" -ForegroundColor Yellow
+Write-Host "P2P    : 30303 (Bootnodes: Laptop 2 & 3)" -ForegroundColor Yellow
+Write-Host "`nStarting node... (Jaringan akan sync otomatis)`n" -ForegroundColor Green
+
+# Daftar bootnode diambil dari config pusat
+$MY_BOOTNODES = $ALL_BOOTNODES
 
 & "C:\besu\bin\besu.bat" `
   --data-path="$BASE\node1\data" `
@@ -24,9 +31,10 @@ Write-Host "`nStarting node... (Ctrl+C untuk stop)`n" -ForegroundColor Green
   --host-allowlist="*" `
   --rpc-ws-enabled=true `
   --rpc-ws-host=0.0.0.0 `
-  --rpc-ws-port=8646 `
+  --rpc-ws-port=8546 `
   --p2p-host=0.0.0.0 `
   --p2p-port=30303 `
   --nat-method=NONE `
+  --bootnodes="$MY_BOOTNODES" `
   --min-gas-price=0 `
   --logging=INFO

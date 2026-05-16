@@ -22,7 +22,7 @@ export default {
       initialBaseFeePerGas: 0,
     },
     localhost: {
-      url: "http://127.0.0.1:8545",
+      url: "http://10.223.153.80:8545",
     },
 
     // ─── Hyperledger Besu IBFT 2.0 (PRODUKSI DEMO) ──────────────────────────
@@ -30,7 +30,7 @@ export default {
     // Ganti PRIVATE_KEY_DEPLOYER_ANDA dengan private key MetaMask yang ada
     // di alloc genesis.json
     besu: {
-      url: "http://127.0.0.1:8545",
+      url: "http://10.223.153.80:8545",
       chainId: 31337,
       gasPrice: 0,
       accounts: [

@@ -67,47 +67,51 @@ function LandRow({ tokenId }: LandRowProps) {
 
       {/* Detail Modal */}
       {showDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full shadow-2xl relative">
-            <button onClick={() => setShowDetails(false)} className="absolute top-8 right-8 text-moss-400 hover:text-moss-900 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            <h3 className="text-2xl font-black text-moss-900 mb-6 font-display uppercase tracking-tight">Detail Sertifikat Digital</h3>
-            
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
-                <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Nomor Identifikasi Bidang (NIB)</div>
-                <div className="font-bold text-moss-900">{land.nib}</div>
-              </div>
-              <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
-                <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan Terukur</div>
-                <div className="font-bold text-moss-900">{land.area.toString()} m²</div>
-              </div>
-              <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
-                <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Titik Koordinat (Geo-Location)</div>
-                <div className="font-mono text-sm text-moss-900 font-bold">{land.gpsCoordinates}</div>
-              </div>
-            </div>
+        <tr>
+          <td colSpan={5} className="p-0 border-none">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/60 backdrop-blur-sm">
+              <div className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full shadow-2xl relative">
+                <button onClick={() => setShowDetails(false)} className="absolute top-8 right-8 text-moss-400 hover:text-moss-900 transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <h3 className="text-2xl font-black text-moss-900 mb-6 font-display uppercase tracking-tight">Detail Sertifikat Digital</h3>
+                
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                  <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
+                    <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Nomor Identifikasi Bidang (NIB)</div>
+                    <div className="font-bold text-moss-900">{land.nib}</div>
+                  </div>
+                  <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
+                    <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan Terukur</div>
+                    <div className="font-bold text-moss-900">{land.area.toString()} m²</div>
+                  </div>
+                  <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
+                    <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Titik Koordinat (Geo-Location)</div>
+                    <div className="font-mono text-sm text-moss-900 font-bold">{land.gpsCoordinates}</div>
+                  </div>
+                </div>
 
-            <div className="space-y-4">
-              <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest">Dokumen Tersemat (IPFS)</h4>
-              <div className="flex flex-col gap-3">
-                {land.ipfsHashes.map((hash, idx) => (
-                  <a key={idx} href={`https://gateway.pinata.cloud/ipfs/${hash}`} target="_blank" rel="noreferrer" 
-                    className="flex items-center justify-between p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 transition-all group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-moss-50 rounded flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                      </div>
-                      <span className="text-xs font-bold text-moss-700">{idx === 0 ? 'Warkah / Surat Ukur' : idx === 1 ? 'Foto Batas Bidang' : `Dokumen Tambahan #${idx-1}`}</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-moss-300 group-hover:text-olive-400">LIHAT DATA</span>
-                  </a>
-                ))}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-black text-moss-900 uppercase tracking-widest">Dokumen Tersemat (IPFS)</h4>
+                  <div className="flex flex-col gap-3">
+                    {land.ipfsHashes.map((hash, idx) => (
+                      <a key={idx} href={`https://gateway.pinata.cloud/ipfs/${hash}`} target="_blank" rel="noreferrer" 
+                        className="flex items-center justify-between p-4 bg-white border border-moss-200 rounded-xl hover:border-olive-500 transition-all group">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-moss-50 rounded flex items-center justify-center text-moss-400 group-hover:text-olive-600 transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                          </div>
+                          <span className="text-xs font-bold text-moss-700">{idx === 0 ? 'Warkah / Surat Ukur' : idx === 1 ? 'Foto Batas Bidang' : `Dokumen Tambahan #${idx-1}`}</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-moss-300 group-hover:text-olive-400">LIHAT DATA</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </td>
+        </tr>
       )}
     </>
   );

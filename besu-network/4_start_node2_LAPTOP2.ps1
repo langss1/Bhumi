@@ -1,23 +1,23 @@
 # ============================================================
-# LAPTOP 2 (BPN WILAYAH A) - VALIDATOR NODE 2
-# Copy folder node2 dari Laptop 1 ke C:\bhumi-besu\node2
-# Copy genesis.json ke C:\bhumi-besu\genesis.json
-# GANTI ENODE_LAPTOP1 dengan enode:// dari Laptop 1!
+# LAPTOP 2 (BPN WILAYAH A) - FULL NODE & VALIDATOR
 # ============================================================
 
 $BASE     = "C:\bhumi-besu"
 $GENESIS  = "$BASE\genesis.json"
 
-# !! GANTI INI dengan enode:// dari output Laptop 1 !!
-$BOOTNODE = "enode://aecca68df415b2ae78193329cfd5cccf0493f2252e633b2cc05965466442a75a2b657cf0c3785d321f14be999d9e0f7b0c1c2f501a8a855f5da1a331c8b77338@10.223.153.80:30303"
+# Load Konfigurasi Jaringan
+. "$PSScriptRoot\network_config.ps1"
 
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host " LAPTOP 2 - BPN WILAYAH A (VALIDATOR) " -ForegroundColor Cyan
+Write-Host " LAPTOP 2 - BPN WILAYAH A (NODE 2)    " -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "Bootnode : $BOOTNODE" -ForegroundColor Yellow
-Write-Host "RPC      : http://0.0.0.0:8545" -ForegroundColor Yellow
-Write-Host "P2P      : 0.0.0.0:30303" -ForegroundColor Yellow
-Write-Host "`nStarting node... (Ctrl+C untuk stop)`n" -ForegroundColor Green
+Write-Host "My IP     : $IP_LAPTOP2" -ForegroundColor Yellow
+Write-Host "RPC       : http://0.0.0.0:8545" -ForegroundColor Yellow
+Write-Host "P2P       : 30303 (Bootnodes: Laptop 1 & 3)" -ForegroundColor Yellow
+Write-Host "`nStarting node... (Jaringan akan sync otomatis)`n" -ForegroundColor Green
+
+# Daftar bootnode untuk laptop 2 adalah laptop 1 & 3
+$MY_BOOTNODES = "enode://$ENODE_1@$IP_LAPTOP1:30303,enode://$ENODE_3@$IP_LAPTOP3:30303"
 
 & "C:\besu\bin\besu.bat" `
   --data-path="$BASE\node2\data" `
@@ -34,5 +34,6 @@ Write-Host "`nStarting node... (Ctrl+C untuk stop)`n" -ForegroundColor Green
   --p2p-host=0.0.0.0 `
   --p2p-port=30303 `
   --nat-method=NONE `
-  --bootnodes="$BOOTNODE" `
+  --bootnodes="$MY_BOOTNODES" `
+  --min-gas-price=0 `
   --logging=INFO
