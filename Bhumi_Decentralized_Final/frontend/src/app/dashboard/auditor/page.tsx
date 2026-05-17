@@ -428,6 +428,56 @@ function ForensikSearch() {
   );
 }
 
+// ─── Web 2.5 Anomaly Dashboard ──────────────────────────────────────────────────
+function AnomalyDashboard() {
+  const [anomalyIds, setAnomalyIds] = React.useState<number[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function fetchAnomalies() {
+      try {
+        // [WEB 2.5] Hanya memanggil database untuk ID yang berstatus Sengketa!
+        // Ini menghemat 99% resource dibanding me-looping jutaan aset di Blockchain.
+        const { data, error } = await supabase
+          .from('asset_metadata')
+          .select('asset_id')
+          .eq('status', 'Sengketa');
+          
+        if (data) {
+          setAnomalyIds(data.map(d => d.asset_id));
+        }
+      } catch (err) {
+        console.error("Gagal menarik data anomali dari Supabase", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnomalies();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-10 text-center bg-slate-50 rounded-[2.5rem] border border-slate-200">
+        <p className="text-moss-500 font-bold animate-pulse">Memindai Database Web 2.5 untuk anomali...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {anomalyIds.length === 0 ? (
+        <div className="col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+          <p className="text-moss-500 font-bold">Aman! Tidak ada aset berstatus sengketa di Database.</p>
+        </div>
+      ) : (
+        anomalyIds.map((id) => (
+          <DisputedAssetChecker key={id} tokenId={id} />
+        ))
+      )}
+    </div>
+  );
+}
+
 // ─── Main Auditor Dashboard ────────────────────────────────────────────────────
 export default function AuditorDashboard() {
   const [activeTab, setActiveTab] = useState('ledger');
@@ -511,20 +561,11 @@ export default function AuditorDashboard() {
               <div className="mb-8">
                 <h3 className="text-2xl font-black text-moss-900">Deteksi Anomali & Sengketa</h3>
                 <p className="text-sm text-moss-500 mt-2">
-                  Pantau semua aset yang berada dalam status sengketa atau memiliki transfer mencurigakan.
+                  Memantau aset yang berada dalam status sengketa secara real-time via <span className="font-bold text-olive-700">Supabase Web 2.5</span>.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {[...Array(total)].map((_, i) => (
-                  <DisputedAssetChecker key={i} tokenId={i} />
-                ))}
-                {total === 0 && (
-                  <div className="col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
-                    <p className="text-moss-500 font-bold">Tidak ada aset yang perlu dipantau.</p>
-                  </div>
-                )}
-              </div>
+              <AnomalyDashboard />
             </motion.div>
           )}
         </AnimatePresence>
