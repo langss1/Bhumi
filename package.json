@@ -1,0 +1,13 @@
+{
+  "name": "bhumi-root",
+  "version": "1.0.0",
+  "description": "Root package for Bhumi DApp",
+  "scripts": {
+    "dev": "npm --prefix Bhumi_Decentralized_Final/frontend run dev",
+    "build": "npm --prefix Bhumi_Decentralized_Final/frontend run build",
+    "start": "npm --prefix Bhumi_Decentralized_Final/frontend start",
+    "lint": "npm --prefix Bhumi_Decentralized_Final/frontend run lint",
+    "install:frontend": "npm install --prefix Bhumi_Decentralized_Final/frontend",
+    "install:all": "npm run install:frontend"
+  }
+}

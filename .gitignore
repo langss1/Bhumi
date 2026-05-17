@@ -25,3 +25,15 @@ foundry/cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Friend's shared documentation & setup files
+dokum/
+
+# IDE Settings
+.vscode/
+
+# Besu binaries, networks, and data
+besu-binary/
+besu-network/
+jdk-17.0.11+9/
+
