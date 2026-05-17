@@ -52,7 +52,7 @@ export default function LoginPage() {
       }
 
       if (data.success) {
-        router.push(`/dashboard/${data.role}`);
+        window.location.href = `/dashboard/${data.role}`;
       } else {
         setError(data.message || 'Login gagal.');
       }
@@ -94,8 +94,11 @@ export default function LoginPage() {
         .single();
 
       if (profileErr || !profile) {
+        console.error("Profile Error:", profileErr);
         throw new Error('Profil tidak ditemukan. Harap hubungi admin.');
       }
+
+      console.log("LOGIN SUCCESS! Profile Role is:", profile.role, "Verification Status:", profile.verification_status);
 
       // 3. Cek Status Verifikasi (Khusus Pejabat)
       if (['NOTARIS', 'AUDITOR'].includes(profile.role) && profile.verification_status === 'PENDING') {
@@ -106,22 +109,27 @@ export default function LoginPage() {
       }
 
       // 4. Arahkan ke dashboard sesuai Role
+      console.log("Routing to dashboard based on role:", profile.role);
       switch (profile.role) {
         case 'BPN_PUSAT':
-          router.push('/dashboard/bpn-pusat');
+          console.log("Pushing to /dashboard/bpn-pusat");
+          window.location.href = '/dashboard/bpn-pusat';
           break;
         case 'BPN_WILAYAH':
-          router.push('/dashboard/bpn-wilayah');
+          console.log("Pushing to /dashboard/bpn-wilayah");
+          window.location.href = '/dashboard/bpn-wilayah';
           break;
         case 'NOTARIS':
-          router.push('/dashboard/notaris');
+          window.location.href = '/dashboard/notaris';
           break;
         case 'AUDITOR':
-          router.push('/dashboard/auditor');
+          console.log("Pushing to /dashboard/auditor");
+          window.location.href = '/dashboard/auditor';
           break;
         case 'UMUM':
         default:
-          router.push('/dashboard/user');
+          console.log("Pushing to /dashboard/user");
+          window.location.href = '/dashboard/user';
           break;
       }
 
