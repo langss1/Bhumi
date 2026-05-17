@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReadContract, usePublicClient } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
+import { getAllAuditorComments, DBAuditorComment } from '@/lib/supabase';
 
 // ─── Tipe data hasil pencarian ────────────────────────────────────────────────
 interface LandDetail {
@@ -417,8 +418,17 @@ function ForensikSearch() {
 }
 
 // ─── Main Auditor Dashboard ────────────────────────────────────────────────────
+const CATEGORY_STYLES: Record<string, { label: string; color: string }> = {
+  general:    { label: 'Umum',       color: 'bg-slate-100 text-slate-700 border-slate-200' },
+  warning:    { label: 'Peringatan', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  dispute:    { label: 'Sengketa',   color: 'bg-red-100 text-red-700 border-red-200' },
+  compliance: { label: 'Kepatuhan',  color: 'bg-blue-100 text-blue-700 border-blue-200' },
+};
+
 export default function AuditorDashboard() {
   const [activeTab, setActiveTab] = useState('ledger');
+  const [allComments, setAllComments] = useState<DBAuditorComment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -428,10 +438,21 @@ export default function AuditorDashboard() {
 
   const total = Number(totalLands || 0);
 
+  useEffect(() => {
+    if (activeTab === 'comments') {
+      setCommentsLoading(true);
+      getAllAuditorComments().then(data => {
+        setAllComments(data);
+        setCommentsLoading(false);
+      });
+    }
+  }, [activeTab]);
+
   const tabs = [
     { id: 'ledger', label: '📊 Monitoring Ledger' },
     { id: 'search', label: '🔍 Forensik Silsilah Aset' },
     { id: 'anomaly', label: '⚠️ Deteksi Anomali' },
+    { id: 'comments', label: '💬 Catatan Audit' },
   ];
 
   return (
@@ -484,7 +505,7 @@ export default function AuditorDashboard() {
                   Semua NFT Sertifikat Tanah yang tersegel di blockchain. Total: <strong>{total} aset</strong> terdaftar.
                 </p>
               </div>
-              <LandLedger />
+              <LandLedger showAuditComments />
             </motion.div>
           )}
 
@@ -513,6 +534,65 @@ export default function AuditorDashboard() {
                   </div>
                 )}
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'comments' && (
+            <motion.div key="comments" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="mb-8">
+                <h3 className="text-2xl font-black text-moss-900">Catatan Audit</h3>
+                <p className="text-sm text-moss-500 mt-2">
+                  Semua catatan dan feedback yang telah ditambahkan oleh auditor. Untuk menambah catatan baru, klik aset di tab Monitoring Ledger.
+                </p>
+              </div>
+
+              {commentsLoading ? (
+                <div className="p-10 text-center text-moss-500">Memuat catatan audit...</div>
+              ) : allComments.length === 0 ? (
+                <div className="p-20 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-7 h-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                  </div>
+                  <p className="text-slate-500 font-bold">Belum ada catatan audit.</p>
+                  <p className="text-sm text-slate-400 mt-1">Buka tab &quot;Monitoring Ledger&quot; dan klik aset untuk menambah catatan.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-sm font-bold text-moss-500 px-1 mb-2">
+                    Total <span className="text-slate-700">{allComments.length}</span> catatan
+                  </div>
+                  {allComments.map((c) => {
+                    const catConfig = CATEGORY_STYLES[c.category] || CATEGORY_STYLES.general;
+                    return (
+                      <motion.div
+                        key={c.id}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-sm transition-shadow"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="bg-slate-100 text-slate-700 text-[10px] font-black px-2.5 py-1 rounded-lg border border-slate-200 font-mono">
+                              Token #{c.token_id}
+                            </span>
+                            {c.nib && (
+                              <span className="text-[10px] font-bold text-moss-500">NIB: {c.nib}</span>
+                            )}
+                            <span className={`text-[9px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${catConfig.color}`}>
+                              {catConfig.label}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                            {new Date(c.created_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed">{c.comment}</p>
+                        <p className="text-[10px] font-mono text-slate-400 mt-3 truncate">oleh: {c.auditor_wallet}</p>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

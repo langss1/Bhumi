@@ -25,3 +25,10 @@ foundry/cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Friend's shared documentation & setup files
+dokum/
+
+# Besu blockchain data (local node)
+besu-network/node*/data/database/
+besu-network/node*/data/caches/

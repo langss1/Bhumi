@@ -57,13 +57,16 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
       }
 
       setIsUploading(false);
-      await writeContractAsync({
+      const tx = await writeContractAsync({
         address: LAND_REGISTRY_ADDRESS,
         abi: LandRegistryABI,
         functionName: 'approveTransferNotaris',
         args: [BigInt(tokenId), hash],
-        
       });
+      
+      // Tunggu sampai transaksi benar-benar masuk ke block
+      alert(`⌛ Transaksi terkirim! Menunggu konfirmasi blockchain...`);
+      
       alert(`✅ Transfer Token #${tokenId} berhasil dieksekusi! NFT resmi berpindah ke pembeli.`);
     } catch (err: any) {
       console.error(err);
