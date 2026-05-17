@@ -6,6 +6,7 @@ import { useReadContract, usePublicClient } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
+import { supabase } from '@/lib/supabase';
 
 // ─── Tipe data hasil pencarian ────────────────────────────────────────────────
 interface LandDetail {
@@ -254,50 +255,61 @@ function ForensikSearch() {
 
       const found: LandDetail[] = [];
 
-      for (let i = 0; i < total; i++) {
-        const isTokenIdMatch = q === String(i);
+      // ========================================================
+      // WEB 2.5 HYBRID SEARCH
+      // 1. Cari ID Tanah di Supabase (Sangat Cepat)
+      // 2. Jika ketemu, ambil file & sejarah aslinya di Blockchain
+      // ========================================================
+      let supabaseQuery = supabase.from('asset_metadata').select('asset_id');
+      
+      if (!isNaN(Number(q))) {
+        supabaseQuery = supabaseQuery.or(`asset_name.ilike.%${q}%,asset_id.eq.${Number(q)}`);
+      } else {
+        supabaseQuery = supabaseQuery.ilike('asset_name', `%${q}%`);
+      }
 
-        const land = await publicClient.readContract({
-          address: LAND_REGISTRY_ADDRESS,
-          abi: LandRegistryABI,
-          functionName: 'getLandDetails',
-          args: [BigInt(i)],
-        }) as any;
+      const { data: searchResults, error } = await supabaseQuery;
+      
+      if (error) {
+        console.error("Supabase search error:", error);
+        throw new Error("Gagal mencari di database Web 2.5");
+      }
 
-        if (!land) continue;
+      // 3. Tarik data otentik dari Blockchain HANYA untuk hasil yang cocok
+      if (searchResults && searchResults.length > 0) {
+        for (const item of searchResults) {
+          const tokenId = item.asset_id;
 
-        const landObj = {
-          gpsCoordinates: land[0],
-          area: land[1],
-          nib: land[2],
-          ipfsHashes: land[3],
-          isDisputed: land[4]
-        };
+          const land = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'getLandDetails',
+            args: [BigInt(tokenId)],
+          }) as any;
 
-        const nibMatch = landObj.nib?.toLowerCase().includes(q.toLowerCase());
+          if (!land) continue;
 
-        if (isTokenIdMatch || nibMatch) {
           const owner = await publicClient.readContract({
             address: LAND_REGISTRY_ADDRESS,
             abi: LandRegistryABI,
             functionName: 'ownerOf',
-            args: [BigInt(i)],
+            args: [BigInt(tokenId)],
           }) as string;
 
           const history = await publicClient.readContract({
             address: LAND_REGISTRY_ADDRESS,
             abi: LandRegistryABI,
             functionName: 'getOwnershipHistory',
-            args: [BigInt(i)],
+            args: [BigInt(tokenId)],
           }) as string[];
 
           found.push({
-            tokenId: i,
-            nib: landObj.nib,
-            gpsCoordinates: landObj.gpsCoordinates,
-            area: landObj.area,
-            ipfsHashes: Array.from(landObj.ipfsHashes || []),
-            isDisputed: landObj.isDisputed,
+            tokenId: tokenId,
+            nib: land[2],
+            gpsCoordinates: land[0],
+            area: land[1],
+            ipfsHashes: Array.from(land[3] || []),
+            isDisputed: land[4],
             owner,
             ownershipHistory: Array.from(history || []),
           });
@@ -321,7 +333,7 @@ function ForensikSearch() {
       <div className="bg-white border border-moss-100 p-10 rounded-[2rem] shadow-sm">
         <h3 className="text-2xl font-black text-moss-900 mb-2">Pencarian Forensik</h3>
         <p className="text-sm text-moss-500 mb-8">
-          Cari berdasarkan <span className="font-bold text-moss-700">NIB</span> atau <span className="font-bold text-moss-700">ID Token NFT</span>. Sistem akan memindai seluruh ledger blockchain ({Number(totalLands || 0)} token).
+          Cari berdasarkan <span className="font-bold text-moss-700">NIB</span> atau <span className="font-bold text-moss-700">ID Token NFT</span>. (Didukung oleh Web 2.5 Hybrid Search Engine).
         </p>
         <div className="flex gap-4">
           <input
@@ -372,10 +384,10 @@ function ForensikSearch() {
           </svg>
           <div>
             <p className="text-sm font-bold text-olive-800">
-              Memindai {Number(totalLands || 0)} token di Ledger Blockchain...
+              Mencari aset di Database Supabase Web 2.5...
             </p>
             <p className="text-xs text-olive-600 mt-0.5">
-              Membaca data langsung dari node. Mohon tunggu.
+              Melakukan verifikasi keaslian dokumen ke blockchain (Hybrid Sync). Mohon tunggu.
             </p>
           </div>
         </div>
