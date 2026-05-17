@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     // Set HTTP-Only Cookie untuk dibaca oleh Middleware Next.js
     response.cookies.set({
       name: 'user_role',
-      value: role,
+      value: routeRole,
       path: '/',
       httpOnly: false, // Set false for testing if frontend needs it, but middleware reads it either way
       sameSite: 'lax',
