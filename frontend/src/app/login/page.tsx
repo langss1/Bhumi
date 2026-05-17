@@ -105,25 +105,19 @@ export default function LoginPage() {
         return;
       }
 
-      // 4. Arahkan ke dashboard sesuai Role
-      switch (profile.role) {
-        case 'BPN_PUSAT':
-          router.push('/dashboard/bpn-pusat');
-          break;
-        case 'BPN_WILAYAH':
-          router.push('/dashboard/bpn-wilayah');
-          break;
-        case 'NOTARIS':
-          router.push('/dashboard/notaris');
-          break;
-        case 'AUDITOR':
-          router.push('/dashboard/auditor');
-          break;
-        case 'UMUM':
-        default:
-          router.push('/dashboard/user');
-          break;
-      }
+      // 4. Map role Supabase → cookie value (untuk middleware proxy.ts)
+      const roleToCookie: Record<string, string> = {
+        'BPN_PUSAT': 'bpn-pusat',
+        'BPN_WILAYAH': 'bpn-wilayah',
+        'NOTARIS': 'notaris',
+        'AUDITOR': 'auditor',
+        'UMUM': 'user',
+      };
+      const cookieRole = roleToCookie[profile.role] || 'user';
+      document.cookie = `user_role=${cookieRole}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
+
+      // 5. Arahkan ke dashboard sesuai Role
+      router.push(`/dashboard/${cookieRole}`);
 
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan saat login.');
