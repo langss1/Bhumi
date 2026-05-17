@@ -29,6 +29,11 @@ Thumbs.db
 # Friend's shared documentation & setup files
 dokum/
 
-# Besu blockchain data (local node)
-besu-network/node*/data/database/
-besu-network/node*/data/caches/
+# IDE Settings
+.vscode/
+
+# Besu binaries, networks, and data
+besu-binary/
+besu-network/
+jdk-17.0.11+9/
+
