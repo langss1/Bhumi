@@ -52,9 +52,17 @@ if (Test-Path $configPath) {
     $content | Set-Content $configPath
 }
 
-# --- STEP 4: Copy Node Identities ---
-Write-Host "`n[4/5] Menyiapkan Identitas Node (Kunci)..." -ForegroundColor Yellow
+# --- STEP 4: Copy Node Identities & Genesis ---
+Write-Host "`n[4/5] Menyiapkan Identitas Node (Kunci) dan Genesis..." -ForegroundColor Yellow
 if (!(Test-Path $BASE)) { New-Item -ItemType Directory -Path $BASE -Force | Out-Null }
+
+# Copy genesis.json
+if (Test-Path "$SCRIPT_DIR\genesis.json") {
+    Copy-Item -Path "$SCRIPT_DIR\genesis.json" -Destination "$BASE\genesis.json" -Force
+    Write-Host "  ✅ File genesis.json berhasil disiapkan di $BASE" -ForegroundColor Green
+} else {
+    Write-Host "  ⚠️ File genesis.json tidak ditemukan di folder besu-network!" -ForegroundColor Red
+}
 
 $identitySource = "$SCRIPT_DIR\..\node-identities"
 if (Test-Path $identitySource) {
