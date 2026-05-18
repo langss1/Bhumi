@@ -52,8 +52,20 @@ if (Test-Path $configPath) {
     $content | Set-Content $configPath
 }
 
-# --- STEP 4: Install Dependencies (Storage Sync) ---
-Write-Host "`n[4/4] Memasang dependensi (npm install)..." -ForegroundColor Yellow
+# --- STEP 4: Copy Node Identities ---
+Write-Host "`n[4/5] Menyiapkan Identitas Node (Kunci)..." -ForegroundColor Yellow
+if (!(Test-Path $BASE)) { New-Item -ItemType Directory -Path $BASE -Force | Out-Null }
+
+$identitySource = "$SCRIPT_DIR\..\node-identities"
+if (Test-Path $identitySource) {
+    Copy-Item -Path "$identitySource\*" -Destination $BASE -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "  ✅ File kunci berhasil disiapkan di $BASE" -ForegroundColor Green
+} else {
+    Write-Host "  ⚠️ Folder node-identities tidak ditemukan. Pastikan file kunci sudah ada di $BASE" -ForegroundColor Yellow
+}
+
+# --- STEP 5: Install Dependencies (Storage Sync) ---
+Write-Host "`n[5/5] Memasang dependensi (npm install)..." -ForegroundColor Yellow
 cd "$SCRIPT_DIR\..\frontend"
 npm install
 cd "$SCRIPT_DIR\..\hardhat_deploy"

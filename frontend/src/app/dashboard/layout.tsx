@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -9,6 +9,21 @@ import { motion } from 'framer-motion';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { address } = useAccount();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { supabase } = await import('@/lib/supabase');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        setProfile(data);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const activeAddress = profile?.wallet_address || address;
 
   // Extract role from pathname
   const role = pathname.split('/')[2] || 'user';
@@ -68,8 +83,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="text-moss-800 font-bold text-sm">0x</span>
             </div>
             <div className="overflow-hidden">
-              <p className="text-[10px] font-bold text-olive-500 uppercase tracking-widest mb-1">Sesi Aktif</p>
-              <p className="text-xs font-mono text-moss-900 truncate font-semibold">{address || 'Tidak terhubung'}</p>
+              <p className="text-[10px] font-bold text-olive-500 uppercase tracking-widest mb-0.5">
+                {profile ? `${profile.full_name}` : 'Sesi Aktif'}
+              </p>
+              <p className="text-[9px] text-moss-400 truncate mb-1" title={profile?.email}>{profile?.email || 'Tidak terhubung'}</p>
+              <p className="text-xs font-mono text-moss-900 truncate font-semibold">{activeAddress || 'Tidak terhubung'}</p>
             </div>
           </div>
         </div>
@@ -86,10 +104,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Verified Node
             </span>
           </div>
-          <Link href="/login" className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-moss-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100">
+          <button 
+            onClick={async () => {
+              // Hapus cookie user_role
+              document.cookie = "user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+              // Sign out Supabase Auth
+              const { supabase } = await import('@/lib/supabase');
+              await supabase.auth.signOut();
+              // Redirect ke login
+              window.location.href = '/login';
+            }} 
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-moss-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100 cursor-pointer"
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
             Keluar
-          </Link>
+          </button>
         </header>
         
         <div className="flex-1 overflow-y-auto p-12 pb-24">

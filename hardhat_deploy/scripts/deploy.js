@@ -31,10 +31,15 @@ async function main() {
     if (i === 1 || i === 2) {
         await landRegistry.grantRole(BPN_WILAYAH_ROLE, signer.address, { gasPrice: 1000000000 });
         console.log(`Granted BPN_WILAYAH_ROLE to ${signer.address}`);
-    } else if (i === 3) {
+    } 
+    
+    // Berikan NOTARIS_ROLE ke akun 2 dan 3 agar tidak bingung
+    if (i === 2 || i === 3) {
         await landRegistry.grantRole(NOTARIS_ROLE, signer.address, { gasPrice: 1000000000 });
         console.log(`Granted NOTARIS_ROLE to ${signer.address}`);
-    } else if (i === 4) {
+    }
+
+    if (i === 4) {
         await landRegistry.grantRole(AUDITOR_ROLE, signer.address, { gasPrice: 1000000000 });
         console.log(`Granted AUDITOR_ROLE to ${signer.address}`);
     }

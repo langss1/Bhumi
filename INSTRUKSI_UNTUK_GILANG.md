@@ -15,7 +15,18 @@ Kirimkan folder project **Bhumi** secara utuh, namun pastikan:
 2.  **Ihab**: Harus memiliki folder `C:\bhumi-besu\node3` di laptopnya.
 3.  Semua orang harus punya file `genesis.json` yang sama (ada di dalam folder `besu-network`).
 
-### 3. Apa yang harus DISET oleh Arin & Ihab? (Otomatis)
+### 3. Daftar Akun MetaMask untuk Testing
+Berikut adalah daftar akun yang sudah diberikan akses (Role) di dalam Smart Contract:
+
+| Role | MetaMask Account Index | Address (Hardhat) |
+| :--- | :--- | :--- |
+| **Admin BPN** | Account #0 | `0xf39Fd6e51aad...` |
+| **BPN Wilayah** | Account #1 & #2 | `0x7099...`, `0x3C44...` |
+| **Notaris** | **Account #2 & #3** | `0x3C44...`, `0x90F7...` |
+| **Auditor** | Account #4 | `0x15d3...` |
+| **Buyer/Seller** | Account #5 dst | `0xdF3e...` |
+
+### 4. Apa yang harus DISET oleh Arin & Ihab? (Otomatis)
 Beri tahu mereka cukup melakukan 2 langkah ini saja:
 1.  Buka terminal (PowerShell) di folder `besu-network`.
 2.  Jalankan script setup otomatis yang baru saya buat:

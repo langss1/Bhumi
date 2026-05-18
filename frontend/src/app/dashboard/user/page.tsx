@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
@@ -106,8 +106,8 @@ function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, toke
 }
 
 // ─── Kartu Aset NFT Milik User ─────────────────────────────────────────────────
-function AssetCard({ tokenId }: { tokenId: number }) {
-  const { address } = useAccount();
+function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress: string | undefined }) {
+  const address = activeAddress;
   const [showCertificate, setShowCertificate] = useState(false);
   
   const { data: landData } = useReadContract({
@@ -267,7 +267,7 @@ function AssetCard({ tokenId }: { tokenId: number }) {
 }
 
 // ─── Komponen Konfirmasi Pembelian (Sebagai Buyer) ─────────────────────────────
-function BuyerApprovalPanel() {
+function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefined }) {
   const [tokenIdInput, setTokenIdInput] = useState('');
   const [checkedId, setCheckedId] = useState<number | null>(null);
 
@@ -296,7 +296,7 @@ function BuyerApprovalPanel() {
   } : null;
 
   const { writeContract: approveBuy, isPending: isApproving } = useWriteContract();
-  const { address } = useAccount();
+  const address = activeAddress;
 
   const handleApprove = () => {
     if (checkedId === null) return;
@@ -405,8 +405,8 @@ function BuyerApprovalPanel() {
   );
 }
 
-// ─── Komponen Pelacakan Status Pendaftaran ─────────────────────────────────────
-function RequestStatusCard({ requestId }: { requestId: number }) {
+// ─── Kartu Status Permohonan Tanah ─────────────────────────────────────────────
+function RequestStatusCard({ requestId, activeAddress }: { requestId: number, activeAddress: string | undefined }) {
   const { data: requestData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
@@ -424,7 +424,7 @@ function RequestStatusCard({ requestId }: { requestId: number }) {
     ipfsHashes: (requestData as any)[6],
   } : null;
 
-  const { address } = useAccount();
+  const address = activeAddress;
 
   if (!request || request.to.toLowerCase() !== address?.toLowerCase()) return null;
 
@@ -484,6 +484,21 @@ function RequestStatusCard({ requestId }: { requestId: number }) {
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
   const { address } = useAccount();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { supabase } = await import('@/lib/supabase');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        setProfile(data);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const activeAddress = profile?.wallet_address || address;
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -521,10 +536,10 @@ export default function UserDashboard() {
           <p className="font-black text-moss-900">Masyarakat Pemilik Tanah</p>
           <p className="text-xs text-moss-500 mt-0.5">Kelola aset tanah digital Anda secara langsung dan aman</p>
         </div>
-        {address && (
+        {activeAddress && (
           <div className="ml-auto text-right hidden sm:block">
             <p className="text-[10px] text-moss-400 uppercase tracking-widest font-bold">Wallet Aktif</p>
-            <p className="text-xs font-mono text-moss-700 truncate max-w-[180px]">{address}</p>
+            <p className="text-xs font-mono text-moss-700 truncate max-w-[180px]">{activeAddress}</p>
           </div>
         )}
       </div>
@@ -570,7 +585,7 @@ export default function UserDashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} />)}
+                  {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} activeAddress={activeAddress} />)}
                 </div>
               )}
             </motion.div>
@@ -591,7 +606,7 @@ export default function UserDashboard() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {[...Array(totalReq)].map((_, i) => <RequestStatusCard key={i} requestId={i} />)}
+                  {[...Array(totalReq)].map((_, i) => <RequestStatusCard key={i} requestId={i} activeAddress={activeAddress} />)}
                 </div>
               )}
             </motion.div>
@@ -599,7 +614,7 @@ export default function UserDashboard() {
 
           {activeTab === 'transfer' && (
             <motion.div key="transfer" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <BuyerApprovalPanel />
+              <BuyerApprovalPanel activeAddress={activeAddress} />
             </motion.div>
           )}
         </AnimatePresence>

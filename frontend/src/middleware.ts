@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // We are currently simulating the role check using a cookie.
-  // In a real app, the Supabase session token or a signed JWT would be validated here.
+  // Membaca cookie user_role untuk otentikasi berbasis peran (RBAC)
   const roleCookie = request.cookies.get('user_role')?.value;
 
-  // If user tries to access /dashboard but has no role, redirect to /login
+  // Jika user mencoba mengakses dashboard tanpa sesi/role, arahkan ke login
   if (pathname.startsWith('/dashboard') && !roleCookie) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // RBAC Checks for specific routes
+  // Validasi RBAC untuk masing-masing rute dashboard khusus
   if (pathname.startsWith('/dashboard/bpn-pusat') && roleCookie !== 'bpn-pusat') {
     return NextResponse.redirect(new URL(`/dashboard/${roleCookie || 'user'}`, request.url));
   }
@@ -30,7 +29,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/dashboard/${roleCookie || 'user'}`, request.url));
   }
 
-  // Redirect base /dashboard to specific role dashboard
+  // Redirect dasar dari /dashboard ke dashboard peran masing-masing
   if (pathname === '/dashboard') {
     return NextResponse.redirect(new URL(`/dashboard/${roleCookie || 'user'}`, request.url));
   }

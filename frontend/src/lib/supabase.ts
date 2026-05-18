@@ -167,7 +167,6 @@ export async function getPendingVerificators(): Promise<DBProfile[]> {
     .from('profiles')
     .select('*')
     .eq('verification_status', 'PENDING')
-    .neq('role', 'UMUM')
     .order('updated_at', { ascending: false });
   return data || [];
 }
