@@ -10,9 +10,9 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 
 // Role Hashes dari Smart Contract
 const ROLES = {
-  BPN_WILAYAH: "0xd8619ebc57406c13ed639e2467d02cb34a41ebf40f09b531dc14112674e2d277",
-  NOTARIS: "0x35bc858485de34d3d1f3b89b88cf411516e828e833f40f7d4dc9cd82cbabdf92",
-  AUDITOR: "0x0bff7c1b4ac6b50d6d5c363cf9d6f57f48a5d4571c3e8e5a15f636c4c657af3"
+  BPN_WILAYAH: "0x3b6c71f6d44639d5b3e40f2ef3056c3385a1e68a255a703ac23442c1c3be357d",
+  NOTARIS: "0x4e19be690c034b73b896a80e4645324b1ada2a2d102cf965cd497dd07f3a1950",
+  AUDITOR: "0x59a1c48e5837ad7a7f3dcedcbe129bf3249ec4fbf651fd4f5e2600ead39fe2f5"
 };
 
 export default function PendingVerificators() {

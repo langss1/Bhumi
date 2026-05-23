@@ -12,6 +12,13 @@ export const localIBFT = defineChain({
     default: { http: [RPC_URL] },
     public: { http: [RPC_URL] },
   },
+  fees: {
+    estimateFeesPerGas: async () => ({
+      gasPrice: 0n,
+      maxFeePerGas: undefined,
+      maxPriorityFeePerGas: undefined,
+    }),
+  },
 });
 
 export const wagmiConfig = createConfig({
