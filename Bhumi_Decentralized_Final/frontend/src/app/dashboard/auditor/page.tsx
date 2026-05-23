@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReadContract, usePublicClient } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
-import { supabase } from '@/lib/supabase';
+import { getAllAuditorComments, DBAuditorComment } from '@/lib/supabase';
 
 // ─── Tipe data hasil pencarian ────────────────────────────────────────────────
 interface LandDetail {
@@ -255,61 +255,50 @@ function ForensikSearch() {
 
       const found: LandDetail[] = [];
 
-      // ========================================================
-      // WEB 2.5 HYBRID SEARCH
-      // 1. Cari ID Tanah di Supabase (Sangat Cepat)
-      // 2. Jika ketemu, ambil file & sejarah aslinya di Blockchain
-      // ========================================================
-      let supabaseQuery = supabase.from('asset_metadata').select('asset_id');
-      
-      if (!isNaN(Number(q))) {
-        supabaseQuery = supabaseQuery.or(`asset_name.ilike.%${q}%,asset_id.eq.${Number(q)}`);
-      } else {
-        supabaseQuery = supabaseQuery.ilike('asset_name', `%${q}%`);
-      }
+      for (let i = 0; i < total; i++) {
+        const isTokenIdMatch = q === String(i);
 
-      const { data: searchResults, error } = await supabaseQuery;
-      
-      if (error) {
-        console.error("Supabase search error:", error);
-        throw new Error("Gagal mencari di database Web 2.5");
-      }
+        const land = await publicClient.readContract({
+          address: LAND_REGISTRY_ADDRESS,
+          abi: LandRegistryABI,
+          functionName: 'getLandDetails',
+          args: [BigInt(i)],
+        }) as any;
 
-      // 3. Tarik data otentik dari Blockchain HANYA untuk hasil yang cocok
-      if (searchResults && searchResults.length > 0) {
-        for (const item of searchResults) {
-          const tokenId = item.asset_id;
+        if (!land) continue;
 
-          const land = await publicClient.readContract({
-            address: LAND_REGISTRY_ADDRESS,
-            abi: LandRegistryABI,
-            functionName: 'getLandDetails',
-            args: [BigInt(tokenId)],
-          }) as any;
+        const landObj = {
+          gpsCoordinates: land[0],
+          area: land[1],
+          nib: land[2],
+          ipfsHashes: land[3],
+          isDisputed: land[4]
+        };
 
-          if (!land) continue;
+        const nibMatch = landObj.nib?.toLowerCase().includes(q.toLowerCase());
 
+        if (isTokenIdMatch || nibMatch) {
           const owner = await publicClient.readContract({
             address: LAND_REGISTRY_ADDRESS,
             abi: LandRegistryABI,
             functionName: 'ownerOf',
-            args: [BigInt(tokenId)],
+            args: [BigInt(i)],
           }) as string;
 
           const history = await publicClient.readContract({
             address: LAND_REGISTRY_ADDRESS,
             abi: LandRegistryABI,
             functionName: 'getOwnershipHistory',
-            args: [BigInt(tokenId)],
+            args: [BigInt(i)],
           }) as string[];
 
           found.push({
-            tokenId: tokenId,
-            nib: land[2],
-            gpsCoordinates: land[0],
-            area: land[1],
-            ipfsHashes: Array.from(land[3] || []),
-            isDisputed: land[4],
+            tokenId: i,
+            nib: landObj.nib,
+            gpsCoordinates: landObj.gpsCoordinates,
+            area: landObj.area,
+            ipfsHashes: Array.from(landObj.ipfsHashes || []),
+            isDisputed: landObj.isDisputed,
             owner,
             ownershipHistory: Array.from(history || []),
           });
@@ -333,7 +322,7 @@ function ForensikSearch() {
       <div className="bg-white border border-moss-100 p-10 rounded-[2rem] shadow-sm">
         <h3 className="text-2xl font-black text-moss-900 mb-2">Pencarian Forensik</h3>
         <p className="text-sm text-moss-500 mb-8">
-          Cari berdasarkan <span className="font-bold text-moss-700">NIB</span> atau <span className="font-bold text-moss-700">ID Token NFT</span>. (Didukung oleh Web 2.5 Hybrid Search Engine).
+          Cari berdasarkan <span className="font-bold text-moss-700">NIB</span> atau <span className="font-bold text-moss-700">ID Token NFT</span>. Sistem akan memindai seluruh ledger blockchain ({Number(totalLands || 0)} token).
         </p>
         <div className="flex gap-4">
           <input
@@ -384,10 +373,10 @@ function ForensikSearch() {
           </svg>
           <div>
             <p className="text-sm font-bold text-olive-800">
-              Mencari aset di Database Supabase Web 2.5...
+              Memindai {Number(totalLands || 0)} token di Ledger Blockchain...
             </p>
             <p className="text-xs text-olive-600 mt-0.5">
-              Melakukan verifikasi keaslian dokumen ke blockchain (Hybrid Sync). Mohon tunggu.
+              Membaca data langsung dari node. Mohon tunggu.
             </p>
           </div>
         </div>
@@ -428,59 +417,18 @@ function ForensikSearch() {
   );
 }
 
-// ─── Web 2.5 Anomaly Dashboard ──────────────────────────────────────────────────
-function AnomalyDashboard() {
-  const [anomalyIds, setAnomalyIds] = React.useState<number[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function fetchAnomalies() {
-      try {
-        // [WEB 2.5] Hanya memanggil database untuk ID yang berstatus Sengketa!
-        // Ini menghemat 99% resource dibanding me-looping jutaan aset di Blockchain.
-        const { data, error } = await supabase
-          .from('asset_metadata')
-          .select('asset_id')
-          .eq('status', 'Sengketa');
-          
-        if (data) {
-          setAnomalyIds(data.map(d => d.asset_id));
-        }
-      } catch (err) {
-        console.error("Gagal menarik data anomali dari Supabase", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchAnomalies();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="p-10 text-center bg-slate-50 rounded-[2.5rem] border border-slate-200">
-        <p className="text-moss-500 font-bold animate-pulse">Memindai Database Web 2.5 untuk anomali...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {anomalyIds.length === 0 ? (
-        <div className="col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
-          <p className="text-moss-500 font-bold">Aman! Tidak ada aset berstatus sengketa di Database.</p>
-        </div>
-      ) : (
-        anomalyIds.map((id) => (
-          <DisputedAssetChecker key={id} tokenId={id} />
-        ))
-      )}
-    </div>
-  );
-}
-
 // ─── Main Auditor Dashboard ────────────────────────────────────────────────────
+const CATEGORY_STYLES: Record<string, { label: string; color: string }> = {
+  general:    { label: 'Umum',       color: 'bg-slate-100 text-slate-700 border-slate-200' },
+  warning:    { label: 'Peringatan', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  dispute:    { label: 'Sengketa',   color: 'bg-red-100 text-red-700 border-red-200' },
+  compliance: { label: 'Kepatuhan',  color: 'bg-blue-100 text-blue-700 border-blue-200' },
+};
+
 export default function AuditorDashboard() {
   const [activeTab, setActiveTab] = useState('ledger');
+  const [allComments, setAllComments] = useState<DBAuditorComment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -490,10 +438,21 @@ export default function AuditorDashboard() {
 
   const total = Number(totalLands || 0);
 
+  useEffect(() => {
+    if (activeTab === 'comments') {
+      setCommentsLoading(true);
+      getAllAuditorComments().then(data => {
+        setAllComments(data);
+        setCommentsLoading(false);
+      });
+    }
+  }, [activeTab]);
+
   const tabs = [
     { id: 'ledger', label: '📊 Monitoring Ledger' },
     { id: 'search', label: '🔍 Forensik Silsilah Aset' },
     { id: 'anomaly', label: '⚠️ Deteksi Anomali' },
+    { id: 'comments', label: '💬 Catatan Audit' },
   ];
 
   return (
@@ -546,7 +505,7 @@ export default function AuditorDashboard() {
                   Semua NFT Sertifikat Tanah yang tersegel di blockchain. Total: <strong>{total} aset</strong> terdaftar.
                 </p>
               </div>
-              <LandLedger />
+              <LandLedger showAuditComments />
             </motion.div>
           )}
 
@@ -561,11 +520,79 @@ export default function AuditorDashboard() {
               <div className="mb-8">
                 <h3 className="text-2xl font-black text-moss-900">Deteksi Anomali & Sengketa</h3>
                 <p className="text-sm text-moss-500 mt-2">
-                  Memantau aset yang berada dalam status sengketa secara real-time via <span className="font-bold text-olive-700">Supabase Web 2.5</span>.
+                  Pantau semua aset yang berada dalam status sengketa atau memiliki transfer mencurigakan.
                 </p>
               </div>
 
-              <AnomalyDashboard />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[...Array(total)].map((_, i) => (
+                  <DisputedAssetChecker key={i} tokenId={i} />
+                ))}
+                {total === 0 && (
+                  <div className="col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                    <p className="text-moss-500 font-bold">Tidak ada aset yang perlu dipantau.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'comments' && (
+            <motion.div key="comments" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="mb-8">
+                <h3 className="text-2xl font-black text-moss-900">Catatan Audit</h3>
+                <p className="text-sm text-moss-500 mt-2">
+                  Semua catatan dan feedback yang telah ditambahkan oleh auditor. Untuk menambah catatan baru, klik aset di tab Monitoring Ledger.
+                </p>
+              </div>
+
+              {commentsLoading ? (
+                <div className="p-10 text-center text-moss-500">Memuat catatan audit...</div>
+              ) : allComments.length === 0 ? (
+                <div className="p-20 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-7 h-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                  </div>
+                  <p className="text-slate-500 font-bold">Belum ada catatan audit.</p>
+                  <p className="text-sm text-slate-400 mt-1">Buka tab &quot;Monitoring Ledger&quot; dan klik aset untuk menambah catatan.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-sm font-bold text-moss-500 px-1 mb-2">
+                    Total <span className="text-slate-700">{allComments.length}</span> catatan
+                  </div>
+                  {allComments.map((c) => {
+                    const catConfig = CATEGORY_STYLES[c.category] || CATEGORY_STYLES.general;
+                    return (
+                      <motion.div
+                        key={c.id}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-sm transition-shadow"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="bg-slate-100 text-slate-700 text-[10px] font-black px-2.5 py-1 rounded-lg border border-slate-200 font-mono">
+                              Token #{c.token_id}
+                            </span>
+                            {c.nib && (
+                              <span className="text-[10px] font-bold text-moss-500">NIB: {c.nib}</span>
+                            )}
+                            <span className={`text-[9px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${catConfig.color}`}>
+                              {catConfig.label}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                            {new Date(c.created_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed">{c.comment}</p>
+                        <p className="text-[10px] font-mono text-slate-400 mt-3 truncate">oleh: {c.auditor_wallet}</p>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
@@ -106,8 +106,8 @@ function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, toke
 }
 
 // ─── Kartu Aset NFT Milik User ─────────────────────────────────────────────────
-function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress: string | undefined }) {
-  const address = activeAddress;
+function AssetCard({ tokenId }: { tokenId: number }) {
+  const { address } = useAccount();
   const [showCertificate, setShowCertificate] = useState(false);
   
   const { data: landData } = useReadContract({
@@ -149,23 +149,44 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
   const { writeContract: proposeTransfer, isPending: isProposing } = useWriteContract();
   const [buyerAddress, setBuyerAddress] = useState('');
   const [showSellForm, setShowSellForm] = useState(false);
+  const [suratJualBeli, setSuratJualBeli] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedHash, setUploadedHash] = useState<string | null>(null);
 
   // Hanya tampilkan jika milik user ini
   if (!land || owner?.toLowerCase() !== address?.toLowerCase()) return null;
 
   const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
 
-  const handlePropose = () => {
+  const handlePropose = async () => {
     if (!buyerAddress || !buyerAddress.startsWith('0x')) {
       return alert('Masukkan alamat dompet pembeli yang valid (0x...)!');
     }
-    proposeTransfer({
-      address: LAND_REGISTRY_ADDRESS,
-      abi: LandRegistryABI,
-      functionName: 'proposeTransfer',
-      args: [BigInt(tokenId), buyerAddress as `0x${string}`],
+    if (!suratJualBeli) {
+      return alert('Harap unggah Surat Konfirmasi Jual Beli (PDF)!');
+    }
+
+    try {
+      setIsUploading(true);
       
-    });
+      // Upload ke IPFS menggunakan fungsi pinata.ts
+      const { uploadToIPFS } = await import('@/lib/pinata');
+      const hash = await uploadToIPFS(suratJualBeli);
+      setUploadedHash(hash);
+      setIsUploading(false);
+
+      // Panggil Smart Contract
+      proposeTransfer({
+        address: LAND_REGISTRY_ADDRESS,
+        abi: LandRegistryABI,
+        functionName: 'proposeTransfer',
+        args: [BigInt(tokenId), buyerAddress as `0x${string}`],
+      });
+    } catch (error) {
+      console.error(error);
+      alert("Gagal mengunggah dokumen ke IPFS");
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -239,11 +260,30 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
           <AnimatePresence>
             {showSellForm && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                <div className="mt-4 pt-4 border-t border-moss-100 space-y-3">
-                  <input type="text" value={buyerAddress} onChange={(e) => setBuyerAddress(e.target.value)} placeholder="Wallet Pembeli (0x...)" className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono" />
-                  <button onClick={handlePropose} disabled={isProposing} className="w-full py-3 bg-olive-500 text-white text-[11px] font-black rounded-xl uppercase tracking-widest">
-                    {isProposing ? 'Memproses...' : 'Kirim Proposal'}
+                <div className="mt-4 pt-4 border-t border-moss-100 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-moss-500 uppercase tracking-widest mb-2">Wallet Pembeli</label>
+                    <input type="text" value={buyerAddress} onChange={(e) => setBuyerAddress(e.target.value)} placeholder="0x..." className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-moss-500 uppercase tracking-widest mb-2">Surat Konfirmasi Jual Beli (PDF)</label>
+                    <label className="block w-full border-2 border-dashed border-moss-200 p-4 rounded-xl text-center cursor-pointer hover:bg-moss-50 transition-colors">
+                      <input type="file" accept=".pdf" className="hidden" onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) setSuratJualBeli(e.target.files[0]);
+                      }} />
+                      <span className="text-[11px] font-bold text-moss-700">
+                        {suratJualBeli ? suratJualBeli.name : "Pilih File PDF..."}
+                      </span>
+                    </label>
+                  </div>
+                  <button onClick={handlePropose} disabled={isProposing || isUploading} className="w-full py-3 bg-olive-500 text-white text-[11px] font-black rounded-xl uppercase tracking-widest hover:bg-olive-600 transition-colors disabled:opacity-50 mt-2">
+                    {isUploading ? 'Mengunggah ke IPFS...' : isProposing ? 'Memproses di Blockchain...' : 'Kirim Proposal'}
                   </button>
+                  {uploadedHash && (
+                    <div className="mt-2 p-2 bg-emerald-50 rounded-lg text-[9px] font-mono text-emerald-700 break-all border border-emerald-100 text-center">
+                      File di-upload ke: ipfs://{uploadedHash}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -267,9 +307,21 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
 }
 
 // ─── Komponen Konfirmasi Pembelian (Sebagai Buyer) ─────────────────────────────
-function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefined }) {
-  const [tokenIdInput, setTokenIdInput] = useState('');
-  const [checkedId, setCheckedId] = useState<number | null>(null);
+function BuyerApprovalPanel() {
+  const [nibInput, setNibInput] = useState('');
+  const [checkedNib, setCheckedNib] = useState<string | null>(null);
+
+  // Cari Token ID berdasarkan NIB
+  const { data: nibResult, isLoading: isSearchLoading } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getTokenByNIB',
+    args: [checkedNib || ''],
+    query: { enabled: checkedNib !== null },
+  });
+
+  const isNibFound = nibResult && (nibResult as any)[1];
+  const checkedId = isNibFound ? Number((nibResult as any)[0]) : null;
 
   const { data: transferReq } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -296,7 +348,7 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
   } : null;
 
   const { writeContract: approveBuy, isPending: isApproving } = useWriteContract();
-  const address = activeAddress;
+  const { address } = useAccount();
 
   const handleApprove = () => {
     if (checkedId === null) return;
@@ -319,26 +371,33 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
       <div className="bg-white border border-moss-100 p-10 rounded-[2rem] shadow-sm">
         <h3 className="text-2xl font-black text-moss-900 mb-2">Konfirmasi Pembelian</h3>
         <p className="text-sm text-moss-500 mb-8 leading-relaxed">
-          Jika seseorang mengajukan <strong>proposal jual beli</strong> tanah kepada Anda, masukkan ID Token-nya di bawah untuk melihat detail dan menyetujuinya. Setelah Anda setuju, transaksi diteruskan ke Notaris untuk pengesahan final.
+          Jika seseorang mengajukan <strong>proposal jual beli</strong> tanah kepada Anda, masukkan NIB tanah di bawah untuk melihat detail dan menyetujuinya. Setelah Anda setuju, transaksi diteruskan ke Notaris untuk pengesahan final.
         </p>
 
         <div className="flex gap-4 mb-8">
           <input
-            type="number"
-            value={tokenIdInput}
-            onChange={(e) => setTokenIdInput(e.target.value)}
-            placeholder="Masukkan ID Token (misal: 0, 1, 2...)"
+            type="text"
+            value={nibInput}
+            onChange={(e) => setNibInput(e.target.value)}
+            placeholder="Masukkan NIB (misal: 12345)"
             className="flex-1 p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-olive-500"
           />
           <button
-            onClick={() => setCheckedId(Number(tokenIdInput))}
-            className="px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 transition-all"
+            onClick={() => setCheckedNib(nibInput)}
+            disabled={!nibInput}
+            className="px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 transition-all disabled:opacity-50"
           >
-            Periksa
+            Periksa NIB
           </button>
         </div>
 
-        {checkedId !== null && (
+        {checkedNib !== null && !isSearchLoading && !isNibFound && (
+          <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
+            <p className="text-sm font-bold text-amber-700">⚠️ NIB tidak ditemukan di Blockchain.</p>
+          </div>
+        )}
+
+        {checkedNib !== null && isNibFound && checkedId !== null && (
           <AnimatePresence>
             {isActive && isMyTransfer ? (
               <motion.div
@@ -395,7 +454,7 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
               </div>
             ) : (
               <div className="p-6 bg-moss-50 rounded-2xl border border-moss-200 text-center">
-                <p className="text-sm font-bold text-moss-600">ℹ️ Tidak ada transfer aktif untuk Token #{checkedId}.</p>
+                <p className="text-sm font-bold text-moss-600">ℹ️ Tidak ada transfer aktif untuk NIB {checkedNib}.</p>
               </div>
             )}
           </AnimatePresence>
@@ -405,13 +464,14 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
   );
 }
 
-// ─── Kartu Status Permohonan Tanah ─────────────────────────────────────────────
-function RequestStatusCard({ requestId, activeAddress }: { requestId: number, activeAddress: string | undefined }) {
+// ─── Komponen Pelacakan Status Pendaftaran ─────────────────────────────────────
+function RequestStatusCard({ requestId }: { requestId: number }) {
   const { data: requestData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getRequestDetails',
     args: [BigInt(requestId)],
+    query: { refetchInterval: 5000 },
   });
 
   const request = requestData ? {
@@ -424,7 +484,7 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
     ipfsHashes: (requestData as any)[6],
   } : null;
 
-  const address = activeAddress;
+  const { address } = useAccount();
 
   if (!request || request.to.toLowerCase() !== address?.toLowerCase()) return null;
 
@@ -484,21 +544,6 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
   const { address } = useAccount();
-  const [profile, setProfile] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const { supabase } = await import('@/lib/supabase');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        setProfile(data);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  const activeAddress = profile?.wallet_address || address;
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -536,10 +581,10 @@ export default function UserDashboard() {
           <p className="font-black text-moss-900">Masyarakat Pemilik Tanah</p>
           <p className="text-xs text-moss-500 mt-0.5">Kelola aset tanah digital Anda secara langsung dan aman</p>
         </div>
-        {activeAddress && (
+        {address && (
           <div className="ml-auto text-right hidden sm:block">
             <p className="text-[10px] text-moss-400 uppercase tracking-widest font-bold">Wallet Aktif</p>
-            <p className="text-xs font-mono text-moss-700 truncate max-w-[180px]">{activeAddress}</p>
+            <p className="text-xs font-mono text-moss-700 truncate max-w-[180px]">{address}</p>
           </div>
         )}
       </div>
@@ -585,7 +630,7 @@ export default function UserDashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} activeAddress={activeAddress} />)}
+                  {[...Array(total)].map((_, i) => <AssetCard key={i} tokenId={i} />)}
                 </div>
               )}
             </motion.div>
@@ -606,7 +651,7 @@ export default function UserDashboard() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {[...Array(totalReq)].map((_, i) => <RequestStatusCard key={i} requestId={i} activeAddress={activeAddress} />)}
+                  {[...Array(totalReq)].map((_, i) => <RequestStatusCard key={i} requestId={i} />)}
                 </div>
               )}
             </motion.div>
@@ -614,7 +659,7 @@ export default function UserDashboard() {
 
           {activeTab === 'transfer' && (
             <motion.div key="transfer" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <BuyerApprovalPanel activeAddress={activeAddress} />
+              <BuyerApprovalPanel />
             </motion.div>
           )}
         </AnimatePresence>

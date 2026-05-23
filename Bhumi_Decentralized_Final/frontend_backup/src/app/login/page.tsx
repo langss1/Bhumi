@@ -52,7 +52,7 @@ export default function LoginPage() {
       }
 
       if (data.success) {
-        router.push(`/dashboard/${data.role}`);
+        window.location.href = `/dashboard/${data.role}`;
       } else {
         setError(data.message || 'Login gagal.');
       }
@@ -83,7 +83,7 @@ export default function LoginPage() {
         password: password,
       });
 
-      if (authErr) throw new Error('Email atau password salah.');
+      if (authErr) throw new Error(`Supabase Error: ${authErr.message}`);
       if (!authData.user) throw new Error('Gagal memuat data pengguna.');
 
       // 2. Ambil profil pengguna
@@ -94,8 +94,11 @@ export default function LoginPage() {
         .single();
 
       if (profileErr || !profile) {
+        console.error("Profile Error:", profileErr);
         throw new Error('Profil tidak ditemukan. Harap hubungi admin.');
       }
+
+      console.log("LOGIN SUCCESS! Profile Role is:", profile.role, "Verification Status:", profile.verification_status);
 
       // 3. Cek Status Verifikasi (Khusus Pejabat)
       if (['NOTARIS', 'AUDITOR'].includes(profile.role) && profile.verification_status === 'PENDING') {
@@ -105,19 +108,30 @@ export default function LoginPage() {
         return;
       }
 
-      // 4. Map role Supabase → cookie value (untuk middleware proxy.ts)
-      const roleToCookie: Record<string, string> = {
-        'BPN_PUSAT': 'bpn-pusat',
-        'BPN_WILAYAH': 'bpn-wilayah',
-        'NOTARIS': 'notaris',
-        'AUDITOR': 'auditor',
-        'UMUM': 'user',
-      };
-      const cookieRole = roleToCookie[profile.role] || 'user';
-      document.cookie = `user_role=${cookieRole}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
-
-      // 5. Arahkan ke dashboard sesuai Role
-      router.push(`/dashboard/${cookieRole}`);
+      // 4. Arahkan ke dashboard sesuai Role
+      console.log("Routing to dashboard based on role:", profile.role);
+      switch (profile.role) {
+        case 'BPN_PUSAT':
+          console.log("Pushing to /dashboard/bpn-pusat");
+          window.location.href = '/dashboard/bpn-pusat';
+          break;
+        case 'BPN_WILAYAH':
+          console.log("Pushing to /dashboard/bpn-wilayah");
+          window.location.href = '/dashboard/bpn-wilayah';
+          break;
+        case 'NOTARIS':
+          window.location.href = '/dashboard/notaris';
+          break;
+        case 'AUDITOR':
+          console.log("Pushing to /dashboard/auditor");
+          window.location.href = '/dashboard/auditor';
+          break;
+        case 'UMUM':
+        default:
+          console.log("Pushing to /dashboard/user");
+          window.location.href = '/dashboard/user';
+          break;
+      }
 
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan saat login.');

@@ -167,7 +167,6 @@ export async function getPendingVerificators(): Promise<DBProfile[]> {
     .from('profiles')
     .select('*')
     .eq('verification_status', 'PENDING')
-    .neq('role', 'UMUM')
     .order('updated_at', { ascending: false });
   return data || [];
 }
@@ -216,6 +215,49 @@ export async function getActivityByAsset(assetId: number): Promise<DBActivity[]>
     .select('*')
     .eq('asset_id', assetId)
     .order('timestamp', { ascending: false });
+  return data || [];
+}
+
+// ── Auditor Comments ─────────────────────────────────────────────────────────
+
+export interface DBAuditorComment {
+  id:              string;
+  token_id:        number;
+  nib:             string | null;
+  auditor_wallet:  string;
+  auditor_name:    string | null;
+  comment:         string;
+  category:        'general' | 'warning' | 'dispute' | 'compliance';
+  created_at:      string;
+}
+
+export async function addAuditorComment(
+  entry: Omit<DBAuditorComment, 'id' | 'created_at'>
+) {
+  if (!SUPABASE_READY) return { data: null, error: { message: 'Supabase not configured' } };
+  return supabase.from('auditor_comments').insert({
+    ...entry,
+    created_at: new Date().toISOString(),
+  });
+}
+
+export async function getCommentsByToken(tokenId: number): Promise<DBAuditorComment[]> {
+  if (!SUPABASE_READY) return [];
+  const { data } = await supabase
+    .from('auditor_comments')
+    .select('*')
+    .eq('token_id', tokenId)
+    .order('created_at', { ascending: false });
+  return data || [];
+}
+
+export async function getAllAuditorComments(): Promise<DBAuditorComment[]> {
+  if (!SUPABASE_READY) return [];
+  const { data } = await supabase
+    .from('auditor_comments')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
   return data || [];
 }
 

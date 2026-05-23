@@ -70,6 +70,7 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
       // Note: Di produksi sebaiknya pakai useWaitForTransactionReceipt
       // Tapi untuk demo ini, kita beri delay atau asumsikan jika tidak error di awal maka masuk
       // Namun agar lebih pasti, kita beri info ke user.
+      
       alert(`✅ Transfer Token #${tokenId} berhasil dieksekusi! NFT resmi berpindah ke pembeli.`);
     } catch (err: any) {
       console.error(err);
@@ -159,6 +160,88 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
   );
 }
 
+// ─── Sub-component: Riwayat Transfer yang Sudah Selesai Dieksekusi ──────────────
+function NotarisHistoryRow({ tokenId }: { tokenId: number }) {
+  const { data: transfer } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'transferRequests',
+    args: [BigInt(tokenId)],
+    query: { refetchInterval: 5000 },
+  });
+
+  const { data: landData } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getLandDetails',
+    args: [BigInt(tokenId)],
+  });
+
+  // Hanya tampilkan transfer yang sudah SELESAI (isActive = false, tapi seller & buyer sudah ada)
+  // Transfer selesai ditandai dengan isActive = false DAN sellerApproved = true
+  if (!transfer) return null;
+  const isActive = transfer[6] as boolean;
+  const sellerApproved = transfer[3] as boolean;
+  const seller = transfer[0] as string;
+  const buyer = transfer[1] as string;
+  const notarisApproved = transfer[5] as boolean;
+
+  // Hanya tampilkan yang sudah dieksekusi notaris (notarisApproved && !isActive)
+  if (!notarisApproved || isActive) return null;
+
+  const nib = landData ? (landData as any)[2] as string : '-';
+  const area = landData ? (landData as any)[1] : null;
+
+  return (
+    <tr className="bg-white hover:bg-moss-50/50 transition-colors border-b border-moss-50">
+      <td className="px-6 py-4 font-mono text-xs font-bold text-moss-900">Token #{tokenId}</td>
+      <td className="px-6 py-4">
+        <span className="text-xs font-bold text-moss-800">{nib}</span>
+        {area && <div className="text-[10px] text-moss-500 mt-0.5">{area.toString()} m²</div>}
+      </td>
+      <td className="px-6 py-4 font-mono text-[10px] text-moss-600 truncate max-w-[130px]">{seller}</td>
+      <td className="px-6 py-4 font-mono text-[10px] text-moss-600 truncate max-w-[130px]">{buyer}</td>
+      <td className="px-6 py-4 text-center">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 uppercase tracking-wider">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+          Selesai
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+function NotarisHistory({ total }: { total: number }) {
+  if (total === 0) return (
+    <div className="p-20 text-center bg-moss-50/50 rounded-[2.5rem] border-2 border-dashed border-moss-200">
+      <p className="text-moss-400 font-bold">Belum ada riwayat eksekusi transfer.</p>
+    </div>
+  );
+
+  return (
+    <div className="bg-white border border-moss-100 rounded-[2rem] shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left">
+          <thead className="bg-[#F9FAF8] border-b border-moss-100">
+            <tr>
+              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">Token ID</th>
+              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">NIB & Luas</th>
+              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">Penjual</th>
+              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">Pembeli</th>
+              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(total)].map((_, i) => (
+              <NotarisHistoryRow key={i} tokenId={i} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function NotarisDashboard() {
   const [activeTab, setActiveTab] = useState('transfer');
@@ -178,6 +261,7 @@ export default function NotarisDashboard() {
   const tabs = [
     { id: 'transfer', label: 'Eksekusi Balik Nama (AJB)' },
     { id: 'search', label: 'Cari Transfer by Token ID' },
+    { id: 'history', label: 'Riwayat Notaris' },
   ];
 
   return (
@@ -283,6 +367,18 @@ export default function NotarisDashboard() {
               {searchedId !== null && (
                 <TransferRequestCard tokenId={searchedId} />
               )}
+            </motion.div>
+          )}
+          {/* ── Tab 3: Riwayat Notaris ── */}
+          {activeTab === 'history' && (
+            <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <div className="mb-8">
+                <h3 className="text-2xl font-black text-moss-900">Riwayat Eksekusi Transfer</h3>
+                <p className="text-sm text-moss-500 mt-2">
+                  Daftar seluruh transaksi balik nama yang telah berhasil Anda eksekusi di Blockchain.
+                </p>
+              </div>
+              <NotarisHistory total={total} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -17,7 +17,6 @@ function RequestRow({ requestId }: RequestRowProps) {
     abi: LandRegistryABI,
     functionName: 'getRequestDetails',
     args: [BigInt(requestId)],
-    query: { refetchInterval: 5000 },
   });
 
   const request = requestData ? {

@@ -2,105 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
-import { encryptData } from '@/lib/crypto';
-
-// ─── Komponen Baris Riwayat Request ─────────────────────────────────────────
-function RequestHistoryRow({ requestId }: { requestId: number }) {
-  const { data: requestData } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'getRequestDetails',
-    args: [BigInt(requestId)],
-    query: { refetchInterval: 5000 },
-  });
-
-  if (!requestData) return null;
-
-  const to = (requestData as any)[0] as string;
-  const nib = (requestData as any)[1] as string;
-  const area = (requestData as any)[2];
-  const gps = (requestData as any)[3] as string;
-  const isProcessed = (requestData as any)[4] as boolean;
-  const isRejected = (requestData as any)[5] as boolean;
-  const isPending = !isProcessed && !isRejected;
-
-  const statusBadge = isProcessed
-    ? { label: 'Disetujui', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
-    : isRejected
-    ? { label: 'Ditolak', cls: 'bg-red-50 text-red-700 border-red-200' }
-    : { label: 'Pending', cls: 'bg-amber-50 text-amber-700 border-amber-200' };
-
-  const iconEl = isProcessed ? (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-  ) : isRejected ? (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-  ) : (
-    <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-  );
-
-  return (
-    <tr className={`bg-white hover:bg-moss-50/50 transition-colors border-b border-moss-50 ${isRejected ? 'border-l-4 border-l-red-400' : isPending ? 'border-l-4 border-l-amber-400' : ''}`}>
-      <td className="px-6 py-4 font-mono text-xs font-bold text-moss-900">REQ-{requestId}</td>
-      <td className="px-6 py-4">
-        <span className="text-xs font-bold text-moss-800">{nib}</span>
-        <div className="text-[10px] text-moss-500 mt-0.5 font-mono truncate max-w-[150px]">{to}</div>
-      </td>
-      <td className="px-6 py-4 text-xs text-moss-700">{area?.toString()} m²</td>
-      <td className="px-6 py-4 text-xs font-mono text-moss-500 truncate max-w-[120px]">{gps}</td>
-      <td className="px-6 py-4 text-center">
-        <span className={`inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1 rounded-full border uppercase tracking-wider ${statusBadge.cls}`}>
-          {iconEl}{statusBadge.label}
-        </span>
-      </td>
-    </tr>
-  );
-}
-
-function WilayahRequestHistory() {
-  const { data: totalRequests, isLoading } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'getTotalRequests',
-    query: { refetchInterval: 5000 },
-  });
-
-  if (isLoading) return <div className="p-10 text-center text-moss-500">Memuat riwayat...</div>;
-
-  const total = Number(totalRequests || 0);
-
-  if (total === 0) return (
-    <div className="p-20 text-center bg-moss-50/50 rounded-3xl border-2 border-dashed border-moss-200">
-      <p className="text-moss-400 font-bold">Belum ada riwayat pendaftaran.</p>
-    </div>
-  );
-
-  return (
-    <div className="bg-white border border-moss-100 rounded-[2rem] shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left">
-          <thead className="bg-[#F9FAF8] border-b border-moss-100">
-            <tr>
-              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">Request ID</th>
-              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">NIB & Pemilik</th>
-              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">Luas</th>
-              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest">GPS</th>
-              <th className="px-6 py-4 text-[11px] font-black text-moss-400 uppercase tracking-widest text-center">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...Array(total)].map((_, i) => (
-              <RequestHistoryRow key={i} requestId={i} />
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+import LandLedger from '@/components/LandLedger';
 
 export default function BpnWilayahDashboard() {
   const [activeTab, setActiveTab] = useState('daftar');
@@ -145,22 +51,19 @@ export default function BpnWilayahDashboard() {
       
       setIsUploading(false);
 
-      // 2. Enkripsi data sensitif sebelum kirim ke Blockchain
-      const encryptedGps = await encryptData(gps);
-      const encryptedNib = await encryptData(nib);
-
-      // 3. Mint NFT ke Blockchain
+      // 2. Mint NFT ke Blockchain
       const txHash = await writeContractAsync({
         address: LAND_REGISTRY_ADDRESS,
         abi: LandRegistryABI,
         functionName: 'requestLandMinting',
         args: [
           walletAddress as `0x${string}`,
-          encryptedGps,
+          gps,
           BigInt(area),
-          encryptedNib,
+          nib,
           [warkahHash, fotoHash]
         ],
+        
       });
 
       alert(`Transaksi dikirim ke Blockchain!\nMenunggu konfirmasi blok... TxHash: ${txHash}`);
@@ -295,11 +198,11 @@ export default function BpnWilayahDashboard() {
               transition={{ duration: 0.3 }}
               className="bg-white border border-moss-100 p-8 rounded-[2rem] shadow-sm"
             >
-              <div className="mb-8">
-                <h3 className="text-2xl font-black text-moss-900">Riwayat Pendaftaran</h3>
-                <p className="text-sm text-moss-500 mt-2">Pantau semua pengajuan yang pernah Anda kirim beserta statusnya secara <em>real-time</em>.</p>
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-bold text-moss-900 mb-2">Riwayat Pendaftaran</h3>
+                <p className="text-moss-500">Anda dapat memantau sertifikat yang Anda cetak di sini.</p>
               </div>
-              <WilayahRequestHistory />
+              <LandLedger />
             </motion.div>
           )}
         </AnimatePresence>

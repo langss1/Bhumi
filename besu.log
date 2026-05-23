@@ -1,0 +1,114 @@
+Setting logging level to INFO
+2026-05-23 22:30:19.347+07:00 | main | INFO  | Besu | Starting Besu
+2026-05-23 22:30:20.396+07:00 | main | INFO  | Besu | Connecting to 0 static nodes.
+2026-05-23 22:30:20.424+07:00 | main | INFO  | Besu | Forcing price bump for transaction replacement to 0, since we are on a zero basefee network
+2026-05-23 22:30:20.426+07:00 | main | INFO  | Besu | Forcing price bump for transaction replacement to 0, since min-gas-price is set to 0
+2026-05-23 22:30:20.428+07:00 | main | WARN  | Besu | Forcing tx-pool-min-gas-price=0, since it cannot be greater than the value of min-gas-price
+2026-05-23 22:30:20.472+07:00 | main | INFO  | Besu | jemalloc library not found, memory usage may be reduced by installing it
+2026-05-23 22:30:20.687+07:00 | main | INFO  | Besu | 
+####################################################################################################
+#                                                                                                  #
+# Besu version 24.1.2                                                                              #
+#                                                                                                  #
+# Configuration:                                                                                   #
+# Network: Custom genesis file                                                                     #
+# /home/habb/Kuliah/blockchain/Bhumi/besu-network/genesis.json                                     #
+# Network Id: 31337                                                                                #
+# Data storage: Forest                                                                             #
+# Sync mode: Full                                                                                  #
+# RPC HTTP APIs: ETH,NET,IBFT,ADMIN,DEBUG,WEB3                                                     #
+# RPC HTTP port: 8545                                                                              #
+# Using LAYERED transaction pool implementation                                                    #
+# Using STACKED worldstate update mode                                                             #
+#                                                                                                  #
+# Host:                                                                                            #
+# Java: openjdk-java-17                                                                            #
+# Maximum heap size: 7.77 GB                                                                       #
+# OS: linux-x86_64                                                                                 #
+# glibc: 2.39                                                                                      #
+# Total memory: 31.05 GB                                                                           #
+# CPU cores: 24                                                                                    #
+#                                                                                                  #
+# Plugins:                                                                                         #
+# TOTAL = 0 of 0 plugins successfully loaded                                                       #
+# from /home/habb/Kuliah/blockchain/Bhumi/besu-binary/plugins                                      #
+#                                                                                                  #
+####################################################################################################
+2026-05-23 22:30:20.687+07:00 | main | INFO  | Besu | Security Module: localfile
+2026-05-23 22:30:20.740+07:00 | main | INFO  | Besu | Using the native implementation of alt bn128
+2026-05-23 22:30:20.774+07:00 | main | INFO  | Besu | Using the native implementation of modexp
+2026-05-23 22:30:20.775+07:00 | main | INFO  | Besu | Using the native implementation of the signature algorithm
+2026-05-23 22:30:20.780+07:00 | main | INFO  | Besu | Using the native implementation of the blake2bf algorithm
+2026-05-23 22:30:20.896+07:00 | main | INFO  | Besu | Forcing price bump for transaction replacement to 0, since we are on a zero basefee network
+2026-05-23 22:30:20.897+07:00 | main | INFO  | Besu | Forcing price bump for transaction replacement to 0, since min-gas-price is set to 0
+2026-05-23 22:30:20.897+07:00 | main | WARN  | Besu | Forcing tx-pool-min-gas-price=0, since it cannot be greater than the value of min-gas-price
+2026-05-23 22:30:20.899+07:00 | main | INFO  | KeyPairUtil | Attempting to load public key from /home/habb/Kuliah/blockchain/Bhumi/besu-network/node3/data/key
+2026-05-23 22:30:20.917+07:00 | main | INFO  | KeyPairUtil | Loaded public key 0xf6c74bd81d47e9ddd49ddc11329860be6bfb64cf4a43c9eae3d4b81c08e83154822d110586f08f61d9f26235d0983d9da3af7f0677acfd31467d056cad87e0d2 from /home/habb/Kuliah/blockchain/Bhumi/besu-network/node3/data/key
+2026-05-23 22:30:21.044+07:00 | main | INFO  | ProtocolScheduleBuilder | Protocol schedule created with milestones: [London:0]
+2026-05-23 22:30:21.072+07:00 | main | INFO  | DatabaseMetadata | Lookup database metadata file in data directory: /home/habb/Kuliah/blockchain/Bhumi/besu-network/node3/data
+2026-05-23 22:30:21.104+07:00 | main | INFO  | RocksDBKeyValueStorageFactory | Existing database detected at /home/habb/Kuliah/blockchain/Bhumi/besu-network/node3/data. Version 1. Compacting database...
+2026-05-23 22:30:21.438+07:00 | main | INFO  | TransactionPoolFactory | Enabling transaction pool
+2026-05-23 22:30:21.450+07:00 | main | INFO  | BesuControllerBuilder | TTD difficulty is not present, creating initial sync phase for PoW
+2026-05-23 22:30:21.467+07:00 | main | INFO  | IbftBesuControllerBuilder | Starting IBFT mining coordinator
+2026-05-23 22:30:22.468+07:00 | main | INFO  | RunnerBuilder | Resolved 2 bootnodes.
+2026-05-23 22:30:22.482+07:00 | main | INFO  | RunnerBuilder | Detecting NAT service.
+2026-05-23 22:30:22.866+07:00 | main | INFO  | Runner | Starting external services ... 
+2026-05-23 22:30:22.867+07:00 | main | INFO  | JsonRpcHttpService | Starting JSON-RPC service on 0.0.0.0:8545
+2026-05-23 22:30:22.994+07:00 | vert.x-eventloop-thread-1 | INFO  | JsonRpcHttpService | JSON-RPC service started and listening on 0.0.0.0:8545
+2026-05-23 22:30:22.996+07:00 | main | INFO  | WebSocketService | Starting Websocket service on 0.0.0.0:8546
+2026-05-23 22:30:22.998+07:00 | vert.x-eventloop-thread-1 | INFO  | WebSocketService | Websocket service started and listening on 0.0.0.0:8546
+2026-05-23 22:30:23.000+07:00 | main | INFO  | AutoTransactionLogBloomCachingService | Starting auto transaction log bloom caching service.
+2026-05-23 22:30:23.001+07:00 | main | INFO  | LogBloomCacheMetadata | Lookup cache metadata file in data directory: /home/habb/Kuliah/blockchain/Bhumi/besu-network/node3/data/caches
+2026-05-23 22:30:23.006+07:00 | main | INFO  | Runner | Starting Ethereum main loop ... 
+2026-05-23 22:30:23.006+07:00 | main | INFO  | NatService | No NAT environment detected so no service could be started
+2026-05-23 22:30:23.007+07:00 | main | INFO  | NetworkRunner | Starting Network.
+2026-05-23 22:30:23.016+07:00 | nioEventLoopGroup-2-1 | INFO  | RlpxAgent | P2P RLPx agent started and listening on /[0:0:0:0:0:0:0:0]:30303.
+2026-05-23 22:30:23.016+07:00 | main | INFO  | PeerDiscoveryAgent | Starting peer discovery agent on host=0.0.0.0, port=30303
+2026-05-23 22:30:23.027+07:00 | vert.x-eventloop-thread-1 | INFO  | VertxPeerDiscoveryAgent | Started peer discovery agent successfully, on effective host=0:0:0:0:0:0:0:0%0 and port=30303
+2026-05-23 22:30:23.027+07:00 | vert.x-eventloop-thread-1 | INFO  | PeerDiscoveryAgent | P2P peer discovery agent started and listening on /[0:0:0:0:0:0:0:0%0]:30303
+2026-05-23 22:30:23.063+07:00 | vert.x-eventloop-thread-1 | INFO  | PeerDiscoveryAgent | Writing node record to disk. NodeRecord{seq=13, publicKey=0x02f6c74bd81d47e9ddd49ddc11329860be6bfb64cf4a43c9eae3d4b81c08e83154, udpAddress=Optional[/0.0.0.0:30303], tcpAddress=Optional[/0.0.0.0:30303], asBase64=-Je4QJW-uYEKoXbfIjUEDwOSJEjyMe1K6PVWQJjEaAEM3mZsaL9kzV1_26sp7lVxvYSaWCi_BVQs_ydhFU4GSBFU7aINg2V0aMfGhJVRB8uAgmlkgnY0gmlwhAAAAACJc2VjcDI1NmsxoQL2x0vYHUfp3dSd3BEymGC-a_tkz0pDyerj1LgcCOgxVIN0Y3CCdl-DdWRwgnZf, nodeId=0x67f0f3a546fa0a4cfb8583f0f995523c889ccb4ae7785babae4e86e6be2c7f3d, customFields={tcp=30303, udp=30303, ip=0x00000000, eth=[[0x955107cb, 0x]], id=V4, secp256k1=0x02f6c74bd81d47e9ddd49ddc11329860be6bfb64cf4a43c9eae3d4b81c08e83154}}
+2026-05-23 22:30:23.086+07:00 | main | INFO  | DefaultP2PNetwork | Enode URL enode://f6c74bd81d47e9ddd49ddc11329860be6bfb64cf4a43c9eae3d4b81c08e83154822d110586f08f61d9f26235d0983d9da3af7f0677acfd31467d056cad87e0d2@0.0.0.0:30303
+2026-05-23 22:30:23.086+07:00 | main | INFO  | DefaultP2PNetwork | Node address 0xf995523c889ccb4ae7785babae4e86e6be2c7f3d
+2026-05-23 22:30:23.098+07:00 | main | INFO  | NetworkRunner | Supported capabilities: [eth/62, eth/63, eth/64, eth/65, eth/66, eth/67, eth/68], [IBF/1], [snap/1]
+2026-05-23 22:30:23.098+07:00 | main | INFO  | DefaultSynchronizer | Starting synchronizer.
+2026-05-23 22:30:23.100+07:00 | main | INFO  | TransactionPoolFactory | Enabling transaction handling following initial sync
+2026-05-23 22:30:23.100+07:00 | main | INFO  | IbftBesuControllerBuilder | Starting IBFT mining coordinator following initial sync
+2026-05-23 22:30:23.102+07:00 | main | INFO  | FullSyncDownloader | Starting full sync.
+2026-05-23 22:30:23.103+07:00 | main | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:23.110+07:00 | main | INFO  | Runner | Ethereum main loop is up.
+2026-05-23 22:30:28.114+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:33.115+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:38.116+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:43.117+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:48.118+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:53.119+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:30:58.120+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:03.121+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:08.122+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:13.123+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:18.124+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:23.125+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:28.126+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:33.127+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:38.129+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:43.130+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:48.131+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:53.131+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:31:58.132+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:03.133+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:08.134+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:13.135+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:18.136+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:23.138+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:28.139+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:33.140+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:38.141+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:43.142+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:48.143+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:53.144+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:32:58.145+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:33:03.146+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:33:08.147+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:33:13.148+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:33:18.149+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
+2026-05-23 22:33:23.150+07:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness
