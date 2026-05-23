@@ -47,7 +47,7 @@ function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
   if (!land || !land.nib) return null;
 
   const isDisputed = land.isDisputed;
-  const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
+  const hasActiveTransfer = transferReq && (transferReq[6] as unknown as boolean);
 
   // Hanya tampilkan yang bermasalah
   if (!isDisputed && !hasActiveTransfer) return null;

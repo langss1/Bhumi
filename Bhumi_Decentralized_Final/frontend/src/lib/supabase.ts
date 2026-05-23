@@ -154,7 +154,7 @@ export async function getProfile(userId: string): Promise<DBProfile | null> {
 }
 
 export async function updateProfile(userId: string, updates: Partial<DBProfile>) {
-  if (!SUPABASE_READY) return null;
+  if (!SUPABASE_READY) return { error: { message: 'Supabase not configured' } } as any;
   return supabase
     .from('profiles')
     .update(updates)

@@ -153,7 +153,7 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
   // Hanya tampilkan jika milik user ini
   if (!land || owner?.toLowerCase() !== address?.toLowerCase()) return null;
 
-  const hasActiveTransfer = transferReq && (transferReq[6] as boolean);
+  const hasActiveTransfer = transferReq && (transferReq[6] as unknown as boolean);
 
   const handlePropose = () => {
     if (!buyerAddress || !buyerAddress.startsWith('0x')) {
@@ -309,9 +309,9 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
     });
   };
 
-  const isActive = transferReq && (transferReq[6] as boolean);
+  const isActive = transferReq && (transferReq[6] as unknown as boolean);
   const buyerAddr = transferReq ? (transferReq[1] as string) : '';
-  const buyerApproved = transferReq ? (transferReq[4] as boolean) : false;
+  const buyerApproved = transferReq ? (transferReq[4] as unknown as boolean) : false;
   const isMyTransfer = address && buyerAddr.toLowerCase() === address.toLowerCase();
 
   return (

@@ -39,8 +39,8 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
 
   // transfer: [seller, buyer, notaris, sellerApproved, buyerApproved, notarisApproved, isActive]
   if (!transfer || !transfer[6]) return null; // isActive = index 6
-  const sellerApproved = transfer[3] as boolean;
-  const buyerApproved = transfer[4] as boolean;
+  const sellerApproved = transfer[3] as unknown as boolean;
+  const buyerApproved = transfer[4] as unknown as boolean;
 
   // Hanya tampilkan jika KEDUANYA sudah setuju (menunggu notaris)
   if (!sellerApproved || !buyerApproved) return null;
