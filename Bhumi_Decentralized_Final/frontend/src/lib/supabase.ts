@@ -132,7 +132,7 @@ export interface DBActivity {
   id:           number;
   asset_id:     number;
   actor_wallet: string;
-  action:       'registered' | 'verified' | 'rejected' | 'updated' | 'transferred' | 'archived';
+  action:       'registered' | 'verified' | 'rejected' | 'updated' | 'transferred' | 'archived' | 'notary_assigned';
   tx_hash:      string | null;
   timestamp:    string;
 }

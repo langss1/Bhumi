@@ -146,26 +146,59 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
     args: [BigInt(tokenId)],
   });
 
-  const { writeContract: proposeTransfer, isPending: isProposing } = useWriteContract();
+  const { writeContractAsync: proposeTransfer, isPending: isProposing } = useWriteContract();
   const [buyerAddress, setBuyerAddress] = useState('');
   const [showSellForm, setShowSellForm] = useState(false);
+  const [notaries, setNotaries] = useState<any[]>([]);
+  const [selectedNotaris, setSelectedNotaris] = useState('');
+
+  useEffect(() => {
+    if (showSellForm) {
+      const fetchNotaries = async () => {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase.from('profiles').select('*').eq('role', 'NOTARIS').eq('verification_status', 'APPROVED');
+        if (data) setNotaries(data);
+      };
+      fetchNotaries();
+    }
+  }, [showSellForm]);
 
   // Hanya tampilkan jika milik user ini
   if (!land || owner?.toLowerCase() !== address?.toLowerCase()) return null;
 
   const hasActiveTransfer = transferReq && (transferReq[6] as unknown as boolean);
 
-  const handlePropose = () => {
+  const handlePropose = async () => {
     if (!buyerAddress || !buyerAddress.startsWith('0x')) {
       return alert('Masukkan alamat dompet pembeli yang valid (0x...)!');
     }
-    proposeTransfer({
-      address: LAND_REGISTRY_ADDRESS,
-      abi: LandRegistryABI,
-      functionName: 'proposeTransfer',
-      args: [BigInt(tokenId), buyerAddress as `0x${string}`],
-      
-    });
+    if (!selectedNotaris) {
+      return alert('Silakan pilih Notaris (PPAT) yang akan menangani transaksi ini!');
+    }
+    
+    try {
+      await proposeTransfer({
+        address: LAND_REGISTRY_ADDRESS,
+        abi: LandRegistryABI,
+        functionName: 'proposeTransfer',
+        args: [BigInt(tokenId), buyerAddress as `0x${string}`],
+      });
+
+      // Simpan penugasan Notaris secara off-chain
+      const { logActivity } = await import('@/lib/supabase');
+      await logActivity({
+        asset_id: tokenId,
+        actor_wallet: selectedNotaris,
+        action: 'notary_assigned',
+        tx_hash: buyerAddress
+      });
+
+      alert('Berhasil! Proposal terkirim dan Notaris telah ditunjuk.');
+      setShowSellForm(false);
+    } catch (err: any) {
+      console.error(err);
+      alert('Gagal mengirim proposal: ' + (err.message || 'Unknown error'));
+    }
   };
 
   return (
@@ -241,8 +274,22 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="mt-4 pt-4 border-t border-moss-100 space-y-3">
                   <input type="text" value={buyerAddress} onChange={(e) => setBuyerAddress(e.target.value)} placeholder="Wallet Pembeli (0x...)" className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono" />
-                  <button onClick={handlePropose} disabled={isProposing} className="w-full py-3 bg-olive-500 text-white text-[11px] font-black rounded-xl uppercase tracking-widest">
-                    {isProposing ? 'Memproses...' : 'Kirim Proposal'}
+                  
+                  <select 
+                    value={selectedNotaris} 
+                    onChange={(e) => setSelectedNotaris(e.target.value)}
+                    className="w-full p-3 bg-moss-50 border border-moss-200 rounded-xl text-[11px] font-mono"
+                  >
+                    <option value="">-- Pilih Notaris / PPAT --</option>
+                    {notaries.map(n => (
+                      <option key={n.id} value={n.wallet_address}>
+                        {n.full_name} ({n.wallet_address?.substring(0, 8)}...{n.wallet_address?.substring(38)})
+                      </option>
+                    ))}
+                  </select>
+
+                  <button onClick={handlePropose} disabled={isProposing} className="w-full py-3 bg-olive-500 hover:bg-olive-600 text-white text-[11px] font-black rounded-xl uppercase tracking-widest transition-colors">
+                    {isProposing ? 'Memproses...' : 'Kirim Proposal & Tunjuk Notaris'}
                   </button>
                 </div>
               </motion.div>
@@ -485,6 +532,7 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState('gallery');
   const { address } = useAccount();
   const [profile, setProfile] = useState<any>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -493,10 +541,24 @@ export default function UserDashboard() {
       if (user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         setProfile(data);
+        
+        // Tampilkan pop up, tapi jika sudah di-acc (APPROVED), jangan spam terus menerus
+        const hasSeenStatus = localStorage.getItem(`status_seen_${user.id}_${data.verification_status}`);
+        if (!hasSeenStatus) {
+          setShowStatusModal(true);
+        }
       }
     };
     fetchProfile();
   }, []);
+
+  const handleCloseStatusModal = () => {
+    setShowStatusModal(false);
+    if (profile && profile.id) {
+      // Simpan ke local storage agar tidak muncul lagi untuk status yang sama
+      localStorage.setItem(`status_seen_${profile.id}_${profile.verification_status}`, 'true');
+    }
+  };
 
   const activeAddress = profile?.wallet_address || address;
 
@@ -525,6 +587,55 @@ export default function UserDashboard() {
 
   return (
     <div className="h-full flex flex-col">
+      {/* Pop Up Status Verifikasi Akun */}
+      <AnimatePresence>
+        {showStatusModal && profile && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-moss-900/40 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl border border-moss-100 text-center"
+            >
+              {profile.verification_status === 'APPROVED' && (
+                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-100">
+                  <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </div>
+              )}
+              {profile.verification_status === 'PENDING' && (
+                <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-100">
+                  <svg className="w-10 h-10 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+              )}
+              {profile.verification_status === 'REJECTED' && (
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100">
+                  <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </div>
+              )}
+
+              <h3 className="text-2xl font-black text-moss-900 mb-2">Status Akun Anda</h3>
+              <p className="text-moss-600 mb-8">
+                {profile.verification_status === 'APPROVED' && 'Selamat! Akun Anda telah disetujui (Di-ACC) oleh BPN Pusat. Anda sekarang memiliki dompet digital dan dapat menggunakan semua fitur pendaftaran tanah.'}
+                {profile.verification_status === 'PENDING' && 'Akun Anda saat ini sedang dalam antrean verifikasi oleh BPN Pusat. Harap bersabar, dompet digital Anda akan segera dibuatkan setelah disetujui.'}
+                {profile.verification_status === 'REJECTED' && 'Mohon maaf, pendaftaran akun Anda ditolak oleh BPN Pusat karena data tidak sesuai atau tidak valid.'}
+              </p>
+
+              <button 
+                onClick={handleCloseStatusModal}
+                className="w-full py-4 bg-moss-900 hover:bg-moss-800 text-white font-bold rounded-xl transition-all shadow-md"
+              >
+                Mengerti & Lanjutkan
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Role Banner */}
       <div className="mb-8 p-5 bg-gradient-to-r from-moss-50 to-olive-50 border border-moss-100 rounded-3xl flex items-center gap-4">
         <div className="w-12 h-12 bg-moss-100 rounded-2xl flex items-center justify-center border border-moss-200 shrink-0">
