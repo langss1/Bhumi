@@ -2,6 +2,8 @@ import { createConfig, http } from 'wagmi';
 import { defineChain } from 'viem';
 import { injected } from 'wagmi/connectors';
 
+// [UBAH URL DI BAWAH INI SAAT DEMO DENGAN NGROK URL MILIK GILANG]
+// Contoh: const RPC_URL = 'https://1234-abcd.ngrok-free.app'
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://10.223.153.80:8545';
 
 export const localIBFT = defineChain({
