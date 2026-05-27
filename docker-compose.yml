@@ -55,35 +55,9 @@ services:
       --logging=INFO
     networks:
       - bhumi-net
-    healthcheck:
-      test: ["CMD", "sh", "-c", "wget -qO- http://localhost:8545 --post-data='{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":1}' --header='Content-Type: application/json' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
 
-  # ═══════════════════════════════════════════════════════════
-  #  FRONTEND — Next.js Web Application (Dev Mode)
-  # ═══════════════════════════════════════════════════════════
-  frontend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.frontend
-    container_name: bhumi-frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
-      - NEXT_PUBLIC_RPC_URL=http://${MY_IP:-localhost}:8545
-      - NEXT_PUBLIC_PINATA_JWT=${PINATA_JWT}
-      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON=${SUPABASE_ANON}
-    depends_on:
-      besu-node:
-        condition: service_healthy
-    networks:
-      - bhumi-net
+
+
 
   # ═══════════════════════════════════════════════════════════
   #  STORAGE SYNC — Download IPFS Files to Local Storage
@@ -102,7 +76,7 @@ services:
       - storage-data:/bhumi-data/storage
     depends_on:
       besu-node:
-        condition: service_healthy
+        condition: service_started
     networks:
       - bhumi-net
 
@@ -125,7 +99,7 @@ services:
       - NEXT_PUBLIC_CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
     depends_on:
       besu-node:
-        condition: service_healthy
+        condition: service_started
     profiles:
       - indexer
     networks:
@@ -144,7 +118,7 @@ services:
       - RPC_URL=http://besu-node:8545
     depends_on:
       besu-node:
-        condition: service_healthy
+        condition: service_started
     profiles:
       - deploy
     networks:
@@ -160,7 +134,7 @@ services:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     depends_on:
       besu-node:
-        condition: service_healthy
+        condition: service_started
     profiles:
       - tunnel
     networks:
