@@ -150,6 +150,22 @@ services:
     networks:
       - bhumi-net
 
+  # ─── NGROK (PUBLIC RPC TUNNEL) ──────────────────────────────────
+  # Opsional: Untuk membuka RPC ke publik (diperlukan Vercel / Dosen)
+  rpc-tunnel:
+    image: ngrok/ngrok:latest
+    container_name: bhumi-rpc-tunnel
+    command: http besu-node:8545
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      besu-node:
+        condition: service_healthy
+    profiles:
+      - tunnel
+    networks:
+      - bhumi-net
+
 # ═══════════════════════════════════════════════════════════
 #  VOLUMES — Persistent Data
 # ═══════════════════════════════════════════════════════════

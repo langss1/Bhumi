@@ -95,3 +95,27 @@ Jika kamu ingin menyalakan fitur **Supabase Indexer** (mengirim aktivitas blockc
 docker compose --profile indexer up -d supabase-indexer
 ```
 *(Cukup dinyalakan di 1 laptop saja, misalnya laptop Gilang).*
+
+---
+
+## 6. Mengakses Jaringan dari Publik (Vercel / Dosen)
+
+Jika dosen meminta aplikasi ini bisa diakses secara publik (contoh: via Vercel) **tanpa harus menginstall ZeroTier**, kita harus membocorkan (tunneling) RPC Node Gilang ke internet menggunakan Ngrok.
+
+**Langkah-langkah untuk Gilang:**
+1. Daftar akun gratis di [ngrok.com](https://ngrok.com).
+2. Dapatkan token dari menu *Your Authtoken*.
+3. Buka file `.env.laptop1` dan isi tokennya: `NGROK_AUTHTOKEN="<token_kamu_di_sini>"`
+4. Setelah file `.env` diubah, jalankan ulang docker dan nyalakan profile tunnel:
+   ```bash
+   cp .env.laptop1 .env
+   docker compose down
+   docker compose --profile tunnel up -d
+   ```
+5. Lihat URL publik yang diberikan oleh Ngrok dengan menjalankan:
+   ```bash
+   docker compose logs rpc-tunnel | grep "url="
+   ```
+   *Atau Gilang juga bisa membuka browser di `http://localhost:4040` untuk melihat dashboard Ngrok.*
+6. Buka dashboard Vercel, lalu edit Environment Variables `NEXT_PUBLIC_RPC_URL` menjadi URL Ngrok tadi (contoh: `https://abcd-123.ngrok-free.app`). **Jangan pakai garis miring (/) di akhir URL!**
+7. Selesai! Dosen sekarang bisa membuka website Vercel kalian dan MetaMask-nya akan bisa terhubung ke Blockchain lokal kalian lewat terowongan Ngrok ini.
