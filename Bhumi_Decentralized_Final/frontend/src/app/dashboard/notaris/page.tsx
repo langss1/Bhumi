@@ -2,16 +2,37 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useReadContract, useWriteContract } from 'wagmi';
+import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
 
 // ─── Sub-component: Kartu Transfer yang Menunggu Persetujuan Notaris ───────────
 function TransferRequestCard({ tokenId }: { tokenId: number }) {
+  const { address: myAddress } = useAccount();
   const [ajbFile, setAjbFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedHash, setUploadedHash] = useState('');
+  const [assignedNotaris, setAssignedNotaris] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAssignment = async () => {
+      const { supabase } = await import('@/lib/supabase');
+      const { data } = await supabase.from('activity_log')
+        .select('*')
+        .eq('action', 'notary_assigned')
+        .eq('asset_id', tokenId)
+        .order('timestamp', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        setAssignedNotaris(data[0].actor_wallet);
+      } else {
+        setAssignedNotaris('UNASSIGNED');
+      }
+    };
+    fetchAssignment();
+  }, [tokenId]);
 
   const { data: transfer } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
@@ -44,6 +65,13 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
 
   // Hanya tampilkan jika KEDUANYA sudah setuju (menunggu notaris)
   if (!sellerApproved || !buyerApproved) return null;
+
+  // Filter off-chain: Jika sudah ditugaskan ke notaris spesifik, dan bukan dompet saya, maka sembunyikan!
+  if (assignedNotaris && assignedNotaris !== 'UNASSIGNED') {
+    if (myAddress && assignedNotaris.toLowerCase() !== myAddress.toLowerCase()) {
+      return null;
+    }
+  }
 
   const handleExecute = async () => {
     try {
