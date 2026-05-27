@@ -14,7 +14,7 @@ export const localIBFT = defineChain({
   },
   fees: {
     estimateFeesPerGas: async () => ({
-      gasPrice: 0n,
+      gasPrice: BigInt(0),
       maxFeePerGas: undefined,
       maxPriorityFeePerGas: undefined,
     }),
