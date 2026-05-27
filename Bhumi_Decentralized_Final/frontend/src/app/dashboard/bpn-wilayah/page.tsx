@@ -7,11 +7,14 @@ import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
 import LandLedger from '@/components/LandLedger';
+import { supabase } from '@/lib/supabase';
 
 export default function BpnWilayahDashboard() {
   const [activeTab, setActiveTab] = useState('daftar');
   
   // Form State
+  const [searchName, setSearchName] = useState('');
+  const [searchStatus, setSearchStatus] = useState({ loading: false, message: '', type: '' });
   const [walletAddress, setWalletAddress] = useState('');
   const [gps, setGps] = useState('');
   const [area, setArea] = useState('');
@@ -27,6 +30,33 @@ export default function BpnWilayahDashboard() {
     if (e.target.files && e.target.files[0]) {
       if (type === 'warkah') setWarkahFile(e.target.files[0]);
       if (type === 'foto') setFotoFile(e.target.files[0]);
+    }
+  };
+
+  const handleSearchUser = async () => {
+    if (!searchName) return;
+    setSearchStatus({ loading: true, message: 'Mencari ke database...', type: 'info' });
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('wallet_address, full_name')
+        .eq('full_name', searchName)
+        .limit(1)
+        .single();
+        
+      if (error || !data) {
+        setSearchStatus({ loading: false, message: 'Nama tidak ditemukan di sistem.', type: 'error' });
+        setWalletAddress('');
+      } else if (!data.wallet_address) {
+        setSearchStatus({ loading: false, message: `Ditemukan akun ${data.full_name}, tapi akun ini belum dibuatkan Wallet oleh Pusat.`, type: 'error' });
+        setWalletAddress('');
+      } else {
+        setWalletAddress(data.wallet_address);
+        setSearchStatus({ loading: false, message: `Ditemukan: ${data.full_name}`, type: 'success' });
+      }
+    } catch (err) {
+      setSearchStatus({ loading: false, message: 'Terjadi kesalahan pencarian.', type: 'error' });
+      setWalletAddress('');
     }
   };
 
@@ -125,9 +155,37 @@ export default function BpnWilayahDashboard() {
               </div>
               
               <div className="space-y-8">
-                <div>
-                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Dompet Pemilik Tanah (User)</label>
-                  <input type="text" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} placeholder="0x..." className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all" />
+                <div className="bg-moss-50/30 p-6 rounded-2xl border border-moss-100">
+                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Pencarian Nama Pengguna (Pemilik Tanah)</label>
+                  <div className="flex gap-3">
+                    <input 
+                      type="text" 
+                      value={searchName} 
+                      onChange={(e) => setSearchName(e.target.value)} 
+                      placeholder="Masukkan nama warga..." 
+                      className="flex-1 p-4 bg-white border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-medium transition-all" 
+                    />
+                    <button 
+                      onClick={handleSearchUser}
+                      disabled={searchStatus.loading}
+                      className="px-6 py-4 bg-moss-600 hover:bg-moss-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
+                    >
+                      {searchStatus.loading ? 'Mencari...' : 'Cari Dompet'}
+                    </button>
+                  </div>
+                  
+                  {searchStatus.message && (
+                    <div className={`mt-3 text-xs font-bold ${searchStatus.type === 'error' ? 'text-red-500' : searchStatus.type === 'success' ? 'text-olive-600' : 'text-moss-500'}`}>
+                      {searchStatus.message}
+                    </div>
+                  )}
+
+                  {walletAddress && (
+                    <div className="mt-4 p-4 bg-white border border-olive-200 rounded-xl shadow-sm">
+                      <span className="text-[10px] uppercase text-moss-400 font-bold block mb-1">Wallet Ditemukan & Terhubung:</span>
+                      <span className="font-mono text-sm text-moss-800 break-all">{walletAddress}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -17,7 +17,7 @@ Write-Host "P2P       : 30303 (Bootnodes: Laptop 1 & 2)" -ForegroundColor Yellow
 Write-Host "`nStarting node... (Jaringan akan sync otomatis)`n" -ForegroundColor Green
 
 # Daftar bootnode untuk laptop 3 adalah laptop 1 & 2
-$MY_BOOTNODES = "enode://$ENODE_1@$IP_LAPTOP1:30303,enode://$ENODE_2@$IP_LAPTOP2:30303"
+$MY_BOOTNODES = "enode://$ENODE_1@$($IP_LAPTOP1):30303,enode://$ENODE_2@$($IP_LAPTOP2):30303"
 
 & "C:\besu\bin\besu.bat" `
   --data-path="$BASE\node3\data" `
