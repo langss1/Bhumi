@@ -41,3 +41,7 @@ docker/node-keys/
 docker/.env
 .env.laptop*
 node-identities/
+
+# Local Node configs
+env.laptop*
+*.key
