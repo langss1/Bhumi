@@ -1,0 +1,23 @@
+# ============================================================
+# BHUMI FRONTEND — Next.js Development Server
+# ============================================================
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (cache layer)
+COPY Bhumi_Decentralized_Final/frontend/package.json Bhumi_Decentralized_Final/frontend/package-lock.json ./
+COPY Bhumi_Decentralized_Final/frontend/.npmrc ./.npmrc
+
+RUN npm install --legacy-peer-deps
+
+# Copy frontend source code
+COPY Bhumi_Decentralized_Final/frontend/ ./
+
+# Next.js dev server port
+EXPOSE 3000
+
+# Environment variables are injected via docker-compose
+# NEXT_PUBLIC_* vars are baked at runtime for dev mode
+
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]

@@ -13,7 +13,7 @@ const envPath = path.join(__dirname, '../Bhumi_Decentralized_Final/frontend/.env
 dotenv.config({ path: envPath });
 
 // Konfigurasi ABI Smart Contract
-const CONTRACT_JSON_PATH = path.join(__dirname, '../Bhumi_Decentralized_Final/frontend/src/contracts/LandRegistry.json');
+const CONTRACT_JSON_PATH = process.env.CONTRACT_ABI_PATH || path.join(__dirname, '../Bhumi_Decentralized_Final/frontend/src/contracts/LandRegistry.json');
 
 // Inisialisasi Supabase
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;

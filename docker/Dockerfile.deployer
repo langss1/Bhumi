@@ -1,0 +1,35 @@
+# ============================================================
+# BHUMI DEPLOYER — Hardhat Smart Contract Deploy (One-Shot)
+# ============================================================
+FROM node:20-alpine
+
+# Install build tools for native modules (solc needs them)
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy hardhat project
+COPY hardhat_deploy/package.json hardhat_deploy/package-lock.json* ./
+
+# Install hardhat dependencies
+RUN npm install
+
+# Copy hardhat config, contracts, and scripts
+COPY hardhat_deploy/ ./
+
+# Copy ABI sync script destination (will be mounted as volume)
+RUN mkdir -p /app/abi-output
+
+# Deploy script: compile, deploy to besu, export ABI
+# RPC_URL is passed via environment variable
+CMD ["sh", "-c", "\
+  echo '========================================' && \
+  echo ' BHUMI CONTRACT DEPLOYER' && \
+  echo '========================================' && \
+  echo \"Deploying to: $RPC_URL\" && \
+  npx hardhat compile && \
+  npx hardhat run scripts/deploy.js --network besu && \
+  echo 'Copying ABI to shared volume...' && \
+  cp artifacts/contracts/LandRegistry.sol/LandRegistry.json /app/abi-output/ && \
+  echo 'Deploy complete!' \
+"]

@@ -1,0 +1,167 @@
+# ============================================================
+# BHUMI BLOCKCHAIN PLATFORM — Docker Compose
+# ============================================================
+# Setiap laptop menjalankan file ini dengan .env yang berbeda:
+#   cp .env.laptop1 .env && docker compose up -d    (Gilang)
+#   cp .env.laptop2 .env && docker compose up -d    (Arin)
+#   cp .env.laptop3 .env && docker compose up -d    (Ihab)
+#
+# Untuk deploy contract (hanya sekali, di laptop Gilang):
+#   docker compose --profile deploy up deployer
+#
+# Untuk supabase indexer (opsional, di laptop manapun):
+#   docker compose --profile indexer up -d supabase-indexer
+# ============================================================
+
+services:
+
+  # ═══════════════════════════════════════════════════════════
+  #  BLOCKCHAIN — Hyperledger Besu IBFT 2.0 Validator Node
+  # ═══════════════════════════════════════════════════════════
+  besu-node:
+    image: hyperledger/besu:24.1.2
+    container_name: bhumi-besu-${NODE_NAME:-node}
+    restart: unless-stopped
+    ports:
+      - "8545:8545"       # JSON-RPC HTTP
+      - "8546:8546"       # WebSocket
+      - "30303:30303"     # P2P TCP
+      - "30303:30303/udp" # P2P UDP
+    volumes:
+      - besu-data:/opt/besu/data
+      - ./besu-network/genesis.json:/opt/besu/genesis.json:ro
+      - ./docker/node-keys/${NODE_KEY_FILE:-node.key}:/opt/besu/node.key:ro
+    environment:
+      - BESU_OPTS=-Xmx2g
+    entrypoint: /opt/besu/bin/besu
+    command: >-
+      --data-path=/opt/besu/data
+      --genesis-file=/opt/besu/genesis.json
+      --node-private-key-file=/opt/besu/node.key
+      --rpc-http-enabled=true
+      --rpc-http-api=ETH,NET,IBFT,ADMIN,DEBUG,WEB3
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-cors-origins=*
+      --host-allowlist=*
+      --rpc-ws-enabled=true
+      --rpc-ws-host=0.0.0.0
+      --rpc-ws-port=8546
+      --p2p-host=0.0.0.0
+      --p2p-port=30303
+      --nat-method=NONE
+      --min-gas-price=0
+      --bootnodes=${BOOTNODES}
+      --logging=INFO
+    networks:
+      - bhumi-net
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -qO- http://localhost:8545 --post-data='{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":1}' --header='Content-Type: application/json' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ═══════════════════════════════════════════════════════════
+  #  FRONTEND — Next.js Web Application (Dev Mode)
+  # ═══════════════════════════════════════════════════════════
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: bhumi-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      - NEXT_PUBLIC_RPC_URL=http://${MY_IP:-localhost}:8545
+      - NEXT_PUBLIC_PINATA_JWT=${PINATA_JWT}
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON=${SUPABASE_ANON}
+    depends_on:
+      besu-node:
+        condition: service_healthy
+    networks:
+      - bhumi-net
+
+  # ═══════════════════════════════════════════════════════════
+  #  STORAGE SYNC — Download IPFS Files to Local Storage
+  # ═══════════════════════════════════════════════════════════
+  storage-sync:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+    container_name: bhumi-storage-sync
+    restart: unless-stopped
+    command: ["node", "bhumi-storage-sync.js"]
+    environment:
+      - RPC_URL=http://besu-node:8545
+      - CONTRACT_ABI_PATH=/app/contracts/LandRegistry.json
+    volumes:
+      - storage-data:/bhumi-data/storage
+    depends_on:
+      besu-node:
+        condition: service_healthy
+    networks:
+      - bhumi-net
+
+  # ═══════════════════════════════════════════════════════════
+  #  SUPABASE INDEXER — Index Blockchain Data to Supabase
+  #  (Opsional — jalankan dengan: docker compose --profile indexer up -d)
+  # ═══════════════════════════════════════════════════════════
+  supabase-indexer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.services
+    container_name: bhumi-supabase-indexer
+    restart: unless-stopped
+    command: ["node", "bhumi-supabase-indexer.js"]
+    environment:
+      - RPC_URL=http://besu-node:8545
+      - CONTRACT_ABI_PATH=/app/contracts/LandRegistry.json
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON=${SUPABASE_ANON}
+      - NEXT_PUBLIC_CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+    depends_on:
+      besu-node:
+        condition: service_healthy
+    profiles:
+      - indexer
+    networks:
+      - bhumi-net
+
+  # ═══════════════════════════════════════════════════════════
+  #  DEPLOYER — Smart Contract Deploy (One-Shot)
+  #  (Sekali saja: docker compose --profile deploy run deployer)
+  # ═══════════════════════════════════════════════════════════
+  deployer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.deployer
+    container_name: bhumi-deployer
+    environment:
+      - RPC_URL=http://besu-node:8545
+    depends_on:
+      besu-node:
+        condition: service_healthy
+    profiles:
+      - deploy
+    networks:
+      - bhumi-net
+
+# ═══════════════════════════════════════════════════════════
+#  VOLUMES — Persistent Data
+# ═══════════════════════════════════════════════════════════
+volumes:
+  besu-data:
+    name: bhumi-besu-data
+  storage-data:
+    name: bhumi-storage-data
+
+# ═══════════════════════════════════════════════════════════
+#  NETWORK
+# ═══════════════════════════════════════════════════════════
+networks:
+  bhumi-net:
+    driver: bridge

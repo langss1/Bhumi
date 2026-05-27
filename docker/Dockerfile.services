@@ -1,0 +1,22 @@
+# ============================================================
+# BHUMI SERVICES — Storage Sync & Supabase Indexer
+# ============================================================
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY besu-network/package.json besu-network/package-lock.json* ./
+
+# Install service dependencies (ethers, axios, dotenv, supabase)
+RUN npm install
+
+# Copy service scripts
+COPY besu-network/bhumi-storage-sync.js ./
+COPY besu-network/bhumi-supabase-indexer.js ./
+
+# Copy contract ABI (needed by both services)
+COPY Bhumi_Decentralized_Final/frontend/src/contracts/LandRegistry.json ./contracts/LandRegistry.json
+
+# Default command (overridden in docker-compose)
+CMD ["node", "bhumi-storage-sync.js"]
