@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STORAGE_DIR = process.platform === 'win32'
     ? 'C:\\bhumi-data\\storage'
     : path.join(process.env.HOME || '/tmp', 'bhumi-data/storage');
-const CONTRACT_JSON_PATH = process.env.CONTRACT_ABI_PATH || path.join(__dirname, '../frontend/src/contracts/LandRegistry.json');
+const CONTRACT_JSON_PATH = process.env.CONTRACT_ABI_PATH || path.join(__dirname, '../Bhumi_Decentralized_Final/frontend/src/contracts/LandRegistry.json');
 
 // Ensure storage dir exists
 if (!fs.existsSync(STORAGE_DIR)) {
@@ -22,7 +22,7 @@ const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:8545';
 // Load Pinata JWT from .env.local manually to authenticate Pinata IPFS Gateway
 let PINATA_JWT = '';
 try {
-    const envPath = path.join(__dirname, '../frontend/.env.local');
+    const envPath = path.join(__dirname, '../Bhumi_Decentralized_Final/frontend/.env.local');
     if (fs.existsSync(envPath)) {
         const envContent = fs.readFileSync(envPath, 'utf8');
         const match = envContent.match(/NEXT_PUBLIC_PINATA_JWT\s*=\s*(.*)/);
