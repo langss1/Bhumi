@@ -235,17 +235,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Private Key</label>
-            <div className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-sm text-gray-400 select-none flex items-center justify-between">
-              ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            </div>
-            <p className="text-[9px] text-moss-500 mt-2 leading-relaxed">
-              *Private Key diamankan secara lokal di ekstensi dompet Anda (misal: MetaMask). 
-              DApp ini (Bhumi) tidak memiliki akses untuk membaca Private Key Anda demi menjaga keamanan Web3.
-            </p>
-          </div>
+
 
           {showWallet && (
             <div className="mt-4 flex gap-3">
