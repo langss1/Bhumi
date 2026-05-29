@@ -1,7 +1,7 @@
 # ============================================================
 # BHUMI SERVICES — Storage Sync & Supabase Indexer
 # ============================================================
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 

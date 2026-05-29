@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  bhumi-frontend:
+    build: .
+    container_name: bhumi_frontend
+    ports:
+      - "3003:3000" # Expose di port 3003 host, mapping ke port 3000 container
+    restart: always
+    env_file:
+      - .env.local

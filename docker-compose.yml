@@ -21,6 +21,7 @@ services:
   besu-node:
     image: hyperledger/besu:24.1.2
     container_name: bhumi-besu-${NODE_NAME:-node}
+    user: root
     restart: unless-stopped
     ports:
       - "8545:8545"       # JSON-RPC HTTP
@@ -55,6 +56,12 @@ services:
       --logging=INFO
     networks:
       - bhumi-net
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
 
 
