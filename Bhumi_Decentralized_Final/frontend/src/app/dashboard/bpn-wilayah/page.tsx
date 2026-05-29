@@ -13,9 +13,11 @@ export default function BpnWilayahDashboard() {
   const [activeTab, setActiveTab] = useState('daftar');
   
   // Form State
+  const [searchType, setSearchType] = useState('email');
   const [searchName, setSearchName] = useState('');
   const [searchStatus, setSearchStatus] = useState({ loading: false, message: '', type: '' });
   const [walletAddress, setWalletAddress] = useState('');
+  const [foundEmail, setFoundEmail] = useState('');
   const [gps, setGps] = useState('');
   const [area, setArea] = useState('');
   const [nib, setNib] = useState('');
@@ -39,24 +41,28 @@ export default function BpnWilayahDashboard() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('wallet_address, full_name')
-        .eq('full_name', searchName)
+        .select('wallet_address, full_name, email')
+        .eq(searchType === 'email' ? 'email' : 'wallet_address', searchName)
         .limit(1)
         .single();
         
       if (error || !data) {
-        setSearchStatus({ loading: false, message: 'Nama tidak ditemukan di sistem.', type: 'error' });
+        setSearchStatus({ loading: false, message: 'Data tidak ditemukan di sistem.', type: 'error' });
         setWalletAddress('');
+        setFoundEmail('');
       } else if (!data.wallet_address) {
         setSearchStatus({ loading: false, message: `Ditemukan akun ${data.full_name}, tapi akun ini belum dibuatkan Wallet oleh Pusat.`, type: 'error' });
         setWalletAddress('');
+        setFoundEmail('');
       } else {
         setWalletAddress(data.wallet_address);
+        setFoundEmail(data.email);
         setSearchStatus({ loading: false, message: `Ditemukan: ${data.full_name}`, type: 'success' });
       }
     } catch (err) {
       setSearchStatus({ loading: false, message: 'Terjadi kesalahan pencarian.', type: 'error' });
       setWalletAddress('');
+      setFoundEmail('');
     }
   };
 
@@ -156,21 +162,29 @@ export default function BpnWilayahDashboard() {
               
               <div className="space-y-8">
                 <div className="bg-moss-50/30 p-6 rounded-2xl border border-moss-100">
-                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Pencarian Nama Pengguna (Pemilik Tanah)</label>
-                  <div className="flex gap-3">
+                  <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Pencarian Akun (Pemilik Tanah)</label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <select 
+                      value={searchType} 
+                      onChange={(e) => setSearchType(e.target.value)}
+                      className="p-4 bg-white border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-medium transition-all min-w-[120px] outline-none"
+                    >
+                      <option value="email">Email</option>
+                      <option value="wallet">Wallet Address</option>
+                    </select>
                     <input 
                       type="text" 
                       value={searchName} 
                       onChange={(e) => setSearchName(e.target.value)} 
-                      placeholder="Masukkan nama warga..." 
-                      className="flex-1 p-4 bg-white border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-medium transition-all" 
+                      placeholder={searchType === 'email' ? 'contoh@gmail.com' : '0x...'} 
+                      className="flex-1 p-4 bg-white border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-medium transition-all outline-none" 
                     />
                     <button 
                       onClick={handleSearchUser}
                       disabled={searchStatus.loading}
                       className="px-6 py-4 bg-moss-600 hover:bg-moss-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
                     >
-                      {searchStatus.loading ? 'Mencari...' : 'Cari Dompet'}
+                      {searchStatus.loading ? 'Mencari...' : 'Cari Data'}
                     </button>
                   </div>
                   
@@ -180,10 +194,17 @@ export default function BpnWilayahDashboard() {
                     </div>
                   )}
 
-                  {walletAddress && (
+                  {walletAddress && foundEmail && (
                     <div className="mt-4 p-4 bg-white border border-olive-200 rounded-xl shadow-sm">
-                      <span className="text-[10px] uppercase text-moss-400 font-bold block mb-1">Wallet Ditemukan & Terhubung:</span>
-                      <span className="font-mono text-sm text-moss-800 break-all">{walletAddress}</span>
+                      <span className="text-[10px] uppercase text-moss-400 font-bold block mb-2">Data Ditemukan & Terhubung:</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium text-moss-800">
+                          <strong className="text-moss-900">Email:</strong> {foundEmail}
+                        </span>
+                        <span className="text-sm font-medium text-moss-800 break-all">
+                          <strong className="text-moss-900">Wallet:</strong> <span className="font-mono bg-moss-50 px-1 rounded">{walletAddress}</span>
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
