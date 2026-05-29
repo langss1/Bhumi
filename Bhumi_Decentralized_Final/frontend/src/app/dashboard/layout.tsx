@@ -10,6 +10,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { address } = useAccount();
   const [profile, setProfile] = useState<any>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,9 +43,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-[#F9FAF8] font-sans overflow-hidden">
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-moss-900/20 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Premium Sidebar */}
-      <aside className="w-72 bg-white border-r border-moss-100/50 flex flex-col z-20 shadow-[4px_0_24px_rgba(138,154,91,0.03)]">
-        <div className="h-24 flex items-center px-8 border-b border-moss-50">
+      <aside className={`fixed md:relative inset-y-0 left-0 w-72 bg-white border-r border-moss-100/50 flex flex-col z-50 shadow-[4px_0_24px_rgba(138,154,91,0.03)] transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="h-20 md:h-24 flex items-center px-8 border-b border-moss-50 shrink-0">
           <img src="/logo.png" alt="Bhumi Logo" className="w-10 h-10 object-contain mr-4" />
           <div>
             <h2 className="text-2xl font-black text-moss-900 tracking-tight">Bhumi</h2>
@@ -96,13 +109,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
-        <header className="h-24 bg-white/70 backdrop-blur-xl border-b border-moss-50 flex items-center justify-between px-12 shrink-0 z-30">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-moss-900 capitalize">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 min-w-0">
+        <header className="h-20 md:h-24 bg-white/70 backdrop-blur-xl border-b border-moss-50 flex items-center justify-between px-4 md:px-12 shrink-0 z-30">
+          <div className="flex items-center gap-3 md:gap-4">
+            <button 
+              className="md:hidden p-2 -ml-2 text-moss-600 hover:bg-moss-50 rounded-lg"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            <h1 className="text-xl md:text-2xl font-bold text-moss-900 capitalize truncate max-w-[140px] sm:max-w-none">
               {role.replace('-', ' ')}
             </h1>
-            <span className="bg-olive-100 text-olive-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border border-olive-200">
+            <span className="hidden sm:inline-block bg-olive-100 text-olive-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border border-olive-200">
               Verified Node
             </span>
           </div>
@@ -123,7 +142,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </header>
         
-        <div className="flex-1 overflow-y-auto p-12 pb-24">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-12 pb-24">
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}

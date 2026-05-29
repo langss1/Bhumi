@@ -285,7 +285,7 @@ export default function NotarisDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-2xl"
+              className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-2xl"
             >
               <h3 className="text-2xl font-black text-moss-900 mb-2">Cari Token Transfer</h3>
               <p className="text-sm text-moss-500 mb-8">

@@ -124,9 +124,9 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Kolom Kiri: Informasi Pribadi */}
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl p-8 border border-moss-100 shadow-sm"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-white rounded-3xl p-5 md:p-8 border border-moss-100 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-moss-50 rounded-xl">
@@ -199,9 +199,9 @@ export default function ProfilePage() {
         {/* Kolom Kanan: Dompet Web3 */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-3xl p-8 border border-moss-100 shadow-sm h-max"
+          className="bg-white rounded-3xl p-5 md:p-8 border border-moss-100 shadow-sm h-max"
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-amber-50 rounded-xl">
@@ -296,9 +296,9 @@ export default function ProfilePage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/40 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl border border-moss-100"
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2rem] p-6 md:p-8 max-w-sm w-full shadow-2xl border border-moss-100"
             >
               <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100 mb-5 mx-auto">
                 <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>

@@ -90,7 +90,7 @@ export default function BpnPusatDashboard() {
             </motion.div>
           )}
           {activeTab === 'sengketa' && (
-            <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl">
+            <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-4xl">
               <h3 className="text-2xl font-black text-moss-900 mb-6">Pembekuan Aset (Dispute)</h3>
               <div className="space-y-6 p-8 bg-red-50 rounded-3xl border border-red-100">
                 <input type="text" value={disputeTokenId} onChange={(e) => setDisputeTokenId(e.target.value)} placeholder="Masukkan Token ID" className="w-full p-4 border-red-200 rounded-xl" />

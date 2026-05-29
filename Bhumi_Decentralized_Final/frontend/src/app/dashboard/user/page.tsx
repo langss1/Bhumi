@@ -600,7 +600,7 @@ export default function UserDashboard() {
               initial={{ scale: 0.9, y: 20 }} 
               animate={{ scale: 1, y: 0 }} 
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl border border-moss-100 text-center"
+              className="bg-white w-full max-w-md p-6 md:p-8 rounded-3xl shadow-2xl border border-moss-100 text-center"
             >
               {profile.verification_status === 'APPROVED' && (
                 <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-100">
@@ -685,8 +685,8 @@ export default function UserDashboard() {
               </div>
 
               {total === 0 ? (
-                <div className="border-2 border-dashed border-moss-200 bg-moss-50/50 rounded-3xl p-24 text-center">
-                  <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-moss-100">
+                <div className="p-6 md:p-12 text-center bg-moss-50/50 border border-dashed border-moss-200 rounded-3xl">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-moss-100">
                     <svg className="w-10 h-10 text-moss-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
                     </svg>

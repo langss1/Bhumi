@@ -148,7 +148,7 @@ export default function BpnWilayahDashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-12 rounded-[2rem] shadow-sm max-w-4xl"
+              className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-4xl"
             >
               <div className="flex items-center gap-5 mb-10">
                 <div className="w-16 h-16 bg-olive-50 rounded-2xl flex items-center justify-center border border-olive-100">
