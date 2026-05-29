@@ -109,6 +109,7 @@ export interface DBProfile {
   email:               string;
   full_name:           string | null;
   wallet_address:      string | null;
+  private_key?:        string;
   role:                'BPN_PUSAT' | 'BPN_WILAYAH' | 'NOTARIS' | 'AUDITOR' | 'UMUM';
   verification_status: string;
   evidence_url:        string | null;

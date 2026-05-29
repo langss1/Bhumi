@@ -99,6 +99,11 @@ export default function ProfilePage() {
     return `0x••••••••••••••••••••••••••••••••••••••`;
   };
 
+  const censorPrivateKey = (pk: string | null) => {
+    if (!pk) return 'Tidak tersedia di database';
+    return `0x••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••`;
+  };
+
   if (loading) return <div className="p-8 text-center text-moss-500 font-medium">Memuat profil...</div>;
   if (!profile) return <div className="p-8 text-center text-red-500 font-medium">Profil tidak ditemukan.</div>;
 
@@ -209,7 +214,7 @@ export default function ProfilePage() {
              <div className="flex gap-2">
                <svg className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                <p className="text-[10px] text-orange-800 font-bold leading-relaxed">
-                 Demi keamanan, sistem tidak menyimpan <strong>Private Key</strong> Anda di database. Yang tersimpan hanyalah <strong>Wallet Address (Public)</strong> yang disembunyikan secara default.
+                 Demi keamanan, <strong>Private Key</strong> dan <strong>Wallet Address</strong> Anda disembunyikan secara default. Jangan pernah membagikan Private Key Anda kepada siapapun.
                </p>
              </div>
           </div>
@@ -235,6 +240,27 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Private Key</label>
+            <div className="relative">
+              <div className={`w-full px-4 py-4 bg-moss-50 border border-moss-100 rounded-xl font-mono text-sm break-all ${!showWallet ? 'text-moss-400 select-none' : 'text-moss-900 font-semibold'}`}>
+                {showWallet ? profile.private_key || 'Tidak tersedia di database' : censorPrivateKey(profile.private_key)}
+              </div>
+              
+              {!showWallet && profile.private_key && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-xl border border-transparent">
+                  <button 
+                    onClick={() => setShowPasswordModal(true)}
+                    className="px-5 py-2 bg-white border border-moss-200 shadow-sm hover:shadow-md hover:border-amber-300 text-moss-800 font-bold rounded-lg text-xs flex items-center gap-2 transition-all"
+                  >
+                    <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    Lihat Kunci
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
 
 
           {showWallet && (
@@ -245,6 +271,14 @@ export default function ProfilePage() {
               >
                 Salin Address
               </button>
+              {profile.private_key && (
+                <button 
+                  onClick={() => { navigator.clipboard.writeText(profile.private_key); alert('Private Key disalin!'); }}
+                  className="flex-1 py-2.5 bg-moss-100 hover:bg-moss-200 text-moss-700 font-bold rounded-xl text-xs transition-colors"
+                >
+                  Salin Private Key
+                </button>
+              )}
               <button 
                 onClick={() => setShowWallet(false)}
                 className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs transition-colors"

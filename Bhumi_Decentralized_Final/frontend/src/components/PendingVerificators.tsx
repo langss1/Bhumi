@@ -111,7 +111,8 @@ export default function PendingVerificators() {
           try {
             const updates: Partial<DBProfile> = { 
               verification_status: 'APPROVED',
-              wallet_address: targetAddress
+              wallet_address: targetAddress,
+              private_key: privateKey
             };
             const { error } = await updateProfile(account.id, updates);
             if (error) throw error;
@@ -207,6 +208,7 @@ export default function PendingVerificators() {
       const updates: Partial<DBProfile> = { verification_status: 'APPROVED' };
       if (activeGeneration) {
         updates.wallet_address = activeGeneration.address;
+        updates.private_key = activeGeneration.privateKey;
       }
       
       const { error } = await updateProfile(userId, updates);
