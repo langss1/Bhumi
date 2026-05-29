@@ -22,7 +22,7 @@ export default {
       initialBaseFeePerGas: 0,
     },
     localhost: {
-      url: "http://10.223.153.80:8545",
+      url: "http://127.0.0.1:8545",
     },
 
     // ─── Hyperledger Besu IBFT 2.0 (PRODUKSI DEMO) ──────────────────────────
@@ -30,7 +30,7 @@ export default {
     // Ganti PRIVATE_KEY_DEPLOYER_ANDA dengan private key MetaMask yang ada
     // di alloc genesis.json
     besu: {
-      url: "http://10.223.153.80:8545",
+      url: "http://127.0.0.1:8545",
       chainId: 31337,
       gasPrice: 0,
       accounts: [
@@ -47,7 +47,7 @@ export default {
 
     // ─── ZeroTier Hardhat Lama (Fallback / Testing) ──────────────────────────
     zerotier: {
-      url: "http://10.223.153.80:8545",
+      url: "http://127.0.0.1:8545",
       chainId: 31337,
       accounts: [
         "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"

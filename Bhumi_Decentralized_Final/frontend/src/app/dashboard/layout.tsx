@@ -78,18 +78,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <div className="p-6 border-t border-moss-50">
-          <div className="p-4 bg-[#F9FAF8] rounded-2xl border border-moss-100 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-moss-100 border border-moss-200 flex items-center justify-center shrink-0">
+          <Link href="/dashboard/profile" className="block p-4 bg-[#F9FAF8] hover:bg-moss-50 rounded-2xl border border-moss-100 flex items-center gap-3 transition-colors cursor-pointer group">
+            <div className="w-10 h-10 rounded-full bg-moss-100 border border-moss-200 flex items-center justify-center shrink-0 group-hover:bg-moss-200 transition-colors">
               <span className="text-moss-800 font-bold text-sm">0x</span>
             </div>
             <div className="overflow-hidden">
-              <p className="text-[10px] font-bold text-olive-500 uppercase tracking-widest mb-0.5">
+              <p className="text-[10px] font-bold text-olive-500 uppercase tracking-widest mb-0.5 group-hover:text-olive-600 transition-colors">
                 {profile ? `${profile.full_name}` : 'Sesi Aktif'}
               </p>
               <p className="text-[9px] text-moss-400 truncate mb-1" title={profile?.email}>{profile?.email || 'Tidak terhubung'}</p>
               <p className="text-xs font-mono text-moss-900 truncate font-semibold">{activeAddress || 'Tidak terhubung'}</p>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 

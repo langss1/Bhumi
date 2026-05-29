@@ -137,6 +137,8 @@ services:
     image: ngrok/ngrok:latest
     container_name: bhumi-rpc-tunnel
     command: http besu-node:8545
+    ports:
+      - "4040:4040"
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     depends_on:
