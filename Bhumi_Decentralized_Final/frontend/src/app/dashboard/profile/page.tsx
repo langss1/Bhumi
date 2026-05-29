@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
@@ -102,8 +104,15 @@ export default function ProfilePage() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mb-8">
-        <h2 className="text-3xl font-black text-moss-900 tracking-tight">Pengaturan Profil</h2>
+      <div className="mb-8 relative">
+        <button 
+          onClick={() => router.back()}
+          className="absolute -top-6 -left-2 p-2 text-moss-500 hover:text-moss-900 transition-colors flex items-center gap-1 text-xs font-bold"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          Kembali ke Dashboard
+        </button>
+        <h2 className="text-3xl font-black text-moss-900 tracking-tight mt-6">Pengaturan Profil</h2>
         <p className="text-sm text-moss-500 mt-2">Kelola informasi pribadi dan amankan dompet digital Anda.</p>
       </div>
 
@@ -205,7 +214,7 @@ export default function ProfilePage() {
              </div>
           </div>
 
-          <div>
+          <div className="mb-6">
             <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Wallet Address (On-Chain)</label>
             <div className="relative">
               <div className={`w-full px-4 py-4 bg-moss-50 border border-moss-100 rounded-xl font-mono text-sm break-all ${!showWallet ? 'text-moss-400 select-none' : 'text-moss-900 font-semibold'}`}>
@@ -224,6 +233,18 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Private Key</label>
+            <div className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-sm text-gray-400 select-none flex items-center justify-between">
+              ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            </div>
+            <p className="text-[9px] text-moss-500 mt-2 leading-relaxed">
+              *Private Key diamankan secara lokal di ekstensi dompet Anda (misal: MetaMask). 
+              DApp ini (Bhumi) tidak memiliki akses untuk membaca Private Key Anda demi menjaga keamanan Web3.
+            </p>
           </div>
 
           {showWallet && (

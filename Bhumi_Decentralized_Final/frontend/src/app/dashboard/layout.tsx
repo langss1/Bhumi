@@ -87,7 +87,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {profile ? `${profile.full_name}` : 'Sesi Aktif'}
               </p>
               <p className="text-[9px] text-moss-400 truncate mb-1" title={profile?.email}>{profile?.email || 'Tidak terhubung'}</p>
-              <p className="text-xs font-mono text-moss-900 truncate font-semibold">{activeAddress || 'Tidak terhubung'}</p>
+              <p className="text-xs font-mono text-moss-900 truncate font-semibold">
+                {activeAddress ? `0x***...${activeAddress.slice(-4)}` : 'Tidak terhubung'}
+              </p>
             </div>
           </Link>
         </div>
