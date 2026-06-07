@@ -11,6 +11,10 @@ export default function DisputeManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [feedbackInput, setFeedbackInput] = useState<{ [key: string]: string }>({});
   
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
@@ -33,6 +37,30 @@ export default function DisputeManagement() {
     setComments(data);
     setIsLoading(false);
   };
+
+  // Reset page when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Filter comments based on search
+  const filteredComments = comments.filter(c => {
+    const query = searchQuery.toLowerCase();
+    return (
+      c.token_id.toString().includes(query) ||
+      (c.auditor_name && c.auditor_name.toLowerCase().includes(query)) ||
+      (c.auditor_wallet && c.auditor_wallet.toLowerCase().includes(query)) ||
+      c.comment.toLowerCase().includes(query) ||
+      c.category.toLowerCase().includes(query)
+    );
+  });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredComments.length / itemsPerPage);
+  const paginatedComments = filteredComments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleAction = async (comment: DBAuditorComment, isDisputed: boolean) => {
     const feedback = feedbackInput[comment.id] || '';
@@ -72,15 +100,25 @@ export default function DisputeManagement() {
   return (
     <div className="bg-white border border-moss-100 p-4 md:p-8 rounded-[2rem] shadow-sm max-w-4xl mx-auto">
       <h3 className="text-2xl font-black text-moss-900 mb-2">Manajemen Sengketa & Feedback Audit</h3>
-      <p className="text-moss-500 mb-8">Daftar catatan dan peringatan dari Auditor terkait integritas aset tanah. BPN Pusat dapat memberikan keputusan akhir di sini.</p>
+      <p className="text-moss-500 mb-6">Daftar catatan dan peringatan dari Auditor terkait integritas aset tanah. BPN Pusat dapat memberikan keputusan akhir di sini.</p>
 
-      {comments.length === 0 ? (
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Cari Token ID, Auditor, Kategori, atau isi komentar..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-4 border border-moss-200 rounded-xl text-sm focus:ring-2 focus:ring-moss-500 focus:border-moss-500 outline-none shadow-sm transition-shadow bg-moss-50/30"
+        />
+      </div>
+
+      {filteredComments.length === 0 ? (
         <div className="p-8 text-center text-moss-500 bg-moss-50 rounded-2xl border border-moss-100">
-          Belum ada catatan audit atau sengketa yang perlu ditinjau.
+          {searchQuery ? "Pencarian tidak ditemukan." : "Belum ada catatan audit atau sengketa yang perlu ditinjau."}
         </div>
       ) : (
         <div className="space-y-6">
-          {comments.map((c) => (
+          {paginatedComments.map((c) => (
             <div key={c.id} className="border border-moss-100 rounded-2xl p-6 bg-white shadow-sm flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
@@ -141,6 +179,28 @@ export default function DisputeManagement() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-8 border-t border-moss-100 pt-6">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-5 py-2 bg-moss-100 hover:bg-moss-200 text-moss-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+          >
+            Sebelumnya
+          </button>
+          <span className="text-sm font-bold text-moss-600">
+            Halaman {currentPage} dari {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-5 py-2 bg-moss-100 hover:bg-moss-200 text-moss-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors"
+          >
+            Selanjutnya
+          </button>
         </div>
       )}
     </div>
