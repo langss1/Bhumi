@@ -164,12 +164,12 @@ export default function LoginPage() {
       </div>
 
       {/* Right Pane (Login form) */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 relative">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md bg-white p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-moss-100/50"
+          className="w-full max-w-md bg-white p-6 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-moss-100/50"
         >
           <div className="mb-10 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h3>
@@ -188,13 +188,13 @@ export default function LoginPage() {
               <div className="flex p-1 bg-moss-50 rounded-xl mb-8">
                 <button
                   onClick={() => { setLoginMethod('traditional'); setError(''); }}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginMethod === 'traditional' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+                  className={`flex-1 py-2 px-1 text-xs sm:text-sm font-bold rounded-lg transition-all ${loginMethod === 'traditional' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
                 >
                   Email & Password
                 </button>
                 <button
                   onClick={() => { setLoginMethod('web3'); setError(''); }}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${loginMethod === 'web3' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+                  className={`flex-1 py-2 px-1 text-xs sm:text-sm font-bold rounded-lg transition-all ${loginMethod === 'web3' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
                 >
                   Web3 Wallet
                 </button>
