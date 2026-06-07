@@ -26,22 +26,14 @@ foundry/cache/
 .DS_Store
 Thumbs.db
 
-# Friend's shared documentation & setup files
-dokum/
-
 # IDE Settings
 .vscode/
 
-# Besu binaries, networks, and data
-besu-binary/
-besu-network/
-jdk-17.0.11+9/
-
-docker/node-keys/
+# Local configs and keys
 docker/.env
 .env.laptop*
-node-identities/
-
-# Local Node configs
 env.laptop*
 *.key
+
+# Archive (Contains old binaries, documentation duplicates, backups)
+_archive/
