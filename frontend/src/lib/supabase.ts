@@ -230,6 +230,8 @@ export interface DBAuditorComment {
   comment:         string;
   category:        'general' | 'warning' | 'dispute' | 'compliance';
   created_at:      string;
+  bpn_feedback?:   string | null;
+  bpn_status?:     string;
 }
 
 export async function addAuditorComment(
@@ -260,6 +262,14 @@ export async function getAllAuditorComments(): Promise<DBAuditorComment[]> {
     .order('created_at', { ascending: false })
     .limit(100);
   return data || [];
+}
+
+export async function updateAuditorFeedback(id: string, feedback: string, status: string) {
+  if (!SUPABASE_READY) return { error: { message: 'Supabase not configured' } };
+  return supabase
+    .from('auditor_comments')
+    .update({ bpn_feedback: feedback, bpn_status: status })
+    .eq('id', id);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

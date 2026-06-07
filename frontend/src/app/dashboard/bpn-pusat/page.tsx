@@ -8,6 +8,7 @@ import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
 import PendingLandRequests from '@/components/PendingLandRequests';
 import PendingVerificators from '@/components/PendingVerificators';
+import DisputeManagement from '@/components/DisputeManagement';
 
 const ROLES = {
   validator: "0x3b6c71f6d44639d5b3e40f2ef3056c3385a1e68a255a703ac23442c1c3be357d", // BPN_WILAYAH_ROLE
@@ -17,20 +18,6 @@ const ROLES = {
 
 export default function BpnPusatDashboard() {
   const [activeTab, setActiveTab] = useState('validation');
-  const [disputeTokenId, setDisputeTokenId] = useState('');
-
-  const { writeContract: writeDispute, isPending: isDisputePending } = useWriteContract();
-
-  const handleSetEnforcement = (isDisputed: boolean) => {
-    if (!disputeTokenId) return alert("Masukkan ID Token!");
-    writeDispute({
-      address: LAND_REGISTRY_ADDRESS,
-      abi: LandRegistryABI,
-      functionName: 'setEnforcement',
-      args: [BigInt(disputeTokenId), isDisputed],
-      
-    });
-  };
 
   const tabs = [
     { id: 'validation', label: 'Validasi Pendaftaran Tanah' },
@@ -90,15 +77,8 @@ export default function BpnPusatDashboard() {
             </motion.div>
           )}
           {activeTab === 'sengketa' && (
-            <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-4xl">
-              <h3 className="text-2xl font-black text-moss-900 mb-6">Pembekuan Aset (Dispute)</h3>
-              <div className="space-y-6 p-8 bg-red-50 rounded-3xl border border-red-100">
-                <input type="text" value={disputeTokenId} onChange={(e) => setDisputeTokenId(e.target.value)} placeholder="Masukkan Token ID" className="w-full p-4 border-red-200 rounded-xl" />
-                <div className="flex gap-4">
-                  <button onClick={() => handleSetEnforcement(true)} disabled={isDisputePending} className="flex-1 py-4 bg-red-600 text-white font-bold rounded-xl">Set Sengketa</button>
-                  <button onClick={() => handleSetEnforcement(false)} disabled={isDisputePending} className="flex-1 py-4 bg-moss-700 text-white font-bold rounded-xl">Lepas Sengketa</button>
-                </div>
-              </div>
+            <motion.div key="sengketa" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <DisputeManagement />
             </motion.div>
           )}
         </AnimatePresence>
