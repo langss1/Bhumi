@@ -184,18 +184,20 @@ export default function RegisterPage() {
           </div>
 
           {/* Toggle Register Type */}
-          <div className="flex w-full p-1 bg-moss-50 rounded-xl mb-8">
+          <div className="grid grid-cols-2 w-full p-1 bg-moss-50 rounded-xl mb-8">
             <button
               type="button"
               onClick={() => { setRegisterType('masyarakat'); setError(''); setSuccess(''); }}
-              className={`flex-1 py-2 px-2 text-xs sm:text-sm font-bold rounded-lg transition-all whitespace-nowrap ${registerType === 'masyarakat' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+              className={`py-2 px-1 text-[11px] sm:text-sm font-bold rounded-lg transition-all whitespace-nowrap truncate ${registerType === 'masyarakat' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+              title="Masyarakat Umum"
             >
               Masyarakat Umum
             </button>
             <button
               type="button"
               onClick={() => { setRegisterType('pejabat'); setError(''); setSuccess(''); }}
-              className={`flex-1 py-2 px-2 text-xs sm:text-sm font-bold rounded-lg transition-all whitespace-nowrap ${registerType === 'pejabat' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+              className={`py-2 px-1 text-[11px] sm:text-sm font-bold rounded-lg transition-all whitespace-nowrap truncate ${registerType === 'pejabat' ? 'bg-white text-moss-800 shadow-sm border border-moss-200/50' : 'text-moss-500 hover:text-moss-700'}`}
+              title="Pejabat / Instansi"
             >
               Pejabat / Instansi
             </button>
@@ -213,7 +215,7 @@ export default function RegisterPage() {
                   <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest mb-2">Email</label>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@email.com" className="w-full px-4 py-3 border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 outline-none" />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest mb-2">Password</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 outline-none" />
@@ -227,7 +229,7 @@ export default function RegisterPage() {
             ) : (
               /* ================= FORM PEJABAT ================= */
               <>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest mb-2">Email Instansi</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@instansi.go.id" className="w-full px-4 py-3 border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 outline-none" />
@@ -240,18 +242,20 @@ export default function RegisterPage() {
 
                 <div className="space-y-3 p-4 bg-moss-50/50 rounded-2xl border border-moss-100/50">
                   <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest">Opsi Wallet Ethereum</label>
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => { setWalletOption('existing'); setWallet(''); }}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl border transition-all ${walletOption === 'existing' ? 'bg-white text-moss-800 border-moss-200 shadow-sm' : 'bg-transparent text-moss-500 border-transparent hover:text-moss-700'}`}
+                      className={`py-2.5 text-[11px] sm:text-xs font-bold rounded-xl border transition-all whitespace-nowrap truncate ${walletOption === 'existing' ? 'bg-white text-moss-800 border-moss-200 shadow-sm' : 'bg-transparent text-moss-500 border-transparent hover:text-moss-700'}`}
+                      title="Pakai MetaMask"
                     >
                       🔑 Pakai MetaMask
                     </button>
                     <button
                       type="button"
                       onClick={() => { setWalletOption('generate'); setWallet(''); }}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl border transition-all ${walletOption === 'generate' ? 'bg-white text-moss-800 border-moss-200 shadow-sm' : 'bg-transparent text-moss-500 border-transparent hover:text-moss-700'}`}
+                      className={`py-2.5 text-[11px] sm:text-xs font-bold rounded-xl border transition-all whitespace-nowrap truncate ${walletOption === 'generate' ? 'bg-white text-moss-800 border-moss-200 shadow-sm' : 'bg-transparent text-moss-500 border-transparent hover:text-moss-700'}`}
+                      title="Buat Otomatis"
                     >
                       ✨ Buat Otomatis
                     </button>
@@ -295,7 +299,7 @@ export default function RegisterPage() {
                   <p className="text-[10px] text-orange-600 mt-2">*Dokumen akan diamankan di IPFS (Pinata) dan diperiksa oleh BPN Pusat.</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest mb-2">Password</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 outline-none" />
