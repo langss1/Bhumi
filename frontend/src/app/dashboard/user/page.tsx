@@ -363,23 +363,23 @@ function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefin
 
   return (
     <div className="max-w-2xl">
-      <div className="bg-white border border-moss-100 p-10 rounded-[2rem] shadow-sm">
-        <h3 className="text-2xl font-black text-moss-900 mb-2">Konfirmasi Pembelian</h3>
-        <p className="text-sm text-moss-500 mb-8 leading-relaxed">
+      <div className="bg-white border border-moss-100 p-5 sm:p-10 rounded-3xl sm:rounded-[2rem] shadow-sm">
+        <h3 className="text-xl sm:text-2xl font-black text-moss-900 mb-2">Konfirmasi Pembelian</h3>
+        <p className="text-xs sm:text-sm text-moss-500 mb-6 sm:mb-8 leading-relaxed">
           Jika seseorang mengajukan <strong>proposal jual beli</strong> tanah kepada Anda, masukkan ID Token-nya di bawah untuk melihat detail dan menyetujuinya. Setelah Anda setuju, transaksi diteruskan ke Notaris untuk pengesahan final.
         </p>
 
-        <div className="flex gap-4 mb-8">
+        <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8">
           <input
             type="number"
             value={tokenIdInput}
             onChange={(e) => setTokenIdInput(e.target.value)}
-            placeholder="Masukkan ID Token (misal: 0, 1, 2...)"
-            className="flex-1 p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-olive-500"
+            placeholder="ID Token (0, 1, 2...)"
+            className="flex-1 p-3 sm:p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-xs sm:text-sm focus:ring-2 focus:ring-olive-500"
           />
           <button
             onClick={() => setCheckedId(Number(tokenIdInput))}
-            className="px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 transition-all"
+            className="px-4 sm:px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 transition-all text-xs sm:text-sm shrink-0"
           >
             Periksa
           </button>
@@ -483,10 +483,10 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="bg-white border border-moss-100 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+      className="bg-white border border-moss-100 p-5 sm:p-6 rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
     >
-      <div className="flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${
+      <div className="flex items-start sm:items-center gap-4">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border shrink-0 ${
           isApproved ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 
           isRejected ? 'bg-red-50 border-red-100 text-red-600' : 
           'bg-amber-50 border-amber-100 text-amber-600'
@@ -500,7 +500,7 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
           )}
         </div>
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[10px] font-black text-moss-400 uppercase tracking-widest">Request #{requestId}</span>
             <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase ${
               isApproved ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
@@ -510,12 +510,12 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
               {isApproved ? 'Disetujui' : isRejected ? 'Ditolak' : 'Proses Verifikasi'}
             </span>
           </div>
-          <h4 className="text-base font-black text-moss-900">Pendaftaran Tanah NIB: {request.nib}</h4>
-          <p className="text-xs text-moss-500 mt-0.5">Luas: {request.area.toString()} m² • GPS: {request.gpsCoordinates}</p>
+          <h4 className="text-sm sm:text-base font-black text-moss-900">Pendaftaran Tanah NIB: {request.nib}</h4>
+          <p className="text-[11px] sm:text-xs text-moss-500 mt-0.5">Luas: {request.area.toString()} m² • GPS: {request.gpsCoordinates}</p>
         </div>
       </div>
 
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col items-start md:items-end gap-2">
         <p className="text-[10px] font-bold text-moss-400 uppercase tracking-wider">Update Terakhir</p>
         <p className="text-xs font-medium text-moss-700 bg-moss-50 px-3 py-1.5 rounded-lg border border-moss-100 italic">
           {isApproved ? 'Sertifikat telah dicetak ke Blockchain' : 
@@ -655,13 +655,13 @@ export default function UserDashboard() {
         )}
       </div>
 
-      <div className="flex gap-4 mb-10 border-b border-moss-100 pb-px">
+      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative px-6 py-4 text-sm font-bold tracking-wide transition-colors ${
-              activeTab === tab.id ? 'text-moss-900' : 'text-moss-400 hover:text-moss-700'
+            className={`relative px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold tracking-wide transition-colors shrink-0 ${
+              activeTab === tab.id ? 'text-moss-900 font-extrabold' : 'text-moss-400 hover:text-moss-700'
             }`}
           >
             {tab.label}

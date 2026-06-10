@@ -119,13 +119,13 @@ export default function BpnWilayahDashboard() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex gap-4 mb-10 border-b border-moss-100 pb-px">
+      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative px-6 py-4 text-sm font-bold tracking-wide transition-colors ${
-              activeTab === tab.id ? 'text-moss-900' : 'text-moss-400 hover:text-moss-700'
+            className={`relative px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold tracking-wide transition-colors shrink-0 ${
+              activeTab === tab.id ? 'text-moss-900 font-extrabold' : 'text-moss-400 hover:text-moss-700'
             }`}
           >
             {tab.label}
