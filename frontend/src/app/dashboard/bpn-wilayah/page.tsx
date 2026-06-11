@@ -6,7 +6,7 @@ import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
-import LandLedger from '@/components/LandLedger';
+import RegistrationHistory from '@/components/RegistrationHistory';
 import { supabase } from '@/lib/supabase';
 
 export default function BpnWilayahDashboard() {
@@ -25,6 +25,7 @@ export default function BpnWilayahDashboard() {
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedHashes, setUploadedHashes] = useState<Record<string, string>>({});
+  const [modal, setModal] = useState<{ isOpen: boolean; type: 'success' | 'error' | 'warning'; title: string; message: string; txHash?: string }>({ isOpen: false, type: 'success', title: '', message: '' });
 
   const { writeContractAsync, isPending: isMintPending } = useWriteContract();
 
@@ -68,7 +69,7 @@ export default function BpnWilayahDashboard() {
 
   const handleRegisterLand = async () => {
     if (!walletAddress || !gps || !area || !nib || !warkahFile || !fotoFile) {
-      alert("Harap lengkapi semua field dan unggah dokumen!");
+      setModal({ isOpen: true, type: 'warning', title: 'Data Belum Lengkap', message: 'Harap lengkapi semua field dan unggah dokumen Warkah serta Foto Batas Patok.' });
       return;
     }
 
@@ -102,11 +103,11 @@ export default function BpnWilayahDashboard() {
         
       });
 
-      alert(`Transaksi dikirim ke Blockchain!\nMenunggu konfirmasi blok... TxHash: ${txHash}`);
+      setModal({ isOpen: true, type: 'success', title: 'Transaksi Berhasil', message: 'Transaksi pendaftaran telah dikirim ke Blockchain! Permintaan Anda kini berstatus Pending.', txHash: txHash });
       
     } catch (error: any) {
       console.error(error);
-      alert("Terjadi kesalahan: " + (error.message || "Gagal memproses"));
+      setModal({ isOpen: true, type: 'error', title: 'Gagal Memproses', message: error.message || "Terjadi kesalahan saat memproses pendaftaran ke Blockchain." });
     } finally {
       setIsUploading(false);
     }
@@ -281,11 +282,60 @@ export default function BpnWilayahDashboard() {
                 <h3 className="text-xl font-bold text-moss-900 mb-2">Riwayat Pendaftaran</h3>
                 <p className="text-moss-500">Anda dapat memantau sertifikat yang Anda cetak di sini.</p>
               </div>
-              <LandLedger />
+              <RegistrationHistory />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Custom Modal */}
+      <AnimatePresence>
+        {modal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+            >
+              <div className="flex flex-col items-center text-center">
+                {modal.type === 'success' && (
+                  <div className="w-20 h-20 bg-olive-50 text-olive-600 rounded-full flex items-center justify-center mb-6 border-4 border-olive-100">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                )}
+                {modal.type === 'error' && (
+                  <div className="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6 border-4 border-red-100">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </div>
+                )}
+                {modal.type === 'warning' && (
+                  <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-6 border-4 border-amber-100">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  </div>
+                )}
+                
+                <h3 className="text-2xl font-black text-moss-900 mb-2">{modal.title}</h3>
+                <p className="text-moss-500 text-sm mb-6">{modal.message}</p>
+                
+                {modal.txHash && (
+                  <div className="w-full bg-moss-50 p-4 rounded-xl mb-6 border border-moss-100 text-left">
+                    <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Transaction Hash</p>
+                    <p className="text-xs font-mono text-moss-700 break-all">{modal.txHash}</p>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setModal({ ...modal, isOpen: false })}
+                  className="w-full py-4 bg-moss-900 hover:bg-moss-950 text-white font-bold rounded-xl transition-all"
+                >
+                  OK, Mengerti
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
