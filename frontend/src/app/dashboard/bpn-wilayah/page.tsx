@@ -114,28 +114,32 @@ export default function BpnWilayahDashboard() {
   };
 
   const tabs = [
-    { id: 'daftar', label: 'Input Pendaftaran Baru' },
+    { id: 'daftar', label: 'Pendaftaran Baru' },
     { id: 'history', label: 'Riwayat Pendaftaran' }
   ];
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+      <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-12 bg-moss-50/80 p-2 rounded-2xl border border-moss-100 w-max max-w-full shadow-inner">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold tracking-wide transition-colors shrink-0 ${
-              activeTab === tab.id ? 'text-moss-900 font-extrabold' : 'text-moss-400 hover:text-moss-700'
+            className={`relative px-6 py-3 md:px-8 md:py-4 text-xs md:text-sm font-black tracking-wide transition-all rounded-xl outline-none ${
+              activeTab === tab.id 
+                ? 'text-white' 
+                : 'text-moss-500 hover:text-moss-800 hover:bg-white/50'
             }`}
           >
-            {tab.label}
             {activeTab === tab.id && (
               <motion.div
-                layoutId="bpnTab"
-                className="absolute bottom-0 left-0 right-0 h-1 bg-olive-500 rounded-t-full"
+                layoutId="active-tab"
+                className="absolute inset-0 bg-moss-900 rounded-xl shadow-md shadow-moss-900/20"
+                initial={false}
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
+            <span className="relative z-10">{tab.label}</span>
           </button>
         ))}
       </div>
