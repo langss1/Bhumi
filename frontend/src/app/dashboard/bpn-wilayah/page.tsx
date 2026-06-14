@@ -2,15 +2,18 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
 import RegistrationHistory from '@/components/RegistrationHistory';
 import { supabase } from '@/lib/supabase';
+import { useWalletGuard } from '@/hooks/useWalletGuard';
 
 export default function BpnWilayahDashboard() {
+  useWalletGuard();
+  const { address } = useAccount();
   const [activeTab, setActiveTab] = useState('daftar');
   
   // Form State

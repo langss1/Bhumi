@@ -53,6 +53,7 @@ export default function LoginPage() {
       }
 
       if (data.success) {
+        localStorage.setItem('connected_wallet', address);
         router.push(`/dashboard/${data.role}`);
       } else {
         setError(data.message || 'Login gagal.');
@@ -83,6 +84,9 @@ export default function LoginPage() {
         email: email,
         password: password,
       });
+
+      // Hapus jejak Web3 wallet jika ada
+      localStorage.removeItem('connected_wallet');
 
       if (authErr) throw new Error('Email atau password salah.');
       if (!authData.user) throw new Error('Gagal memuat data pengguna.');

@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useReadContract, usePublicClient } from 'wagmi';
+import { useReadContract, usePublicClient, useAccount } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
 import { getAllAuditorComments, DBAuditorComment } from '@/lib/supabase';
-
+import { useWalletGuard } from '@/hooks/useWalletGuard';
 // ─── Tipe data hasil pencarian ────────────────────────────────────────────────
 interface LandDetail {
   tokenId: number;
@@ -426,6 +426,7 @@ const CATEGORY_STYLES: Record<string, { label: string; color: string }> = {
 };
 
 export default function AuditorDashboard() {
+  useWalletGuard();
   const [activeTab, setActiveTab] = useState('ledger');
   const [allComments, setAllComments] = useState<DBAuditorComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);

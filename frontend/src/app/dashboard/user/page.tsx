@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount, useReadContract } from 'wagmi';
 import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
+import { useWalletGuard } from '@/hooks/useWalletGuard';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { supabase, getActivityByAsset, getAssetMeta, uploadDocumentToStorage, logActivity, getProfile } from '@/lib/supabase';
@@ -537,6 +539,7 @@ function RequestStatusCard({ requestId, activeAddress }: { requestId: number, ac
 
 // ─── Main Dashboard User ───────────────────────────────────────────────────────
 export default function UserDashboard() {
+  useWalletGuard();
   const [activeTab, setActiveTab] = useState('gallery');
   const { address } = useAccount();
   const [profile, setProfile] = useState<any>(null);

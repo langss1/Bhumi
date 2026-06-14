@@ -8,6 +8,7 @@ import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { uploadToIPFS } from '@/lib/pinata';
 import { cleanNIB } from '@/lib/formatters';
+import { useWalletGuard } from '@/hooks/useWalletGuard';
 
 // ─── Sub-component: Kartu Transfer yang Menunggu Persetujuan Notaris ───────────
 function TransferRequestCard({ tokenId }: { tokenId: number }) {
@@ -191,6 +192,7 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function NotarisDashboard() {
+  useWalletGuard();
   const [activeTab, setActiveTab] = useState('transfer');
   const [searchTokenId, setSearchTokenId] = useState('');
   const [searchedId, setSearchedId] = useState<number | null>(null);

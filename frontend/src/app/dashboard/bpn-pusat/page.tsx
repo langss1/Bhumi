@@ -17,6 +17,8 @@ const ROLES = {
 };
 
 export default function BpnPusatDashboard() {
+  useWalletGuard();
+  const { address } = useAccount();
   const [activeTab, setActiveTab] = useState('validation');
 
   const tabs = [
