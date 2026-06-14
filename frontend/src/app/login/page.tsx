@@ -142,7 +142,7 @@ export default function LoginPage() {
           className="relative z-10 flex items-center gap-4"
         >
           <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20">
-            <img src="/logo.png" alt="Bhumi Logo" className="h-10 w-10 object-contain brightness-0 invert" />
+            <img src="/logo.png" alt="Bhumi Logo" className="h-10 w-10 object-contain" />
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">Bhumi</h1>
         </motion.div>
@@ -171,7 +171,8 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md bg-white p-6 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-moss-100/50"
         >
-          <div className="mb-10 text-center">
+          <div className="mb-10 text-center flex flex-col items-center">
+            <img src="/logo.png" alt="Bhumi Logo" className="h-24 w-auto object-contain mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h3>
             <p className="text-moss-600/70 text-sm">Masuk untuk mengelola aset dan layanan Anda</p>
           </div>
