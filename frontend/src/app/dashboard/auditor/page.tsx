@@ -230,6 +230,7 @@ function ForensikSearch() {
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getTotalLands',
+    query: { refetchInterval: 5000 }
   });
 
   const handleSearch = async () => {
@@ -246,7 +247,12 @@ function ForensikSearch() {
     setErrorMsg('');
 
     try {
-      const total = Number(totalLands || 0);
+      const freshTotalLands = await publicClient.readContract({
+        address: LAND_REGISTRY_ADDRESS,
+        abi: LandRegistryABI,
+        functionName: 'getTotalLands',
+      });
+      const total = Number(freshTotalLands || 0);
       if (total === 0) {
         setSearched(true);
         setIsSearching(false);
@@ -435,6 +441,7 @@ export default function AuditorDashboard() {
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getTotalLands',
+    query: { refetchInterval: 5000 }
   });
 
   const total = Number(totalLands || 0);
