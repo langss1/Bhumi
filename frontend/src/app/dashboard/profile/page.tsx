@@ -296,8 +296,8 @@ export default function ProfilePage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-moss-900/40 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="bg-white rounded-[2rem] p-6 md:p-8 max-w-sm w-full shadow-2xl border border-moss-100"
             >
               <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100 mb-5 mx-auto">

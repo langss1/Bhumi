@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Bhumi | Sistem Informasi Pertanahan Terdesentralisasi',
   description: 'Digitalisasi dan tokenisasi aset tanah serta sertifikat secara aman melalui blockchain.',
   keywords: ['RWA', 'blockchain', 'real world assets', 'Land Registry', 'BPN'],
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

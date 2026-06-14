@@ -64,6 +64,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1 overflow-y-auto py-8 px-5">
           <p className="px-3 text-[11px] font-bold text-moss-400/80 uppercase tracking-widest mb-4">Modul Operasional</p>
           <nav className="space-y-2">
+            {pathname === '/dashboard/profile' && (
+              <Link href={(() => {
+                const r = profile?.role?.toLowerCase() || '';
+                if (r.includes('wilayah')) return '/dashboard/bpn-wilayah';
+                if (r.includes('pusat')) return '/dashboard/bpn-pusat';
+                if (r.includes('notaris')) return '/dashboard/notaris';
+                if (r.includes('auditor')) return '/dashboard/auditor';
+                return '/dashboard/user';
+              })()} className="block relative">
+                <div className="relative flex items-center gap-4 px-5 py-4 rounded-2xl transition-colors text-moss-500 hover:text-moss-900 hover:bg-moss-50/50">
+                  <svg className="w-6 h-6 text-moss-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <span className="text-sm">Home</span>
+                </div>
+              </Link>
+            )}
             {menuItems.map((item) => {
               const isActive = pathname === item.path;
               if (item.path !== `/dashboard/${role}`) return null; 
