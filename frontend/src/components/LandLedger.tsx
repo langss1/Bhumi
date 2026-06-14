@@ -6,6 +6,7 @@ import { useReadContract, useAccount } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { addAuditorComment, getCommentsByToken, DBAuditorComment } from '@/lib/supabase';
+import { cleanNIB, cleanGPS } from '@/lib/formatters';
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
   general:    { label: 'Umum',       color: 'bg-slate-100 text-slate-700 border-slate-200' },
@@ -114,8 +115,8 @@ function LandRow({ tokenId, showAuditComments = false }: LandRowProps) {
         <td className="px-6 py-4 font-mono text-xs font-bold text-moss-900">#{tokenId}</td>
         <td className="px-6 py-4 font-mono text-xs text-moss-600 truncate max-w-[120px]">{owner as string}</td>
         <td className="px-6 py-4">
-          <span className="text-xs font-bold text-moss-800">{land.nib}</span>
-          <div className="text-[10px] text-moss-500 mt-0.5">{land.gpsCoordinates}</div>
+          <span className="text-xs font-bold text-moss-800">{cleanNIB(land.nib)}</span>
+          <div className="text-[10px] text-moss-500 mt-0.5">{cleanGPS(land.gpsCoordinates)}</div>
         </td>
         <td className="px-6 py-4">
           <span className="text-xs font-medium text-moss-700">{land.area.toString()} m²</span>
@@ -141,7 +142,7 @@ function LandRow({ tokenId, showAuditComments = false }: LandRowProps) {
             <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Nomor Identifikasi Bidang (NIB)</div>
-                <div className="font-bold text-moss-900">{land.nib}</div>
+                <div className="font-bold text-moss-900">{cleanNIB(land.nib)}</div>
               </div>
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan Terukur</div>
@@ -149,7 +150,7 @@ function LandRow({ tokenId, showAuditComments = false }: LandRowProps) {
               </div>
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Titik Koordinat (Geo-Location)</div>
-                <div className="font-mono text-sm text-moss-900 font-bold">{land.gpsCoordinates}</div>
+                <div className="font-mono text-sm text-moss-900 font-bold">{cleanGPS(land.gpsCoordinates)}</div>
               </div>
             </div>
 

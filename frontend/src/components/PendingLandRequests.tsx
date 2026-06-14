@@ -6,6 +6,7 @@ import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteCo
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cleanNIB, cleanGPS } from '@/lib/formatters';
 
 interface RequestRowProps {
   requestId: number;
@@ -65,7 +66,7 @@ function RequestRow({ requestId }: RequestRowProps) {
       <tr className="bg-white hover:bg-moss-50/50 transition-colors border-b border-moss-50">
         <td className="px-6 py-4 font-mono text-xs font-bold text-moss-900">REQ-{requestId}</td>
         <td className="px-6 py-4">
-          <span className="text-xs font-bold text-moss-800">{request.nib}</span>
+          <span className="text-xs font-bold text-moss-800">{cleanNIB(request.nib)}</span>
           <div className="text-[10px] text-moss-500 mt-0.5 font-mono truncate max-w-[150px]">{request.to}</div>
         </td>
         <td className="px-6 py-4">
@@ -121,17 +122,17 @@ function RequestRow({ requestId }: RequestRowProps) {
                   <p className="text-moss-500 mb-8 text-sm">Verifikasi data fisik dan yuridis sebelum dicetak ke Blockchain.</p>
 
                   <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
-                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">NIB</div>
-                      <div className="font-bold text-moss-900">{request.nib}</div>
+                    <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Nomor Identifikasi Bidang (NIB)</div>
+                      <div className="font-bold text-moss-900">{cleanNIB(request.nib)}</div>
                     </div>
                     <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100">
                       <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan</div>
                       <div className="font-bold text-moss-900">{request.area.toString()} m²</div>
                     </div>
-                    <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
-                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Koordinat GPS</div>
-                      <div className="font-mono text-sm text-moss-900 font-bold">{request.gpsCoordinates}</div>
+                    <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
+                      <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Titik Koordinat (Geo-Location)</div>
+                      <div className="font-mono text-sm text-moss-900 font-bold">{cleanGPS(request.gpsCoordinates)}</div>
                     </div>
                     <div className="bg-moss-50/50 p-6 rounded-2xl border border-moss-100 col-span-2">
                       <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Wallet Pemilik</div>

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useReadContract } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
+import { cleanNIB, cleanGPS } from '@/lib/formatters';
 
 interface RequestHistoryRowProps {
   requestId: number;
@@ -67,8 +68,8 @@ function RequestHistoryRow({ requestId }: RequestHistoryRowProps) {
         <td className="px-6 py-4 font-mono text-xs font-bold text-moss-900">REQ-{requestId}</td>
         <td className="px-6 py-4 font-mono text-xs text-moss-600 truncate max-w-[120px]">{request.to}</td>
         <td className="px-6 py-4">
-          <span className="text-xs font-bold text-moss-800">{request.nib}</span>
-          <div className="text-[10px] text-moss-500 mt-0.5">{request.gpsCoordinates}</div>
+          <span className="text-xs font-bold text-moss-800">{cleanNIB(request.nib)}</span>
+          <div className="text-[10px] text-moss-500 mt-0.5">{cleanGPS(request.gpsCoordinates)}</div>
         </td>
         <td className="px-6 py-4">
           <span className="text-xs font-medium text-moss-700">{request.area.toString()} m²</span>
@@ -98,7 +99,7 @@ function RequestHistoryRow({ requestId }: RequestHistoryRowProps) {
             <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Nomor Identifikasi Bidang (NIB)</div>
-                <div className="font-bold text-moss-900">{request.nib}</div>
+                <div className="font-bold text-moss-900">{cleanNIB(request.nib)}</div>
               </div>
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Luas Lahan Terukur</div>
@@ -106,7 +107,7 @@ function RequestHistoryRow({ requestId }: RequestHistoryRowProps) {
               </div>
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Titik Koordinat (Geo-Location)</div>
-                <div className="font-mono text-sm text-moss-900 font-bold">{request.gpsCoordinates}</div>
+                <div className="font-mono text-sm text-moss-900 font-bold">{cleanGPS(request.gpsCoordinates)}</div>
               </div>
               <div className="bg-[#F9FAF8] p-5 rounded-2xl border border-moss-100 col-span-2">
                 <div className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Wallet Pemilik</div>

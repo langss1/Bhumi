@@ -6,6 +6,9 @@ import { useAccount, useReadContract } from 'wagmi';
 import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
+import { supabase, getActivityByAsset, getAssetMeta, uploadDocumentToStorage, logActivity, getProfile } from '@/lib/supabase';
+import { pinFileToIPFS } from '@/lib/pinata';
+import { cleanNIB, cleanGPS } from '@/lib/formatters';
 
 // ─── Modal Sertifikat Digital (Template Resmi BPN) ──────────────────────────────
 function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, tokenId: number, owner: string, onClose: () => void }) {
@@ -235,7 +238,7 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-[10px] text-moss-400 font-black uppercase tracking-widest">NIB Sertifikat</p>
-                <p className="text-lg font-black text-moss-900">{land.nib}</p>
+                <p className="text-lg font-black text-moss-900">{cleanNIB(land.nib)}</p>
               </div>
               <button 
                 onClick={() => setShowCertificate(true)}
@@ -253,7 +256,7 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
               </div>
               <div className="bg-moss-50 rounded-xl p-3 border border-moss-100">
                 <p className="text-[9px] text-moss-400 font-black uppercase tracking-widest mb-0.5">GPS</p>
-                <p className="text-xs font-mono text-moss-800 truncate">{land.gpsCoordinates}</p>
+                <p className="text-xs font-mono text-moss-800 truncate">{cleanGPS(land.gpsCoordinates)}</p>
               </div>
             </div>
           </div>
