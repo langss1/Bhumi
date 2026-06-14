@@ -6,7 +6,7 @@ import { useReadContract, usePublicClient, useAccount } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';
-import { getAllAuditorComments, DBAuditorComment } from '@/lib/supabase';
+import { getAllAuditorComments, DBAuditorComment, addAuditorComment, getCommentsByToken } from '@/lib/supabase';
 import { useWalletGuard } from '@/hooks/useWalletGuard';
 // ─── Tipe data hasil pencarian ────────────────────────────────────────────────
 interface LandDetail {
@@ -78,6 +78,52 @@ function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
 // ─── Kartu hasil pencarian ────────────────────────────────────────────────────
 function LandResultCard({ land }: { land: LandDetail }) {
   const [showHistory, setShowHistory] = useState(false);
+  const { address: walletAddress } = useAccount();
+
+  // ── Audit Comments State ──
+  const [comments, setComments] = useState<DBAuditorComment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [commentCategory, setCommentCategory] = useState<'general' | 'warning' | 'dispute' | 'compliance'>('general');
+  const [showComments, setShowComments] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (showComments) {
+      loadComments();
+    }
+  }, [showComments]);
+
+  const loadComments = async () => {
+    const data = await getCommentsByToken(land.tokenId);
+    setComments(data);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim() || !walletAddress) return;
+    try {
+      setIsSubmitting(true);
+      const result = await addAuditorComment({
+        token_id: land.tokenId,
+        nib: land.nib,
+        auditor_wallet: walletAddress as string,
+        auditor_name: null,
+        comment: newComment.trim(),
+        category: commentCategory,
+      });
+
+      if (result) {
+        setNewComment('');
+        setShowCommentForm(false);
+        await loadComments();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal mengirim komentar.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <motion.div
@@ -198,12 +244,7 @@ function LandResultCard({ land }: { land: LandDetail }) {
                       >
                         {idx + 1}
                       </div>
-                      <p className="text-xs font-mono text-moss-700 break-all">{addr}</p>
-                      {idx === land.ownershipHistory.length - 1 && (
-                        <span className="text-[9px] font-black text-olive-700 bg-olive-100 px-2 py-0.5 rounded uppercase tracking-wider shrink-0">
-                          Pemilik Kini
-                        </span>
-                      )}
+                      <span className="text-xs font-mono font-bold">{addr}</span>
                     </div>
                   ))}
                 </div>
@@ -212,6 +253,136 @@ function LandResultCard({ land }: { land: LandDetail }) {
           </AnimatePresence>
         </div>
       )}
+
+      {/* ── Catatan Audit ── */}
+      <div className="px-10 pb-8">
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center gap-2 text-[11px] font-bold text-moss-500 uppercase tracking-widest hover:text-moss-800 transition-colors"
+        >
+          <svg
+            className={`w-4 h-4 transition-transform ${showComments ? 'rotate-90' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          Catatan Audit ({showComments ? comments.length : 'Buka'})
+        </button>
+
+        <AnimatePresence>
+          {showComments && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 border border-moss-100 rounded-2xl p-6 bg-slate-50/50">
+                <div className="flex items-center justify-between mb-6">
+                  <h4 className="text-sm font-black text-moss-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-moss-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    Catatan Audit ({comments.length})
+                  </h4>
+                  {!showCommentForm && (
+                    <button
+                      onClick={() => setShowCommentForm(true)}
+                      className="px-4 py-2 bg-moss-900 text-white text-xs font-bold rounded-lg hover:bg-moss-800 transition-colors flex items-center gap-2"
+                    >
+                      <span>+</span> Tambah Catatan
+                    </button>
+                  )}
+                </div>
+
+                {showCommentForm && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 p-4 bg-white border border-moss-200 rounded-xl shadow-sm"
+                  >
+                    <div className="mb-4">
+                      <label className="block text-[10px] font-bold text-moss-500 uppercase tracking-widest mb-2">
+                        Kategori Temuan
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(CATEGORY_STYLES).map(([cat, style]) => (
+                          <button
+                            key={cat}
+                            onClick={() => setCommentCategory(cat as any)}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-md border transition-all ${
+                              commentCategory === cat
+                                ? style.color + ' ring-2 ring-offset-1 ring-moss-300'
+                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                            }`}
+                          >
+                            {style.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Tulis hasil temuan audit atau masalah pada dokumen warkah..."
+                      className="w-full p-3 bg-slate-50 border border-moss-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-olive-500 outline-none transition-all resize-y min-h-[100px]"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        onClick={() => { setShowCommentForm(false); setNewComment(''); }}
+                        className="px-4 py-2 text-xs font-bold text-moss-600 hover:bg-moss-50 rounded-lg transition-colors"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={handleSubmitComment}
+                        disabled={isSubmitting || !newComment.trim()}
+                        className="px-5 py-2 bg-moss-700 text-white text-xs font-bold rounded-lg hover:bg-moss-800 transition-colors disabled:opacity-50"
+                      >
+                        {isSubmitting ? 'Menyimpan...' : 'Simpan Catatan'}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {comments.length > 0 ? (
+                  <div className="space-y-4">
+                    {comments.map((c) => {
+                      const style = CATEGORY_STYLES[c.category] || CATEGORY_STYLES.general;
+                      return (
+                        <div key={c.id} className="p-4 bg-white border border-slate-200 rounded-xl relative group">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] font-mono text-slate-500">
+                                {new Date(c.created_at).toLocaleString('id-ID')}
+                              </span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${style.color}`}>
+                                {style.label}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-slate-700 leading-relaxed">{c.comment}</p>
+                          <div className="mt-3 pt-3 border-t border-slate-100">
+                            <span className="text-xs text-slate-500 flex items-center gap-2">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                              <span className="font-mono">{c.auditor_wallet.substring(0,6)}...{c.auditor_wallet.substring(38)}</span>
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : !showCommentForm && (
+                  <div className="text-center py-6 text-slate-400">
+                    <p className="text-sm">Belum ada catatan audit untuk token ini.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
