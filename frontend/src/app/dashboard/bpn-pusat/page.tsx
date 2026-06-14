@@ -25,7 +25,7 @@ export default function BpnPusatDashboard() {
 
   const tabs = [
     { id: 'validation', label: 'Validasi Pendaftaran Tanah' },
-    { id: 'account', label: 'Verifikasi Pejabat / Institusi' },
+    { id: 'account', label: 'Verifikasi Akun' },
     { id: 'ledger', label: 'Master Ledger Blockchain' },
     { id: 'sengketa', label: 'Manajemen Sengketa' }
   ];
