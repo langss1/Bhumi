@@ -264,19 +264,19 @@ export default function NotarisDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-8 md:mb-10 p-1.5 bg-moss-900/5 border border-moss-900/10 rounded-2xl w-fit overflow-x-auto no-scrollbar">
+      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative px-6 py-3 text-xs md:text-sm font-bold tracking-wider uppercase rounded-xl transition-all duration-300 shrink-0 ${
-              activeTab === tab.id ? 'text-amber-900 shadow-sm' : 'text-moss-500 hover:text-moss-800 hover:bg-moss-900/5'
+            className={`relative px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold tracking-wide transition-colors shrink-0 ${
+              activeTab === tab.id ? 'text-moss-900 font-extrabold' : 'text-moss-400 hover:text-moss-700'
             }`}
           >
+            {tab.label}
             {activeTab === tab.id && (
-              <motion.div layoutId="notarisTab" className="absolute inset-0 bg-gradient-to-r from-amber-100 to-amber-200 border border-amber-300/50 rounded-xl" />
+              <motion.div layoutId="notarisTab" className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 rounded-t-full" />
             )}
-            <span className="relative z-10">{tab.label}</span>
           </button>
         ))}
       </div>
