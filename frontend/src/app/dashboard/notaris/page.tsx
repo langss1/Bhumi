@@ -111,69 +111,59 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-gradient-to-b from-white to-[#FAFAFA] border border-amber-200 rounded-[2rem] p-8 shadow-xl shadow-amber-900/5 hover:shadow-2xl hover:shadow-amber-900/10 transition-all duration-500 relative overflow-hidden group"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white border border-amber-100 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700"></div>
-      
       {/* Status badge */}
       <div className="absolute top-6 right-6">
-        <span className="flex items-center gap-2 text-[10px] font-black text-amber-700 bg-amber-50 px-4 py-2 rounded-full border border-amber-200 uppercase tracking-widest shadow-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-          </span>
-          Menunggu Eksekusi
+        <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200 uppercase tracking-widest">
+          Menunggu Notaris
         </span>
       </div>
 
-      <div className="mb-8 relative z-10">
-        <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">NFT Token</p>
-        <p className="text-4xl font-black text-moss-900 font-display tracking-tight mb-2">#{tokenId}</p>
+      <div className="mb-6">
+        <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">NFT Token</p>
+        <p className="text-2xl font-black text-moss-900">#{tokenId}</p>
         {land && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-moss-50 border border-moss-100 rounded-lg">
-            <span className="text-[10px] font-bold text-moss-400 uppercase tracking-widest">NIB</span>
-            <span className="text-xs font-mono text-moss-800">{cleanNIB(land.nib)}</span>
-          </div>
+          <p className="text-sm text-moss-600 font-mono mt-1">NIB: {cleanNIB(land.nib)}</p>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8 relative z-10">
-        <div className="bg-white rounded-2xl p-5 border border-moss-200 shadow-sm">
-          <p className="text-[9px] font-black text-moss-400 uppercase tracking-widest mb-2">Penjual (Seller)</p>
-          <p className="text-xs font-mono text-moss-900 truncate bg-moss-50 px-2 py-1 rounded">{transfer[0] as string}</p>
-          <div className="mt-3 flex items-center gap-2 bg-emerald-50 w-fit px-2.5 py-1.5 rounded-md border border-emerald-100">
-            <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Telah Menyetujui</span>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-moss-50 rounded-2xl p-4 border border-moss-100">
+          <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Penjual (Seller)</p>
+          <p className="text-xs font-mono text-moss-700 truncate">{transfer[0] as string}</p>
+          <div className="mt-2 flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <span className="text-[10px] font-bold text-emerald-600">Sudah Setuju</span>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-moss-200 shadow-sm">
-          <p className="text-[9px] font-black text-moss-400 uppercase tracking-widest mb-2">Pembeli (Buyer)</p>
-          <p className="text-xs font-mono text-moss-900 truncate bg-moss-50 px-2 py-1 rounded">{transfer[1] as string}</p>
-          <div className="mt-3 flex items-center gap-2 bg-emerald-50 w-fit px-2.5 py-1.5 rounded-md border border-emerald-100">
-            <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Telah Menyetujui</span>
+        <div className="bg-moss-50 rounded-2xl p-4 border border-moss-100">
+          <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest mb-1">Pembeli (Buyer)</p>
+          <p className="text-xs font-mono text-moss-700 truncate">{transfer[1] as string}</p>
+          <div className="mt-2 flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <span className="text-[10px] font-bold text-emerald-600">Sudah Setuju</span>
           </div>
         </div>
       </div>
 
       {/* Upload AJB */}
-      <div className="pt-8 border-t border-moss-100/80 space-y-5 relative z-10">
+      <div className="pt-6 border-t border-moss-100 space-y-4">
         <div>
-          <label className="block text-[11px] font-black text-moss-900 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-            Upload Akta Jual Beli (AJB)
+          <label className="block text-[11px] font-black text-moss-500 uppercase tracking-widest mb-3">
+            Upload Akta Jual Beli (AJB) — Tanda Tangan Notaris
           </label>
-          <label className="flex flex-col sm:flex-row items-center gap-5 bg-white border-2 border-dashed border-amber-300 hover:border-amber-500 rounded-2xl p-6 hover:bg-amber-50/30 transition-all cursor-pointer group shadow-sm">
-            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-200 group-hover:scale-110 transition-transform shrink-0 shadow-inner">
-              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <label className="flex items-center gap-4 border-2 border-dashed border-amber-200 rounded-2xl p-5 hover:bg-amber-50/50 transition-all cursor-pointer group">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-amber-100 group-hover:border-amber-300 transition-colors shrink-0">
+              <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
             </div>
-            <div className="text-center sm:text-left">
-              <p className="text-sm font-bold text-moss-900 mb-1">{ajbFile ? ajbFile.name : 'Pilih file AJB (PDF / Scan)'}</p>
-              <p className="text-[11px] text-moss-500">Scan dokumen fisik AJB resmi yang telah ditandatangani oleh semua pihak</p>
+            <div>
+              <p className="text-sm font-bold text-moss-800">{ajbFile ? ajbFile.name : 'Pilih file AJB (PDF/Scan)'}</p>
+              <p className="text-[10px] text-moss-400">Scan dokumen fisik AJB yang sudah ditandatangani</p>
             </div>
             <input type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => {
               if (e.target.files?.[0]) setAjbFile(e.target.files[0]);
@@ -182,32 +172,17 @@ function TransferRequestCard({ tokenId }: { tokenId: number }) {
         </div>
 
         {uploadedHash && (
-          <div className="p-4 bg-emerald-50 rounded-xl text-xs font-mono text-emerald-700 border border-emerald-200 break-all flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            </div>
-            <div>
-              <p className="font-bold text-emerald-900 mb-0.5 font-sans text-[10px] uppercase tracking-widest">Upload Berhasil</p>
-              {uploadedHash}
-            </div>
+          <div className="p-4 bg-emerald-50 rounded-xl text-xs font-mono text-emerald-700 border border-emerald-100 break-all">
+            ✅ AJB berhasil di-upload! Hash IPFS: {uploadedHash}
           </div>
         )}
 
         <button
           onClick={handleExecute}
           disabled={isUploading || isExecPending || (!ajbFile && !uploadedHash)}
-          className="w-full py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-black rounded-2xl shadow-xl shadow-amber-900/20 transition-all disabled:opacity-50 text-sm uppercase tracking-widest flex items-center justify-center gap-3"
+          className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black rounded-2xl shadow-lg shadow-amber-200 transition-all disabled:opacity-50 text-sm uppercase tracking-wide"
         >
-          {isUploading ? (
-            <><svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Mengunggah AJB...</>
-          ) : isExecPending ? (
-            <><svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Mengeksekusi Blockchain...</>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-              Sahkan & Eksekusi Balik Nama
-            </>
-          )}
+          {isUploading ? '1. Mengunggah AJB ke IPFS...' : isExecPending ? '2. Mengeksekusi Transfer di Blockchain...' : '⚖️ Eksekusi Balik Nama (Tanda Tangan Notaris)'}
         </button>
       </div>
     </motion.div>
@@ -238,26 +213,18 @@ export default function NotarisDashboard() {
   return (
     <div className="h-full flex flex-col">
       {/* Header Info Role */}
-      <div className="relative mb-8 md:mb-12 rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-[#1E211A] via-[#161813] to-[#0A0B09] border border-amber-900/30 shadow-2xl shadow-amber-900/20 group">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
-        <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 group-hover:bg-amber-500/20 transition-all duration-1000"></div>
-        
-        <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
-          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-amber-500 to-amber-700 rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-amber-900/50 border border-amber-400/20">
-            <svg className="w-10 h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      <div className="mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-3xl">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center border border-amber-200 shrink-0">
+            <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 mb-3">
-              <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]"></div>
-              <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">Authority Node</span>
-            </div>
-            <h3 className="font-display font-black text-white text-2xl md:text-4xl mb-3 tracking-tight">
-              Notaris / PPAT <span className="text-amber-500">— Transfer Executor</span>
-            </h3>
-            <p className="text-sm md:text-base text-moss-300 leading-relaxed max-w-3xl">
-              Anda adalah <strong className="text-amber-400">tanda tangan ketiga</strong> dalam sistem Multi-Signature. Anda tidak mendaftarkan tanah baru — tugas Anda adalah mengeksekusi balik nama setelah Penjual & Pembeli sama-sama menyetujui. Upload Akta Jual Beli (AJB) ke IPFS, lalu sahkan dokumen.
+            <h3 className="font-black text-amber-900 text-lg">Notaris / PPAT — Transfer Executor</h3>
+            <p className="text-sm text-amber-700 mt-1 leading-relaxed">
+              Anda adalah <strong>tanda tangan ketiga</strong> dalam sistem Multi-Signature. Anda <strong>tidak mendaftarkan tanah baru</strong> — tugas Anda adalah mengeksekusi balik nama setelah Penjual & Pembeli sama-sama menyetujui.
+              Upload Akta Jual Beli (AJB) ke IPFS, lalu jalankan <code className="bg-amber-100 px-1 rounded">approveTransferNotaris()</code>.
             </p>
           </div>
         </div>
@@ -320,43 +287,31 @@ export default function NotarisDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-gradient-to-br from-white to-[#F9FAF8] border border-amber-100 p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-amber-900/5 max-w-3xl mx-auto relative overflow-hidden"
+              className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-2xl"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-              
-              <div className="relative z-10 text-center mb-10">
-                <div className="w-16 h-16 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-600 shadow-inner">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
-                </div>
-                <h3 className="text-3xl font-black text-moss-900 mb-3 tracking-tight font-display">Cari Token Transfer</h3>
-                <p className="text-moss-500 max-w-md mx-auto leading-relaxed">
-                  Masukkan ID Token NFT secara langsung untuk memeriksa status dan mengeksekusi transfer-nya.
-                </p>
-              </div>
+              <h3 className="text-2xl font-black text-moss-900 mb-2">Cari Token Transfer</h3>
+              <p className="text-sm text-moss-500 mb-8">
+                Masukkan ID Token NFT secara langsung untuk memeriksa status transfer-nya.
+              </p>
 
-              <div className="relative flex items-center gap-3 bg-white p-2.5 rounded-2xl border border-moss-200 shadow-sm focus-within:ring-4 focus-within:ring-amber-500/20 focus-within:border-amber-400 transition-all mb-8">
-                <div className="pl-4 text-moss-400">
-                  <span className="font-black text-xl">#</span>
-                </div>
+              <div className="flex gap-4 mb-8">
                 <input
                   type="number"
                   value={searchTokenId}
                   onChange={(e) => setSearchTokenId(e.target.value)}
-                  placeholder="Masukkan ID Token (misal: 0, 1...)"
-                  className="flex-1 py-4 bg-transparent outline-none font-mono text-xl text-moss-900 placeholder:text-moss-300 placeholder:font-sans"
+                  placeholder="Masukkan ID Token (misal: 0, 1, 2...)"
+                  className="flex-1 p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-amber-500 transition-all"
                 />
                 <button
                   onClick={() => setSearchedId(Number(searchTokenId))}
-                  className="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black rounded-xl transition-all shadow-md shadow-amber-900/20 uppercase tracking-widest text-xs"
+                  className="px-8 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition-all"
                 >
-                  Cari Data
+                  Cari
                 </button>
               </div>
 
               {searchedId !== null && (
-                <div className="mt-8 border-t border-moss-100/80 pt-8 relative z-10">
-                  <TransferRequestCard key={searchedId} tokenId={searchedId} />
-                </div>
+                <TransferRequestCard tokenId={searchedId} />
               )}
             </motion.div>
           )}
