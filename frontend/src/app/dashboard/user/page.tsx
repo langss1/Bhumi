@@ -702,6 +702,9 @@ export default function UserDashboard() {
         )}
       </div>
 
+      <div className="bg-red-500 p-10 text-white text-3xl font-black rounded-lg mb-10">
+        TABS ARE RENDERED HERE!
+      </div>
       <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
         {tabs.map((tab) => (
           <button
