@@ -1,9 +1,12 @@
-import { useWriteContract, usePublicClient } from 'wagmi';
+import { useWriteContract, usePublicClient, useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 import Swal from 'sweetalert2';
 
 export function useSafeWriteContract() {
   const { writeContractAsync, writeContract, ...rest } = useWriteContract();
   const publicClient = usePublicClient();
+  const { isConnected } = useAccount();
+  const { connectAsync, connectors } = useConnect();
 
   const checkSLA = async (): Promise<boolean> => {
     try {
@@ -40,6 +43,19 @@ export function useSafeWriteContract() {
   };
 
   const safeWriteContractAsync = async (args: any, options?: any) => {
+    if (!isConnected) {
+      try {
+        await connectAsync({ connector: connectors[0] });
+      } catch (err) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Dompet Belum Terhubung',
+          text: 'Harap hubungkan dompet MetaMask Anda untuk melakukan transaksi di Blockchain.',
+        });
+        throw new Error("WALLET_NOT_CONNECTED");
+      }
+    }
+
     const isSafe = await checkSLA();
     if (!isSafe) {
       // Lempar error diam-diam agar proses isPending di UI berhenti tanpa crash
@@ -55,7 +71,21 @@ export function useSafeWriteContract() {
     }
   };
 
-  const safeWriteContract = (args: any, options?: any) => {
+  const safeWriteContract = async (args: any, options?: any) => {
+    if (!isConnected) {
+      try {
+        await connectAsync({ connector: connectors[0] });
+      } catch (err) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Dompet Belum Terhubung',
+          text: 'Harap hubungkan dompet MetaMask Anda untuk melakukan transaksi di Blockchain.',
+        });
+        if (options?.onError) options.onError(new Error("WALLET_NOT_CONNECTED"));
+        return;
+      }
+    }
+
     checkSLA().then(isSafe => {
       if (isSafe) {
         writeContract(args, {
