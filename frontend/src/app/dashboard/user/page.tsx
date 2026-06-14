@@ -332,139 +332,127 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
   );
 }
 
-// ─── Komponen Konfirmasi Pembelian (Sebagai Buyer) ─────────────────────────────
-function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefined }) {
-  const [tokenIdInput, setTokenIdInput] = useState('');
-  const [checkedId, setCheckedId] = useState<number | null>(null);
-
+// Komponen untuk me-render satu pengajuan transfer yang masuk ke user ini
+function IncomingTransferCard({ tokenId, activeAddress }: { tokenId: number, activeAddress: string }) {
   const { data: transferReq } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'transferRequests',
-    args: [checkedId !== null ? BigInt(checkedId) : BigInt(0)],
-    query: { enabled: checkedId !== null },
+    args: [BigInt(tokenId)],
   });
 
   const { data: landData } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
     functionName: 'getLandDetails',
-    args: [checkedId !== null ? BigInt(checkedId) : BigInt(0)],
-    query: { enabled: checkedId !== null },
+    args: [BigInt(tokenId)],
   });
 
+  const { writeContract: approveBuy, isPending: isApproving } = useWriteContract();
+
+  if (!transferReq || !(transferReq[6] as unknown as boolean)) return null;
+  
+  const buyerAddr = transferReq[1] as string;
+  if (buyerAddr.toLowerCase() !== activeAddress.toLowerCase()) return null;
+  
+  const buyerApproved = transferReq[4] as unknown as boolean;
+  
   const land = landData ? {
-    gpsCoordinates: (landData as any)[0],
     area: (landData as any)[1],
     nib: (landData as any)[2],
-    ipfsHashes: (landData as any)[3],
-    isDisputed: (landData as any)[4],
+    gpsCoordinates: (landData as any)[0],
   } : null;
 
-  const { writeContract: approveBuy, isPending: isApproving } = useWriteContract();
-  const address = activeAddress;
-
   const handleApprove = () => {
-    if (checkedId === null) return;
     approveBuy({
       address: LAND_REGISTRY_ADDRESS,
       abi: LandRegistryABI,
       functionName: 'approveTransferBuyer',
-      args: [BigInt(checkedId)],
-      
+      args: [BigInt(tokenId)],
     });
   };
 
-  const isActive = transferReq && (transferReq[6] as unknown as boolean);
-  const buyerAddr = transferReq ? (transferReq[1] as string) : '';
-  const buyerApproved = transferReq ? (transferReq[4] as unknown as boolean) : false;
-  const isMyTransfer = address && buyerAddr.toLowerCase() === address.toLowerCase();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-moss-50 rounded-2xl p-6 border border-moss-200 space-y-4 mb-4"
+    >
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest">NFT Token #{tokenId}</p>
+          {land && <p className="text-lg font-black text-moss-900 mt-0.5">NIB: {land.nib}</p>}
+        </div>
+        <span className={`text-[10px] font-black px-3 py-1 rounded-full border uppercase ${buyerApproved ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+          {buyerApproved ? '✅ Sudah Setuju' : '⏳ Belum Setuju'}
+        </span>
+      </div>
+
+      {land && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-xl p-3 border border-moss-100">
+            <p className="text-[9px] text-moss-400 uppercase tracking-widest font-black">Luas</p>
+            <p className="text-sm font-bold text-moss-800">{land.area.toString()} m²</p>
+          </div>
+          <div className="bg-white rounded-xl p-3 border border-moss-100">
+            <p className="text-[9px] text-moss-400 uppercase tracking-widest font-black">GPS</p>
+            <p className="text-xs font-mono text-moss-800 truncate">{land.gpsCoordinates}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white rounded-xl p-4 border border-moss-100">
+        <p className="text-[10px] text-moss-400 uppercase tracking-widest font-black mb-1">Penjual</p>
+        <p className="text-xs font-mono text-moss-700 truncate">{transferReq[0] as string}</p>
+      </div>
+
+      {!buyerApproved ? (
+        <button
+          onClick={handleApprove}
+          disabled={isApproving}
+          className="w-full py-4 bg-olive-500 hover:bg-olive-600 text-white font-black rounded-2xl shadow-lg shadow-olive-200 transition-all disabled:opacity-50 uppercase tracking-wide"
+        >
+          {isApproving ? 'Memproses...' : '✅ Setuju Beli (Approve Sebagai Pembeli)'}
+        </button>
+      ) : (
+        <div className="w-full py-3 bg-emerald-100 text-emerald-800 text-center font-bold rounded-2xl border border-emerald-200 text-sm">
+          Menunggu Notaris Mengeksekusi AJB...
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+function BuyerApprovalPanel({ activeAddress }: { activeAddress: string | undefined }) {
+  const { data: totalLands } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'getTotalLands',
+    query: { refetchInterval: 5000 },
+  });
+
+  const total = Number(totalLands || 0);
+
+  if (!activeAddress) return null;
 
   return (
     <div className="max-w-2xl">
       <div className="bg-white border border-moss-100 p-5 sm:p-10 rounded-3xl sm:rounded-[2rem] shadow-sm">
         <h3 className="text-xl sm:text-2xl font-black text-moss-900 mb-2">Konfirmasi Pembelian</h3>
         <p className="text-xs sm:text-sm text-moss-500 mb-6 sm:mb-8 leading-relaxed">
-          Jika seseorang mengajukan <strong>proposal jual beli</strong> tanah kepada Anda, masukkan ID Token-nya di bawah untuk melihat detail dan menyetujuinya. Setelah Anda setuju, transaksi diteruskan ke Notaris untuk pengesahan final.
+          Berikut adalah daftar <strong>proposal jual beli</strong> tanah yang ditujukan kepada Anda. Silakan periksa detailnya dan berikan persetujuan Anda agar transaksi dapat diteruskan ke Notaris.
         </p>
 
-        <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8">
-          <input
-            type="number"
-            value={tokenIdInput}
-            onChange={(e) => setTokenIdInput(e.target.value)}
-            placeholder="ID Token (0, 1, 2...)"
-            className="flex-1 p-3 sm:p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl font-mono text-xs sm:text-sm focus:ring-2 focus:ring-olive-500"
-          />
-          <button
-            onClick={() => setCheckedId(Number(tokenIdInput))}
-            className="px-4 sm:px-8 bg-moss-900 text-white font-bold rounded-xl hover:bg-moss-800 transition-all text-xs sm:text-sm shrink-0"
-          >
-            Periksa
-          </button>
-        </div>
-
-        {checkedId !== null && (
-          <AnimatePresence>
-            {isActive && isMyTransfer ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-moss-50 rounded-2xl p-6 border border-moss-200 space-y-4"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[10px] font-black text-moss-400 uppercase tracking-widest">NFT Token #{checkedId}</p>
-                    {land && <p className="text-lg font-black text-moss-900 mt-0.5">NIB: {land.nib}</p>}
-                  </div>
-                  <span className={`text-[10px] font-black px-3 py-1 rounded-full border uppercase ${buyerApproved ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                    {buyerApproved ? '✅ Sudah Setuju' : '⏳ Belum Setuju'}
-                  </span>
-                </div>
-
-                {land && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white rounded-xl p-3 border border-moss-100">
-                      <p className="text-[9px] text-moss-400 uppercase tracking-widest font-black">Luas</p>
-                      <p className="text-sm font-bold text-moss-800">{land.area.toString()} m²</p>
-                    </div>
-                    <div className="bg-white rounded-xl p-3 border border-moss-100">
-                      <p className="text-[9px] text-moss-400 uppercase tracking-widest font-black">GPS</p>
-                      <p className="text-xs font-mono text-moss-800 truncate">{land.gpsCoordinates}</p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-white rounded-xl p-4 border border-moss-100">
-                  <p className="text-[10px] text-moss-400 uppercase tracking-widest font-black mb-1">Penjual</p>
-                  <p className="text-xs font-mono text-moss-700 truncate">{transferReq[0] as string}</p>
-                </div>
-
-                {!buyerApproved ? (
-                  <button
-                    onClick={handleApprove}
-                    disabled={isApproving}
-                    className="w-full py-4 bg-olive-500 hover:bg-olive-600 text-white font-black rounded-2xl shadow-lg shadow-olive-200 transition-all disabled:opacity-50 uppercase tracking-wide"
-                  >
-                    {isApproving ? 'Memproses...' : '✅ Setuju Beli (Approve Sebagai Pembeli)'}
-                  </button>
-                ) : (
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-center">
-                    <p className="text-sm font-bold text-emerald-700">✅ Anda sudah menyetujui pembelian ini.</p>
-                    <p className="text-xs text-emerald-500 mt-1">Transaksi sekarang menunggu pengesahan dari Notaris/PPAT.</p>
-                  </div>
-                )}
-              </motion.div>
-            ) : isActive && !isMyTransfer ? (
-              <div className="p-6 bg-red-50 rounded-2xl border border-red-100 text-center">
-                <p className="text-sm font-bold text-red-600">🚫 Transfer aktif, namun Anda bukan pembeli yang ditunjuk untuk token ini.</p>
-              </div>
-            ) : (
-              <div className="p-6 bg-moss-50 rounded-2xl border border-moss-200 text-center">
-                <p className="text-sm font-bold text-moss-600">ℹ️ Tidak ada transfer aktif untuk Token #{checkedId}.</p>
-              </div>
-            )}
-          </AnimatePresence>
+        {total === 0 ? (
+          <div className="p-8 text-center bg-moss-50 border border-dashed border-moss-200 rounded-2xl">
+            <p className="text-moss-500 text-sm font-bold">Memindai data blockchain...</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {[...Array(total)].map((_, i) => (
+              <IncomingTransferCard key={i} tokenId={i} activeAddress={activeAddress} />
+            ))}
+          </div>
         )}
       </div>
     </div>
