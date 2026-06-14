@@ -71,8 +71,8 @@ export default function BpnPusatDashboard() {
           {activeTab === 'account' && (
             <motion.div key="account" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="mb-8">
-                <h3 className="text-2xl font-black text-moss-900">Verifikasi Pendaftaran Pejabat</h3>
-                <p className="text-sm text-moss-500 mt-2">Tinjau SK/Dokumen Institusi yang mendaftar dan berikan hak akses Smart Contract (On-Chain).</p>
+                <h3 className="text-2xl font-black text-moss-900">Verifikasi Akun</h3>
+                <p className="text-sm text-moss-500 mt-2">Tinjau bukti identitas pendaftar (Masyarakat/Institusi) dan berikan persetujuan akses ke dalam sistem.</p>
               </div>
               <PendingVerificators />
             </motion.div>
