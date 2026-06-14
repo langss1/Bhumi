@@ -255,23 +255,14 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Private Key</label>
-              <div className="relative group">
-                <div className={`w-full px-4 py-3 bg-black/40 border ${!showWallet ? 'border-moss-800 text-moss-500' : 'border-olive-500/50 text-emerald-400'} rounded-xl font-mono text-xs break-all transition-all shadow-inner`}>
-                  {showWallet ? profile.private_key || 'Tidak tersedia di database' : censorPrivateKey(profile.private_key)}
-                </div>
-                
-                {!showWallet && profile.private_key && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-moss-900/40 backdrop-blur-[2px] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <button 
-                      onClick={() => setShowPasswordModal(true)}
-                      className="px-5 py-2 bg-olive-500 hover:bg-olive-400 text-moss-900 font-black rounded-lg text-xs flex items-center gap-2 transition-all shadow-lg hover:-translate-y-0.5 hover:shadow-olive-500/50"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      Lihat Kunci
-                    </button>
-                  </div>
-                )}
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Private Key (Hashed)</label>
+              <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-xl mb-2 shadow-inner">
+                <p className="text-[10px] text-red-400 font-bold leading-relaxed">
+                  <span className="text-red-300">🔒 Kunci Permanen:</span> Private Key Anda telah di-hash secara satu arah (SHA-256) di database dan tidak dapat dilihat kembali. Kunci asli hanya dikirimkan 1x ke email Anda saat pendaftaran.
+                </p>
+              </div>
+              <div className="w-full px-4 py-3 bg-black/40 border border-moss-800 text-moss-500 rounded-xl font-mono text-[10px] sm:text-xs break-all shadow-inner">
+                {profile.private_key ? `${profile.private_key} (Hashed)` : 'Tidak tersedia di database'}
               </div>
             </div>
 
@@ -284,14 +275,7 @@ export default function ProfilePage() {
                   >
                     Salin Address
                   </button>
-                  {profile.private_key && (
-                    <button 
-                      onClick={() => { navigator.clipboard.writeText(profile.private_key); alert('Private Key disalin!'); }}
-                      className="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold rounded-xl text-xs transition-all hover:-translate-y-0.5"
-                    >
-                      Salin Key
-                    </button>
-                  )}
+
                   <button 
                     onClick={() => setShowWallet(false)}
                     className="flex-1 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/20 text-red-300 font-bold rounded-xl text-xs transition-all hover:-translate-y-0.5"

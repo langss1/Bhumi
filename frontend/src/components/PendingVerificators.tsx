@@ -96,6 +96,14 @@ export default function PendingVerificators() {
     return url;
   };
 
+  const hashPrivateKey = async (pk: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(pk);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
   const handleApprove = async (account: DBProfile) => {
     if (account.role === 'UMUM') {
       // Jalankan pembuatan wallet otomatis untuk Masyarakat Umum secara langsung (tanpa on-chain grantRole)
@@ -110,10 +118,13 @@ export default function PendingVerificators() {
         // Simpan ke Supabase secara langsung
         setTimeout(async () => {
           try {
+            // Hashing private key sebelum disimpan
+            const hashedPrivateKey = await hashPrivateKey(privateKey);
+
             const updates: Partial<DBProfile> = { 
               verification_status: 'APPROVED',
               wallet_address: targetAddress,
-              private_key: privateKey
+              private_key: hashedPrivateKey
             };
             const { error } = await updateProfile(account.id, updates);
             if (error) throw error;
