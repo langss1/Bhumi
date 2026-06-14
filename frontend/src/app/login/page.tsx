@@ -276,7 +276,7 @@ export default function LoginPage() {
                     </div>
                     
                     <div className="space-y-3">
-                      <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest">Simulasi Peran Akses</label>
+                      <label className="block text-xs font-bold text-moss-800 uppercase tracking-widest">Pilih Dasbor Tujuan</label>
                       <div className="relative">
                         <select 
                           value={simulatedRole} 

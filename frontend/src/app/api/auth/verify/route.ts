@@ -21,8 +21,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Signature tidak valid!' }, { status: 401 });
     }
 
-    // Simulasi pengecekan database Supabase (RBAC)
-    // Di produksi, kita akan melakukan query ke Supabase users table
+    // Pemetaan Role dari input Frontend ke Format Database Supabase
+    const roleMapping: Record<string, string> = {
+      'user': 'UMUM',
+      'bpn-wilayah': 'BPN_WILAYAH',
+      'notaris': 'NOTARIS',
+      'bpn-pusat': 'BPN_PUSAT',
+      'auditor': 'AUDITOR',
+    };
+
+    const targetDbRole = roleMapping[simulatedRole || 'user'];
+
+    // Verifikasi Role di Database Supabase
+    // Menggunakan fetch biasa atau Admin Client. Untuk amannya, kita panggil anonymous client dengan supabase service key jika ada, atau sekadar public anon.
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: profile, error: dbErr } = await supabase
+      .from('profiles')
+      .select('role')
+      .ilike('wallet_address', address as string)
+      .single();
+
+    if (dbErr || !profile) {
+      return NextResponse.json({ success: false, message: 'Wallet Anda belum terdaftar di sistem.' }, { status: 403 });
+    }
+
+    if (profile.role !== targetDbRole) {
+      return NextResponse.json({ success: false, message: `Akses ditolak. Wallet ini tidak memiliki izin untuk dasbor ${targetDbRole}.` }, { status: 403 });
+    }
+
     const role = simulatedRole || 'user';
     
     const response = NextResponse.json({ success: true, role });
@@ -32,7 +63,7 @@ export async function POST(request: Request) {
       name: 'user_role',
       value: role,
       path: '/',
-      httpOnly: false, // Set false for testing if frontend needs it, but middleware reads it either way
+      httpOnly: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24, // 1 hari
     });
