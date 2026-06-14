@@ -87,8 +87,7 @@ export default function BpnWilayahDashboard() {
     }
 
     // Validasi GPS (Format: Latitude, Longitude dengan spasi)
-    const gpsRegex = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/;
-    if (!gpsRegex.test(gps)) {
+    if (!/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(gps)) {
       setGpsError('Format salah. Contoh: -6.20, 106.81');
       hasError = true;
     }
