@@ -26,6 +26,11 @@ export default function BpnWilayahDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedHashes, setUploadedHashes] = useState<Record<string, string>>({});
   const [modal, setModal] = useState<{ isOpen: boolean; type: 'success' | 'error' | 'warning'; title: string; message: string; txHash?: string }>({ isOpen: false, type: 'success', title: '', message: '' });
+  
+  // Validation State
+  const [nibError, setNibError] = useState('');
+  const [gpsError, setGpsError] = useState('');
+  const [areaError, setAreaError] = useState('');
 
   const { writeContractAsync, isPending: isMintPending } = useWriteContract();
 
@@ -68,8 +73,36 @@ export default function BpnWilayahDashboard() {
   };
 
   const handleRegisterLand = async () => {
-    if (!walletAddress || !gps || !area || !nib || !warkahFile || !fotoFile) {
-      setModal({ isOpen: true, type: 'warning', title: 'Data Belum Lengkap', message: 'Harap lengkapi semua field dan unggah dokumen Warkah serta Foto Batas Patok.' });
+    // Reset errors
+    setNibError('');
+    setGpsError('');
+    setAreaError('');
+    let hasError = false;
+
+    // Validasi NIB (Harus 13 digit angka)
+    if (!/^\d{13}$/.test(nib)) {
+      setNibError('NIB harus terdiri dari tepat 13 digit angka.');
+      hasError = true;
+    }
+
+    // Validasi GPS (Format: Latitude, Longitude dengan spasi)
+    const gpsRegex = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/;
+    if (!gpsRegex.test(gps)) {
+      setGpsError('Format salah. Contoh: -6.20, 106.81');
+      hasError = true;
+    }
+
+    // Validasi Luas Tanah (Harus angka positif)
+    const areaNum = Number(area);
+    if (isNaN(areaNum) || areaNum <= 0) {
+      setAreaError('Luas tanah harus angka positif.');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    if (!walletAddress || !warkahFile || !fotoFile) {
+      setModal({ isOpen: true, type: 'warning', title: 'Data Belum Lengkap', message: 'Harap isi data pemilik, dokumen Warkah, dan Foto Batas Patok.' });
       return;
     }
 
@@ -240,16 +273,58 @@ export default function BpnWilayahDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="md:col-span-1">
-                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">NIB</label>
-                    <input type="text" value={nib} onChange={(e) => setNib(e.target.value)} placeholder="12345" className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all" />
+                    <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">NIB (13 Digit)</label>
+                    <input 
+                      type="text" 
+                      value={nib} 
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNib(val);
+                        if (val === '') setNibError('');
+                        else if (/[^0-9]/.test(val)) setNibError('Harus berupa angka');
+                        else if (val.length !== 13) setNibError('NIB harus persis 13 digit');
+                        else setNibError('');
+                      }} 
+                      placeholder="Contoh: 1234567890123" 
+                      className={`w-full p-4 bg-[#F9FAF8] border rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all outline-none ${nibError ? 'border-red-500 focus:ring-red-500 bg-red-50/30' : 'border-moss-200'}`} 
+                    />
+                    {nibError && <p className="text-red-500 text-[10px] font-bold mt-2 ml-1">{nibError}</p>}
                   </div>
                   <div className="md:col-span-1">
                     <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Koordinat GPS</label>
-                    <input type="text" value={gps} onChange={(e) => setGps(e.target.value)} placeholder="-6.20, 106.81" className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all" />
+                    <input 
+                      type="text" 
+                      value={gps} 
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setGps(val);
+                        if (val === '') setGpsError('');
+                        else if (!/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(val)) setGpsError('Format salah. Contoh: -6.20, 106.81');
+                        else setGpsError('');
+                      }} 
+                      placeholder="-6.20, 106.81" 
+                      className={`w-full p-4 bg-[#F9FAF8] border rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all outline-none ${gpsError ? 'border-red-500 focus:ring-red-500 bg-red-50/30' : 'border-moss-200'}`} 
+                    />
+                    {gpsError && <p className="text-red-500 text-[10px] font-bold mt-2 ml-1">{gpsError}</p>}
                   </div>
                   <div className="md:col-span-1">
                     <label className="block text-[11px] font-bold text-moss-500 uppercase tracking-widest mb-3">Luas (M²)</label>
-                    <input type="number" value={area} onChange={(e) => setArea(e.target.value)} placeholder="150" className="w-full p-4 bg-[#F9FAF8] border border-moss-200 rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all" />
+                    <input 
+                      type="text" 
+                      value={area} 
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setArea(val);
+                        const num = Number(val);
+                        if (val === '') setAreaError('');
+                        else if (/[^0-9.]/.test(val)) setAreaError('Harus berupa angka');
+                        else if (isNaN(num) || num <= 0) setAreaError('Harus angka positif');
+                        else setAreaError('');
+                      }} 
+                      placeholder="150" 
+                      className={`w-full p-4 bg-[#F9FAF8] border rounded-xl focus:ring-2 focus:ring-olive-500 text-sm font-mono transition-all outline-none ${areaError ? 'border-red-500 focus:ring-red-500 bg-red-50/30' : 'border-moss-200'}`} 
+                    />
+                    {areaError && <p className="text-red-500 text-[10px] font-bold mt-2 ml-1">{areaError}</p>}
                   </div>
                 </div>
                 
