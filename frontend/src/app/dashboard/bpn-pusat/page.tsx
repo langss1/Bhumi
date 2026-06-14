@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAccount } from 'wagmi';
 import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
+import { useWalletGuard } from '@/hooks/useWalletGuard';
 import LandLedger from '@/components/LandLedger';
 import PendingLandRequests from '@/components/PendingLandRequests';
 import PendingVerificators from '@/components/PendingVerificators';
