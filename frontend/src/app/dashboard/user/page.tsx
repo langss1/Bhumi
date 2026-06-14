@@ -271,10 +271,15 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
           ) : (
             <div className="flex gap-2">
               <button
-                onClick={() => setShowSellForm(!showSellForm)}
-                className="flex-1 py-3 bg-moss-900 hover:bg-moss-800 text-white text-[11px] font-black rounded-xl transition-colors uppercase tracking-wide"
+                onClick={() => !land.isDisputed && setShowSellForm(!showSellForm)}
+                disabled={land.isDisputed}
+                className={`flex-1 py-3 text-[11px] font-black rounded-xl transition-colors uppercase tracking-wide ${
+                  land.isDisputed 
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                    : 'bg-moss-900 hover:bg-moss-800 text-white'
+                }`}
               >
-                Ajukan Jual Beli
+                {land.isDisputed ? 'Aset Dibekukan (Sengketa)' : 'Ajukan Jual Beli'}
               </button>
             </div>
           )}
