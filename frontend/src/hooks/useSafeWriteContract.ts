@@ -45,13 +45,30 @@ export function useSafeWriteContract() {
       // Lempar error diam-diam agar proses isPending di UI berhenti tanpa crash
       throw new Error("SLA_VIOLATION");
     }
-    return writeContractAsync(args, options);
+    try {
+      return await writeContractAsync(args, options);
+    } catch (err: any) {
+      if (err?.message?.includes('Connector not connected')) {
+        throw new Error("Dompet MetaMask terputus. Pastikan MetaMask aktif dan muat ulang halaman jika perlu.");
+      }
+      throw err;
+    }
   };
 
   const safeWriteContract = (args: any, options?: any) => {
     checkSLA().then(isSafe => {
       if (isSafe) {
-        writeContract(args, options);
+        writeContract(args, {
+          ...options,
+          onError: (err: any) => {
+            if (err?.message?.includes('Connector not connected')) {
+              const customErr = new Error("Dompet MetaMask terputus. Pastikan MetaMask aktif dan muat ulang halaman jika perlu.");
+              if (options?.onError) options.onError(customErr);
+            } else {
+              if (options?.onError) options.onError(err);
+            }
+          }
+        });
       } else if (options?.onError) {
          options.onError(new Error("SLA_VIOLATION"));
       }
