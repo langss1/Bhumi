@@ -122,65 +122,71 @@ export default function ProfilePage() {
         <p className="text-sm text-moss-500 mt-2">Kelola informasi pribadi dan amankan dompet digital Anda.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
         {/* Kolom Kiri: Informasi Pribadi */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-3xl p-5 md:p-8 border border-moss-100 shadow-sm"
+          className="bg-moss-900 rounded-3xl p-5 md:p-6 border border-moss-800 shadow-2xl shadow-moss-900/30 relative overflow-hidden transition-all flex flex-col h-full"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-moss-50 rounded-xl">
-              <svg className="w-5 h-5 text-moss-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+          {/* Decorative Background */}
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-olive-600 rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
+
+          <div className="flex items-center gap-4 mb-6 pb-5 border-b border-moss-800 relative z-10 shrink-0">
+            <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl shadow-inner border border-white/10">
+              <svg className="w-5 h-5 text-olive-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
-            <h3 className="text-lg font-bold text-moss-900">Informasi Pribadi</h3>
+            <div>
+              <h3 className="text-lg font-black text-white">Informasi Pribadi</h3>
+              <p className="text-[11px] text-olive-200/70 mt-1 font-medium">Detail profil akun resmi Anda.</p>
+            </div>
           </div>
 
-          <div className="space-y-6">
-            <div>
-              <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Nama Lengkap</label>
+          <div className="space-y-4 relative z-10 flex-1 flex flex-col">
+            <div className="group">
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5 group-focus-within:text-emerald-400 transition-colors">Nama Lengkap</label>
               {isEditing ? (
                 <input 
                   type="text" 
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-moss-200 rounded-xl text-sm focus:ring-2 focus:ring-olive-500 outline-none transition-all"
+                  className="w-full px-4 py-3 bg-black/40 border-2 border-olive-500/50 rounded-xl text-sm font-bold text-emerald-400 focus:border-olive-400 outline-none transition-all shadow-inner"
                 />
               ) : (
-                <div className="px-4 py-3 bg-moss-50/50 border border-transparent rounded-xl text-sm font-semibold text-moss-800">
+                <div className="px-4 py-3 bg-black/20 border-2 border-moss-800 rounded-xl text-sm font-black text-emerald-100 shadow-inner">
                   {profile.full_name}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Email Akun (Terkunci)</label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium text-gray-500 flex justify-between items-center cursor-not-allowed">
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Email Akun (Terkunci)</label>
+              <div className="px-4 py-3 bg-black/40 border-2 border-moss-800 rounded-xl text-sm font-bold text-moss-500 flex justify-between items-center cursor-not-allowed shadow-inner">
                 {profile.email}
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                <svg className="w-4 h-4 text-moss-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
               </div>
             </div>
             
             <div>
-              <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Peran / Jabatan</label>
-              <div className="px-4 py-3 bg-olive-50 border border-olive-100 rounded-xl text-sm font-bold text-olive-700 w-max">
-                {profile.role}
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Peran / Jabatan</label>
+              <div className="px-4 py-2.5 bg-emerald-900/40 border border-emerald-500/30 rounded-lg text-sm font-black text-emerald-400 w-max tracking-wide shadow-inner">
+                {profile.role.replace('_', ' ')}
               </div>
             </div>
 
-            <div className="pt-4 border-t border-moss-50 flex justify-end gap-3">
+            <div className="pt-5 mt-auto flex justify-end gap-3 border-t border-moss-800">
               {isEditing ? (
                 <>
                   <button 
                     onClick={() => { setIsEditing(false); setFullName(profile.full_name || ''); }}
-                    className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-colors"
+                    className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-sm transition-all hover:-translate-y-0.5"
                   >
                     Batal
                   </button>
                   <button 
                     onClick={handleSaveProfile}
                     disabled={isSaving}
-                    className="px-6 py-2.5 bg-moss-800 hover:bg-moss-900 text-white font-bold rounded-xl text-sm transition-colors shadow-md disabled:opacity-50"
+                    className="px-5 py-2.5 bg-olive-500 hover:bg-olive-400 text-moss-900 font-black rounded-xl text-sm transition-all shadow-lg hover:shadow-olive-500/50 hover:-translate-y-0.5 disabled:opacity-50"
                   >
                     {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
                   </button>
@@ -188,7 +194,7 @@ export default function ProfilePage() {
               ) : (
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="px-6 py-2.5 bg-moss-100 hover:bg-moss-200 text-moss-700 font-bold rounded-xl text-sm transition-colors"
+                  className="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold rounded-xl text-sm transition-all hover:-translate-y-0.5"
                 >
                   Edit Profil
                 </button>
@@ -200,94 +206,102 @@ export default function ProfilePage() {
         {/* Kolom Kanan: Dompet Web3 */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-3xl p-5 md:p-8 border border-moss-100 shadow-sm h-max"
+          className="bg-moss-900 rounded-3xl p-5 md:p-6 border border-moss-800 shadow-2xl shadow-moss-900/30 relative overflow-hidden flex flex-col h-full"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-amber-50 rounded-xl">
-              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+          {/* Decorative Background */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-olive-500 rounded-full blur-[90px] opacity-20 pointer-events-none"></div>
+
+          <div className="flex items-center gap-4 mb-6 pb-5 border-b border-moss-800 relative z-10 shrink-0">
+            <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl shadow-inner border border-white/10">
+              <svg className="w-5 h-5 text-olive-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
             </div>
-            <h3 className="text-lg font-bold text-moss-900">Keamanan Dompet (Wallet)</h3>
+            <div>
+              <h3 className="text-lg font-black text-white">Keamanan Dompet</h3>
+              <p className="text-[11px] text-olive-200/70 mt-1 font-medium">Wallet Address & Private Key Anda.</p>
+            </div>
           </div>
 
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl mb-6">
-             <div className="flex gap-2">
-               <svg className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-               <p className="text-[10px] text-orange-800 font-bold leading-relaxed">
-                 Demi keamanan, <strong>Private Key</strong> dan <strong>Wallet Address</strong> Anda disembunyikan secara default. Jangan pernah membagikan Private Key Anda kepada siapapun.
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl mb-5 relative z-10 shrink-0">
+             <div className="flex gap-2.5 items-start">
+               <svg className="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+               <p className="text-[10px] text-red-200 font-medium leading-relaxed">
+                 Demi keamanan, <strong className="text-white">Private Key</strong> dan <strong className="text-white">Wallet Address</strong> Anda disembunyikan. Jangan berikan Private Key Anda ke siapapun.
                </p>
              </div>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Wallet Address (On-Chain)</label>
-            <div className="relative">
-              <div className={`w-full px-4 py-4 bg-moss-50 border border-moss-100 rounded-xl font-mono text-sm break-all ${!showWallet ? 'text-moss-400 select-none' : 'text-moss-900 font-semibold'}`}>
-                {showWallet ? profile.wallet_address || 'Belum Dibuat' : censorAddress(profile.wallet_address)}
-              </div>
-              
-              {!showWallet && profile.wallet_address && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-xl border border-transparent">
-                  <button 
-                    onClick={() => setShowPasswordModal(true)}
-                    className="px-5 py-2 bg-white border border-moss-200 shadow-sm hover:shadow-md hover:border-amber-300 text-moss-800 font-bold rounded-lg text-xs flex items-center gap-2 transition-all"
-                  >
-                    <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    Lihat Dompet
-                  </button>
+          <div className="space-y-4 relative z-10 flex-1 flex flex-col">
+            <div>
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Wallet Address (On-Chain)</label>
+              <div className="relative group">
+                <div className={`w-full px-4 py-3 bg-black/40 border ${!showWallet ? 'border-moss-800 text-moss-500' : 'border-olive-500/50 text-emerald-400'} rounded-xl font-mono text-xs break-all transition-all shadow-inner`}>
+                  {showWallet ? profile.wallet_address || 'Belum Dibuat' : censorAddress(profile.wallet_address)}
                 </div>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">Private Key</label>
-            <div className="relative">
-              <div className={`w-full px-4 py-4 bg-moss-50 border border-moss-100 rounded-xl font-mono text-sm break-all ${!showWallet ? 'text-moss-400 select-none' : 'text-moss-900 font-semibold'}`}>
-                {showWallet ? profile.private_key || 'Tidak tersedia di database' : censorPrivateKey(profile.private_key)}
+                
+                {!showWallet && profile.wallet_address && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-moss-900/40 backdrop-blur-[2px] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <button 
+                      onClick={() => setShowPasswordModal(true)}
+                      className="px-5 py-2 bg-olive-500 hover:bg-olive-400 text-moss-900 font-black rounded-lg text-xs flex items-center gap-2 transition-all shadow-lg hover:-translate-y-0.5 hover:shadow-olive-500/50"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      Lihat Dompet
+                    </button>
+                  </div>
+                )}
               </div>
-              
-              {!showWallet && profile.private_key && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-xl border border-transparent">
-                  <button 
-                    onClick={() => setShowPasswordModal(true)}
-                    className="px-5 py-2 bg-white border border-moss-200 shadow-sm hover:shadow-md hover:border-amber-300 text-moss-800 font-bold rounded-lg text-xs flex items-center gap-2 transition-all"
-                  >
-                    <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    Lihat Kunci
-                  </button>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-black text-olive-300/70 uppercase tracking-widest mb-1.5">Private Key</label>
+              <div className="relative group">
+                <div className={`w-full px-4 py-3 bg-black/40 border ${!showWallet ? 'border-moss-800 text-moss-500' : 'border-olive-500/50 text-emerald-400'} rounded-xl font-mono text-xs break-all transition-all shadow-inner`}>
+                  {showWallet ? profile.private_key || 'Tidak tersedia di database' : censorPrivateKey(profile.private_key)}
                 </div>
-              )}
+                
+                {!showWallet && profile.private_key && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-moss-900/40 backdrop-blur-[2px] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <button 
+                      onClick={() => setShowPasswordModal(true)}
+                      className="px-5 py-2 bg-olive-500 hover:bg-olive-400 text-moss-900 font-black rounded-lg text-xs flex items-center gap-2 transition-all shadow-lg hover:-translate-y-0.5 hover:shadow-olive-500/50"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      Lihat Kunci
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+
+            <AnimatePresence>
+              {showWallet && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-auto pt-5 flex gap-3 relative z-10 overflow-hidden">
+                  <button 
+                    onClick={() => { navigator.clipboard.writeText(profile.wallet_address); alert('Wallet disalin!'); }}
+                    className="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold rounded-xl text-xs transition-all hover:-translate-y-0.5"
+                  >
+                    Salin Address
+                  </button>
+                  {profile.private_key && (
+                    <button 
+                      onClick={() => { navigator.clipboard.writeText(profile.private_key); alert('Private Key disalin!'); }}
+                      className="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold rounded-xl text-xs transition-all hover:-translate-y-0.5"
+                    >
+                      Salin Key
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setShowWallet(false)}
+                    className="flex-1 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/20 text-red-300 font-bold rounded-xl text-xs transition-all hover:-translate-y-0.5"
+                  >
+                    Tutup
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-
-
-
-          {showWallet && (
-            <div className="mt-4 flex gap-3">
-              <button 
-                onClick={() => { navigator.clipboard.writeText(profile.wallet_address); alert('Wallet disalin!'); }}
-                className="flex-1 py-2.5 bg-moss-100 hover:bg-moss-200 text-moss-700 font-bold rounded-xl text-xs transition-colors"
-              >
-                Salin Address
-              </button>
-              {profile.private_key && (
-                <button 
-                  onClick={() => { navigator.clipboard.writeText(profile.private_key); alert('Private Key disalin!'); }}
-                  className="flex-1 py-2.5 bg-moss-100 hover:bg-moss-200 text-moss-700 font-bold rounded-xl text-xs transition-colors"
-                >
-                  Salin Private Key
-                </button>
-              )}
-              <button 
-                onClick={() => setShowWallet(false)}
-                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs transition-colors"
-              >
-                Sembunyikan
-              </button>
-            </div>
-          )}
         </motion.div>
       </div>
 
