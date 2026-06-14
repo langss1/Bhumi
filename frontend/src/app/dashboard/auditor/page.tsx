@@ -58,19 +58,19 @@ function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
       animate={{ opacity: 1 }}
       className={`p-6 rounded-3xl border-2 ${isDisputed ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div>
+      <div className="flex items-start justify-between mb-4 gap-4">
+        <div className="min-w-0 flex-1 pr-2">
           <p className="text-xs font-black text-moss-400 uppercase tracking-widest">Token #{tokenId}</p>
-          <p className="font-black text-moss-900">NIB: {land.nib}</p>
+          <p className="font-black text-moss-900 break-all">NIB: {land.nib}</p>
         </div>
         {isDisputed && (
-          <span className="text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
+          <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
         )}
         {hasActiveTransfer && !isDisputed && (
-          <span className="text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
+          <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
         )}
       </div>
-      <p className="text-xs text-moss-600">Luas: {land.area.toString()} m² | GPS: {land.gpsCoordinates}</p>
+      <p className="text-xs text-moss-600 break-all">Luas: {land.area.toString()} m² | GPS: {land.gpsCoordinates}</p>
     </motion.div>
   );
 }
@@ -478,7 +478,7 @@ export default function AuditorDashboard() {
         </div>
       </div>
 
-      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
