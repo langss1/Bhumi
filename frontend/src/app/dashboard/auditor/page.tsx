@@ -27,6 +27,14 @@ interface AnomalyDetail {
   area: bigint;
   isDisputed: boolean;
   hasActiveTransfer: boolean;
+  transferDetails?: {
+    seller: string;
+    buyer: string;
+    notaris: string;
+    sellerApproved: boolean;
+    buyerApproved: boolean;
+    notarisApproved: boolean;
+  };
 }
 
 // ─── Kartu Anomali dengan Komentar ────────────────────────────────────────────
@@ -40,6 +48,7 @@ function DisputedAssetChecker({ anomaly }: { anomaly: AnomalyDetail }) {
   const [showComments, setShowComments] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showTransferDetails, setShowTransferDetails] = useState(false);
 
   useEffect(() => {
     if (showComments) {
@@ -99,6 +108,87 @@ function DisputedAssetChecker({ anomaly }: { anomaly: AnomalyDetail }) {
         </div>
         <p className="text-xs text-moss-600 break-all">Luas: {anomaly.area.toString()} m² | GPS: {anomaly.gpsCoordinates}</p>
       </div>
+
+      {/* ── Rincian Pihak Terlibat ── */}
+      {anomaly.transferDetails && (
+        <div className="px-6 pb-2">
+          <div className="bg-amber-50/50 border border-amber-100 rounded-2xl overflow-hidden">
+            <button
+              onClick={() => setShowTransferDetails(!showTransferDetails)}
+              className="w-full flex items-center justify-between px-4 py-3 text-[11px] font-bold text-amber-700 uppercase tracking-widest hover:bg-amber-100/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <svg
+                  className={`w-4 h-4 transition-transform ${showTransferDetails ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                Pihak Terlibat Transfer
+              </div>
+            </button>
+            <AnimatePresence>
+              {showTransferDetails && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 pb-4 space-y-3 border-t border-amber-100 pt-3">
+                    {/* Penjual */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Penjual (Seller)</span>
+                        {anomaly.transferDetails.sellerApproved ? (
+                          <span className="text-[9px] font-black text-olive-700 bg-olive-50 px-2 py-0.5 rounded border border-olive-100 uppercase">✓ Disetujui</span>
+                        ) : (
+                          <span className="text-[9px] font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 uppercase">Menunggu</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-mono font-bold text-slate-700 break-all bg-white p-2 rounded-lg border border-slate-100">
+                        {anomaly.transferDetails.seller}
+                      </span>
+                    </div>
+
+                    {/* Pembeli */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Pembeli (Buyer)</span>
+                        {anomaly.transferDetails.buyerApproved ? (
+                          <span className="text-[9px] font-black text-olive-700 bg-olive-50 px-2 py-0.5 rounded border border-olive-100 uppercase">✓ Disetujui</span>
+                        ) : (
+                          <span className="text-[9px] font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 uppercase">Menunggu</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-mono font-bold text-slate-700 break-all bg-white p-2 rounded-lg border border-slate-100">
+                        {anomaly.transferDetails.buyer}
+                      </span>
+                    </div>
+
+                    {/* Notaris */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Notaris (PPAT)</span>
+                        {anomaly.transferDetails.notarisApproved ? (
+                          <span className="text-[9px] font-black text-olive-700 bg-olive-50 px-2 py-0.5 rounded border border-olive-100 uppercase">✓ Disetujui</span>
+                        ) : (
+                          <span className="text-[9px] font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 uppercase">Menunggu</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-mono font-bold text-slate-700 break-all bg-white p-2 rounded-lg border border-slate-100">
+                        {anomaly.transferDetails.notaris}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
 
       {/* ── Catatan Audit ── */}
       <div className="px-6 pb-6">
@@ -820,6 +910,14 @@ export default function AuditorDashboard() {
               nib: (landData as any)[2],
               isDisputed,
               hasActiveTransfer,
+              transferDetails: hasActiveTransfer ? {
+                seller: (transferReq as any)[0],
+                buyer: (transferReq as any)[1],
+                notaris: (transferReq as any)[2],
+                sellerApproved: (transferReq as any)[3],
+                buyerApproved: (transferReq as any)[4],
+                notarisApproved: (transferReq as any)[5],
+              } : undefined
             });
           }
         } catch (e) {
