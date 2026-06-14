@@ -910,7 +910,7 @@ export default function AuditorDashboard() {
               nib: (landData as any)[2],
               isDisputed,
               hasActiveTransfer,
-              transferDetails: hasActiveTransfer ? {
+              transferDetails: (transferReq && (transferReq as any)[0] !== '0x0000000000000000000000000000000000000000') ? {
                 seller: (transferReq as any)[0],
                 buyer: (transferReq as any)[1],
                 notaris: (transferReq as any)[2],
