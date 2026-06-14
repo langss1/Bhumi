@@ -30,6 +30,7 @@ services:
       - "30303:30303/udp" # P2P UDP
     volumes:
       - besu-data:/opt/besu/data
+      - ./blockchain/static-nodes.json:/opt/besu/data/static-nodes.json:ro
       - ./blockchain/genesis.json:/opt/besu/genesis.json:ro
       - ./docker/node-keys/${NODE_KEY_FILE:-node.key}:/opt/besu/node.key:ro
     environment:
