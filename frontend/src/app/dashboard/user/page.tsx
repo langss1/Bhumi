@@ -7,7 +7,7 @@ import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteCo
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { supabase, getActivityByAsset, getAssetMeta, uploadDocumentToStorage, logActivity, getProfile } from '@/lib/supabase';
-import { pinFileToIPFS } from '@/lib/pinata';
+
 import { cleanNIB, cleanGPS } from '@/lib/formatters';
 
 // ─── Modal Sertifikat Digital (Template Resmi BPN) ──────────────────────────────
