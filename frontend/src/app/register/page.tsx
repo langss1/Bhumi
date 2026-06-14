@@ -149,7 +149,7 @@ export default function RegisterPage() {
           className="relative z-10 flex items-center gap-4"
         >
           <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20">
-            <img src="/logo.png" alt="Bhumi Logo" className="h-10 w-10 object-contain brightness-0 invert" />
+            <img src="/logo.png" alt="Bhumi Logo" className="h-10 w-10 object-contain rounded-lg" />
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">Bhumi</h1>
         </motion.div>
