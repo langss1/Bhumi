@@ -68,6 +68,16 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24, // 1 hari
     });
 
+    // Set cookie terpisah untuk melacak wallet yang diverifikasi
+    response.cookies.set({
+      name: 'verified_wallet',
+      value: address as string,
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 1 hari
+    });
+
     return response;
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message || 'Server error' }, { status: 500 });

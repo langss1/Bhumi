@@ -563,6 +563,38 @@ export default function UserDashboard() {
     fetchProfile();
   }, []);
 
+  // Evaluasi Stale Session (Sesi Lama) dan Tentukan activeAddress
+  let activeAddress: string | undefined = undefined;
+
+  if (profile) {
+    // 1. Traditional Login: Ikuti dompet yang ada di database
+    activeAddress = profile.wallet_address || undefined;
+  } else {
+    // 2. Web3 Login: Ikuti dompet yang diverifikasi saat login (Cookie/LocalStorage)
+    const getCookie = (name: string) => {
+      if (typeof document === 'undefined') return null;
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+    const cookieWallet = getCookie('verified_wallet');
+    const localWallet = typeof window !== 'undefined' ? localStorage.getItem('connected_wallet') : null;
+    const verifiedWallet = cookieWallet || localWallet;
+
+    if (verifiedWallet) {
+      activeAddress = verifiedWallet;
+    } else {
+      // 3. Stale Session: Punya cookie user_role tapi tidak punya profile dan tidak punya verifiedWallet!
+      // Karena kita tidak tahu siapa ini, kita KICK OUT!
+      if (typeof window !== 'undefined' && document.cookie.includes('user_role=')) {
+        console.warn('⚠️ Stale Session Detected! No profile and no verified wallet.');
+        document.cookie = 'user_role=; Max-Age=0; path=/';
+        window.location.href = '/login?error=stale_session';
+      }
+    }
+  }
+
   const handleCloseStatusModal = () => {
     setShowStatusModal(false);
     if (profile && profile.id) {
@@ -570,8 +602,6 @@ export default function UserDashboard() {
       localStorage.setItem(`status_seen_${profile.id}_${profile.verification_status}`, 'true');
     }
   };
-
-  const activeAddress = profile?.wallet_address || address;
 
   const { data: totalLands } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
