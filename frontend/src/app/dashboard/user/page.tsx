@@ -173,10 +173,14 @@ function AssetCard({ tokenId, activeAddress }: { tokenId: number, activeAddress:
     }
   }, [showSellForm]);
 
-  // Hanya tampilkan jika milik user ini
-  if (!land || owner?.toLowerCase() !== address?.toLowerCase()) return null;
-
   const hasActiveTransfer = transferReq && (transferReq[6] as unknown as boolean);
+  const isSellerInActiveTransfer = hasActiveTransfer && (transferReq[0] as string).toLowerCase() === address?.toLowerCase();
+
+  // Hanya tampilkan jika milik user ini atau jika user adalah penjual yang sedang memproses transfer
+  if (!land) return null;
+  const isOwner = owner?.toLowerCase() === address?.toLowerCase();
+  
+  if (!isOwner && !isSellerInActiveTransfer) return null;
 
   const handlePropose = async () => {
     if (!buyerAddress || !buyerAddress.startsWith('0x')) {
