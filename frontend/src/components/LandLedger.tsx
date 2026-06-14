@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useReadContract, useAccount } from 'wagmi';
 import { LandRegistryABI } from '@/lib/abi';
@@ -283,6 +283,15 @@ function LandRow({ tokenId, showAuditComments = false }: LandRowProps) {
 
 export default function LandLedger({ showAuditComments = false }: { showAuditComments?: boolean }) {
   const [currentPage, setCurrentPage] = useState(1);
+  const tableTopRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll ke atas saat pindah halaman
+  useEffect(() => {
+    if (tableTopRef.current) {
+      // scroll-mt-32 akan menyisakan ruang agar tab di atas tidak tertutup
+      tableTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
   const { data: totalLands, isLoading: isCountLoading } = useReadContract({
     address: LAND_REGISTRY_ADDRESS,
     abi: LandRegistryABI,
@@ -324,7 +333,7 @@ export default function LandLedger({ showAuditComments = false }: { showAuditCom
   };
 
   return (
-    <div className="bg-white border border-moss-100 rounded-[2rem] shadow-sm overflow-hidden">
+    <div ref={tableTopRef} className="bg-white border border-moss-100 rounded-[2rem] shadow-sm overflow-hidden scroll-mt-32">
       {/* Header with count */}
       <div className="px-6 py-4 bg-[#F9FAF8] border-b border-moss-100 flex items-center justify-between">
         <span className="text-xs font-bold text-moss-500">
