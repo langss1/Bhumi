@@ -1,0 +1,41 @@
+name: 🧪 E2E Web3 Testing on Vercel Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      # Wait for Vercel preview deployment to be ready
+      - name: ⏳ Wait for Vercel Preview URL
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        id: vercel_preview
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 300
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🎭 Install Playwright Browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: 🚀 Run Synpress/Playwright E2E Tests
+        working-directory: ./frontend
+        env:
+          BASE_URL: ${{ steps.vercel_preview.outputs.url }}
+          SECRET_WORDS: ${{ secrets.METAMASK_MNEMONIC }}
+          NETWORK_RPC: ${{ secrets.RPC_URL }}
+        run: npm run test:e2e
