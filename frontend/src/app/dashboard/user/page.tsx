@@ -702,24 +702,25 @@ export default function UserDashboard() {
         )}
       </div>
 
-      <div className="bg-red-500 p-10 text-white text-3xl font-black rounded-lg mb-10">
-        TABS ARE RENDERED HERE!
-      </div>
-      <div className="flex gap-2 md:gap-4 mb-6 md:mb-10 border-b border-moss-100 pb-px overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`relative px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold tracking-wide transition-colors shrink-0 ${
-              activeTab === tab.id ? 'text-moss-900 font-extrabold' : 'text-moss-400 hover:text-moss-700'
-            }`}
-          >
-            {tab.label}
-            {activeTab === tab.id && (
-              <motion.div layoutId="userTab" className="absolute bottom-0 left-0 right-0 h-1 bg-olive-500 rounded-t-full" />
-            )}
-          </button>
-        ))}
+      <div style={{ backgroundColor: 'yellow', padding: '30px', margin: '20px 0', border: '5px solid black', display: 'flex', gap: '20px' }}>
+        <button
+          onClick={() => setActiveTab('gallery')}
+          style={{ backgroundColor: activeTab === 'gallery' ? 'black' : 'white', color: activeTab === 'gallery' ? 'white' : 'black', padding: '15px 30px', fontSize: '20px', fontWeight: 'bold', border: '2px solid black', cursor: 'pointer' }}
+        >
+          🏡 Galeri Aset Saya
+        </button>
+        <button
+          onClick={() => setActiveTab('tracking')}
+          style={{ backgroundColor: activeTab === 'tracking' ? 'black' : 'white', color: activeTab === 'tracking' ? 'white' : 'black', padding: '15px 30px', fontSize: '20px', fontWeight: 'bold', border: '2px solid black', cursor: 'pointer' }}
+        >
+          ⏳ Pelacakan Status
+        </button>
+        <button
+          onClick={() => setActiveTab('transfer')}
+          style={{ backgroundColor: activeTab === 'transfer' ? 'black' : 'white', color: activeTab === 'transfer' ? 'white' : 'black', padding: '15px 30px', fontSize: '20px', fontWeight: 'bold', border: '2px solid black', cursor: 'pointer' }}
+        >
+          🤝 Konfirmasi Pembelian
+        </button>
       </div>
 
       <div className="flex-1">
