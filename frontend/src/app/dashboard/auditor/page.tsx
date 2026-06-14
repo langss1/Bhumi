@@ -20,60 +20,214 @@ interface LandDetail {
   ownershipHistory: string[];
 }
 
-// ─── Komponen cek sengketa per aset ───────────────────────────────────────────
-function DisputedAssetChecker({ tokenId }: { tokenId: number }) {
-  const { data: landData } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'getLandDetails',
-    args: [BigInt(tokenId)],
-  });
+interface AnomalyDetail {
+  tokenId: number;
+  nib: string;
+  gpsCoordinates: string;
+  area: bigint;
+  isDisputed: boolean;
+  hasActiveTransfer: boolean;
+}
 
-  const land = landData ? {
-    gpsCoordinates: (landData as any)[0],
-    area: (landData as any)[1],
-    nib: (landData as any)[2],
-    ipfsHashes: (landData as any)[3],
-    isDisputed: (landData as any)[4],
-  } : null;
+// ─── Kartu Anomali dengan Komentar ────────────────────────────────────────────
+function DisputedAssetChecker({ anomaly }: { anomaly: AnomalyDetail }) {
+  const { address: walletAddress } = useAccount();
 
-  const { data: transferReq } = useReadContract({
-    address: LAND_REGISTRY_ADDRESS,
-    abi: LandRegistryABI,
-    functionName: 'transferRequests',
-    args: [BigInt(tokenId)],
-  });
+  // ── Audit Comments State ──
+  const [comments, setComments] = useState<DBAuditorComment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [commentCategory, setCommentCategory] = useState<'general' | 'warning' | 'dispute' | 'compliance'>('warning');
+  const [showComments, setShowComments] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!land || !land.nib) return null;
+  useEffect(() => {
+    if (showComments) {
+      loadComments();
+    }
+  }, [showComments]);
 
-  const isDisputed = land.isDisputed;
-  const hasActiveTransfer = transferReq && (transferReq[6] as unknown as boolean);
+  const loadComments = async () => {
+    const data = await getCommentsByToken(anomaly.tokenId);
+    setComments(data);
+  };
 
-  // Hanya tampilkan yang bermasalah
-  if (!isDisputed && !hasActiveTransfer) return null;
+  const handleSubmitComment = async () => {
+    if (!newComment.trim() || !walletAddress) return;
+    try {
+      setIsSubmitting(true);
+      const result = await addAuditorComment({
+        token_id: anomaly.tokenId,
+        nib: anomaly.nib,
+        auditor_wallet: walletAddress as string,
+        auditor_name: null,
+        comment: newComment.trim(),
+        category: commentCategory,
+      });
+
+      if (result) {
+        setNewComment('');
+        setShowCommentForm(false);
+        await loadComments();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal mengirim komentar.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={`p-6 rounded-3xl border-2 ${isDisputed ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
+      className={`rounded-3xl border-2 overflow-hidden ${anomaly.isDisputed ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
     >
-      <div className="flex items-start justify-between mb-4 gap-4">
-        <div className="min-w-0 flex-1 pr-2">
-          <p className="text-xs font-black text-moss-400 uppercase tracking-widest">Token #{tokenId}</p>
-          <p className="font-black text-moss-900 break-all">NIB: {land.nib}</p>
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-4 gap-4">
+          <div className="min-w-0 flex-1 pr-2">
+            <p className="text-xs font-black text-moss-400 uppercase tracking-widest">Token #{anomaly.tokenId}</p>
+            <p className="font-black text-moss-900 break-all">NIB: {anomaly.nib}</p>
+          </div>
+          {anomaly.isDisputed && (
+            <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
+          )}
+          {anomaly.hasActiveTransfer && !anomaly.isDisputed && (
+            <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
+          )}
         </div>
-        {isDisputed && (
-          <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-red-700 bg-red-100 px-3 py-1.5 rounded-full border border-red-200 uppercase">⚠ Sengketa Aktif</span>
-        )}
-        {hasActiveTransfer && !isDisputed && (
-          <span className="shrink-0 whitespace-nowrap text-[10px] font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 uppercase">⏳ Transfer Berjalan</span>
-        )}
+        <p className="text-xs text-moss-600 break-all">Luas: {anomaly.area.toString()} m² | GPS: {anomaly.gpsCoordinates}</p>
       </div>
-      <p className="text-xs text-moss-600 break-all">Luas: {land.area.toString()} m² | GPS: {land.gpsCoordinates}</p>
+
+      {/* ── Catatan Audit ── */}
+      <div className="px-6 pb-6">
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${anomaly.isDisputed ? 'text-red-500 hover:text-red-800' : 'text-amber-600 hover:text-amber-800'}`}
+        >
+          <svg
+            className={`w-4 h-4 transition-transform ${showComments ? 'rotate-90' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          Catatan Audit ({showComments ? comments.length : 'Buka'})
+        </button>
+
+        <AnimatePresence>
+          {showComments && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 border border-moss-100 rounded-2xl p-5 bg-white shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-black text-moss-900 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-moss-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    Catatan ({comments.length})
+                  </h4>
+                  {!showCommentForm && (
+                    <button
+                      onClick={() => setShowCommentForm(true)}
+                      className={`px-3 py-1.5 text-white text-[10px] font-bold rounded-lg transition-colors flex items-center gap-1 ${anomaly.isDisputed ? 'bg-red-700 hover:bg-red-800' : 'bg-amber-600 hover:bg-amber-700'}`}
+                    >
+                      <span>+</span> Tambah
+                    </button>
+                  )}
+                </div>
+
+                {showCommentForm && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-[#F9FAF8] border border-moss-100 rounded-xl"
+                  >
+                    <div className="mb-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {Object.entries(CATEGORY_STYLES).map(([cat, style]) => (
+                          <button
+                            key={cat}
+                            onClick={() => setCommentCategory(cat as any)}
+                            className={`px-2 py-1 text-[10px] font-bold rounded-md border transition-all ${
+                              commentCategory === cat
+                                ? style.color + ' ring-1 ring-offset-1 ring-moss-300'
+                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                            }`}
+                          >
+                            {style.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Tulis hasil temuan anomali..."
+                      className="w-full p-2 bg-white border border-moss-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-olive-500 outline-none transition-all resize-y min-h-[80px]"
+                    />
+                    <div className="flex justify-end gap-2 mt-2">
+                      <button
+                        onClick={() => { setShowCommentForm(false); setNewComment(''); }}
+                        className="px-3 py-1.5 text-[10px] font-bold text-moss-600 hover:bg-moss-50 rounded-lg transition-colors"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={handleSubmitComment}
+                        disabled={isSubmitting || !newComment.trim()}
+                        className="px-4 py-1.5 bg-moss-700 text-white text-[10px] font-bold rounded-lg hover:bg-moss-800 transition-colors disabled:opacity-50"
+                      >
+                        {isSubmitting ? '...' : 'Simpan'}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {comments.length > 0 ? (
+                  <div className="space-y-3">
+                    {comments.map((c) => {
+                      const style = CATEGORY_STYLES[c.category] || CATEGORY_STYLES.general;
+                      return (
+                        <div key={c.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${style.color}`}>
+                              {style.label}
+                            </span>
+                            <span className="text-[9px] font-mono text-slate-400">
+                              {new Date(c.created_at).toLocaleDateString('id-ID')}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed">{c.comment}</p>
+                          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1.5">
+                            <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            <span className="text-[10px] font-mono text-slate-500">{c.auditor_wallet.substring(0,6)}...</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : !showCommentForm && (
+                  <div className="text-center py-4 text-slate-400">
+                    <p className="text-[10px]">Belum ada catatan.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
+
+// ─── Komponen cek sengketa per aset ───────────────────────────────────────────
+
 
 // ─── Kartu hasil pencarian ────────────────────────────────────────────────────
 function LandResultCard({ land }: { land: LandDetail }) {
@@ -605,6 +759,7 @@ const CATEGORY_STYLES: Record<string, { label: string; color: string }> = {
 export default function AuditorDashboard() {
   useWalletGuard();
   const [activeTab, setActiveTab] = useState('ledger');
+  const publicClient = usePublicClient();
   const [allComments, setAllComments] = useState<DBAuditorComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
 
@@ -615,7 +770,74 @@ export default function AuditorDashboard() {
     query: { refetchInterval: 5000 }
   });
 
-  const total = Number(totalLands || 0);
+  // ── Anomalies State ──
+  const [anomalies, setAnomalies] = useState<AnomalyDetail[]>([]);
+  const [isScanningAnomalies, setIsScanningAnomalies] = useState(false);
+  const [hasScannedAnomalies, setHasScannedAnomalies] = useState(false);
+  const [anomalyPage, setAnomalyPage] = useState(1);
+  const ANOMALIES_PER_PAGE = 10;
+
+  useEffect(() => {
+    if (activeTab === 'anomaly' && !hasScannedAnomalies && totalLands) {
+      scanAllAnomalies();
+    }
+  }, [activeTab, hasScannedAnomalies, totalLands]);
+
+  const scanAllAnomalies = async () => {
+    if (!publicClient) return;
+    setIsScanningAnomalies(true);
+    setAnomalies([]);
+    
+    try {
+      const total = Number(totalLands || 0);
+      const foundAnomalies: AnomalyDetail[] = [];
+      
+      // Karena kita butuh memindai dengan cepat, kita bisa melakukan promise.all dalam batch
+      // Namun untuk kesederhanaan dan keandalan public node, kita loop biasa atau batch kecil.
+      for (let i = 0; i < total; i++) {
+        try {
+          const landData = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'getLandDetails',
+            args: [BigInt(i)],
+          });
+          const transferReq = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'transferRequests',
+            args: [BigInt(i)],
+          });
+
+          const isDisputed = (landData as any)[4];
+          const hasActiveTransfer = transferReq && (transferReq as any)[6];
+
+          if (isDisputed || hasActiveTransfer) {
+            foundAnomalies.push({
+              tokenId: i,
+              gpsCoordinates: (landData as any)[0],
+              area: (landData as any)[1],
+              nib: (landData as any)[2],
+              isDisputed,
+              hasActiveTransfer,
+            });
+          }
+        } catch (e) {
+          console.error(`Failed to scan token ${i}`, e);
+        }
+      }
+      
+      setAnomalies(foundAnomalies);
+      setHasScannedAnomalies(true);
+    } catch (e) {
+      console.error("Error scanning anomalies:", e);
+    } finally {
+      setIsScanningAnomalies(false);
+    }
+  };
+
+  const currentAnomalies = anomalies.slice((anomalyPage - 1) * ANOMALIES_PER_PAGE, anomalyPage * ANOMALIES_PER_PAGE);
+  const totalAnomalyPages = Math.ceil(anomalies.length / ANOMALIES_PER_PAGE);
 
   useEffect(() => {
     if (activeTab === 'comments') {
@@ -681,7 +903,7 @@ export default function AuditorDashboard() {
               <div className="mb-8">
                 <h3 className="text-2xl font-black text-moss-900">Ledger Pertanahan Nasional</h3>
                 <p className="text-sm text-moss-500 mt-2">
-                  Semua NFT Sertifikat Tanah yang tersegel di blockchain. Total: <strong>{total} aset</strong> terdaftar.
+                  Semua NFT Sertifikat Tanah yang tersegel di blockchain. Total: <strong>{Number(totalLands || 0)} aset</strong> terdaftar.
                 </p>
               </div>
               <LandLedger showAuditComments />
@@ -703,16 +925,59 @@ export default function AuditorDashboard() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {[...Array(total)].map((_, i) => (
-                  <DisputedAssetChecker key={i} tokenId={i} />
-                ))}
-                {total === 0 && (
-                  <div className="col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
-                    <p className="text-moss-500 font-bold">Tidak ada aset yang perlu dipantau.</p>
+              {isScanningAnomalies ? (
+                <div className="bg-olive-50 border border-olive-100 p-8 rounded-[2rem] text-center flex flex-col items-center">
+                  <svg className="animate-spin w-8 h-8 text-olive-600 mb-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <p className="font-bold text-olive-800">Memindai seluruh Ledger...</p>
+                  <p className="text-sm text-olive-600 mt-1">Sistem sedang memeriksa status setiap aset. Mohon tunggu.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {currentAnomalies.map((anomaly) => (
+                      <DisputedAssetChecker key={anomaly.tokenId} anomaly={anomaly} />
+                    ))}
+                    
+                    {anomalies.length === 0 && hasScannedAnomalies && (
+                      <div className="col-span-1 lg:col-span-2 p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-200">
+                          <svg className="w-7 h-7 text-moss-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <p className="text-moss-700 font-black text-lg">Semua Bersih</p>
+                        <p className="text-moss-500 font-medium mt-1">Tidak ada aset yang sedang bersengketa atau dalam proses transfer.</p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+
+                  {/* Pagination Controls */}
+                  {totalAnomalyPages > 1 && (
+                    <div className="mt-8 flex items-center justify-center gap-4">
+                      <button
+                        onClick={() => setAnomalyPage(p => Math.max(1, p - 1))}
+                        disabled={anomalyPage === 1}
+                        className="px-4 py-2 border border-moss-200 rounded-xl bg-white text-moss-600 font-bold hover:bg-moss-50 disabled:opacity-50 transition-colors"
+                      >
+                        « Sebelumnya
+                      </button>
+                      <span className="text-sm font-bold text-moss-700">
+                        Halaman {anomalyPage} dari {totalAnomalyPages}
+                      </span>
+                      <button
+                        onClick={() => setAnomalyPage(p => Math.min(totalAnomalyPages, p + 1))}
+                        disabled={anomalyPage === totalAnomalyPages}
+                        className="px-4 py-2 border border-moss-200 rounded-xl bg-white text-moss-600 font-bold hover:bg-moss-50 disabled:opacity-50 transition-colors"
+                      >
+                        Selanjutnya »
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </motion.div>
           )}
 
