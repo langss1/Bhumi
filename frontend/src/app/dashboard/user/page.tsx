@@ -29,7 +29,11 @@ function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, toke
         <div className="p-8 pt-0 text-moss-900">
           {/* Header BPN */}
           <div className="text-center mb-6">
-            <img src="/logo.png" className="w-16 mx-auto mb-3" alt="Garuda" />
+            <img 
+              src="/logo.png" 
+              className="w-20 mx-auto mb-3 mix-blend-multiply sepia contrast-125 opacity-90" 
+              alt="Bhumi Logo" 
+            />
             <h2 className="text-[11px] font-black leading-tight uppercase tracking-widest">Kementerian Agraria dan Tata Ruang /</h2>
             <h2 className="text-[11px] font-black leading-tight uppercase tracking-widest border-b-2 border-moss-900 inline-block pb-1 mb-3">Badan Pertanahan Nasional</h2>
             <h1 className="text-xl font-black uppercase tracking-[0.2em] mt-3">Sertifikat Tanah Elektronik</h1>
