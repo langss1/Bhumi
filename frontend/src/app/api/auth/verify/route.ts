@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // Verifikasi Role di Database Supabase
     // Menggunakan fetch biasa atau Admin Client. Untuk amannya, kita panggil anonymous client dengan supabase service key jika ada, atau sekadar public anon.
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(supabaseUrl, supabaseKey);
