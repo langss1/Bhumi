@@ -584,8 +584,17 @@ export default function UserDashboard() {
     query: { refetchInterval: 5000 },
   });
 
+  const { data: userBalance } = useReadContract({
+    address: LAND_REGISTRY_ADDRESS,
+    abi: LandRegistryABI,
+    functionName: 'balanceOf',
+    args: [activeAddress as `0x${string}`],
+    query: { enabled: !!activeAddress, refetchInterval: 5000 },
+  });
+
   const total = Number(totalLands || 0);
   const totalReq = Number(totalRequests || 0);
+  const balance = Number(userBalance || 0);
 
   const tabs = [
     { id: 'gallery', label: '🏡 Galeri Aset Saya' },
@@ -692,7 +701,7 @@ export default function UserDashboard() {
                 </p>
               </div>
 
-              {total === 0 ? (
+              {total === 0 || balance === 0 ? (
                 <div className="p-6 md:p-12 text-center bg-moss-50/50 border border-dashed border-moss-200 rounded-3xl">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-moss-100">
                     <svg className="w-10 h-10 text-moss-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
