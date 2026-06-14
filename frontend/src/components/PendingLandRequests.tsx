@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useReadContract, useWriteContract } from 'wagmi';
+import { useReadContract } from 'wagmi';
+import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { motion, AnimatePresence } from 'framer-motion';

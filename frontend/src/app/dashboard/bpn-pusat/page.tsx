@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWriteContract } from 'wagmi';
+import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import LandLedger from '@/components/LandLedger';

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWaitForTransactionReceipt } from 'wagmi';
+import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
 import { getAllAuditorComments, updateAuditorFeedback, DBAuditorComment } from '@/lib/supabase';
@@ -88,7 +89,7 @@ export default function DisputeManagement() {
           // Akan dimuat ulang lewat useEffect isSuccess
         }
       },
-      onError: (err) => {
+      onError: (err: any) => {
         alert('Gagal mengeksekusi smart contract: ' + err.message);
         setActiveCommentId(null);
       }
