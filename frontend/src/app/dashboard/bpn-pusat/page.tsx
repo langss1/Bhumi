@@ -28,7 +28,7 @@ export default function BpnPusatDashboard() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-12 bg-moss-50/80 p-2 rounded-2xl border border-moss-100 w-max max-w-full shadow-inner">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-8 md:mb-12 bg-moss-50/80 p-2 rounded-2xl border border-moss-100 w-max mx-auto max-w-full shadow-inner">
         {tabs.map((tab) => (
           <button
             key={tab.id}

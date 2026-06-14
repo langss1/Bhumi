@@ -154,12 +154,12 @@ export default function BpnWilayahDashboard() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-12 bg-moss-50/80 p-2 rounded-2xl border border-moss-100 w-max max-w-full shadow-inner">
+      <div className="flex gap-2 mb-4 md:mb-5 bg-moss-50/80 p-1.5 rounded-2xl border border-moss-100 w-full max-w-4xl mx-auto shadow-inner">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative px-6 py-3 md:px-8 md:py-4 text-xs md:text-sm font-black tracking-wide transition-all rounded-xl outline-none ${
+            className={`relative flex-1 px-6 py-2 md:px-8 md:py-3 text-xs md:text-sm font-black tracking-wide transition-all rounded-xl outline-none ${
               activeTab === tab.id 
                 ? 'text-white' 
                 : 'text-moss-500 hover:text-moss-800 hover:bg-white/50'
@@ -187,7 +187,7 @@ export default function BpnWilayahDashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-4xl"
+              className="bg-white border border-moss-100 p-4 md:p-12 rounded-[2rem] shadow-sm max-w-4xl mx-auto"
             >
               <div className="flex items-center gap-5 mb-10">
                 <div className="w-16 h-16 bg-olive-50 rounded-2xl flex items-center justify-center border border-olive-100">
@@ -356,7 +356,7 @@ export default function BpnWilayahDashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-moss-100 p-8 rounded-[2rem] shadow-sm"
+              className="bg-white border border-moss-100 p-8 rounded-[2rem] shadow-sm max-w-4xl mx-auto"
             >
               <div className="text-center mb-8">
                 <h3 className="text-xl font-bold text-moss-900 mb-2">Riwayat Pendaftaran</h3>
