@@ -26,14 +26,40 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
+  const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+  };
+
   const fetchProfile = async () => {
     try {
       const { supabase } = await import('@/lib/supabase');
+      
+      // 1. Coba login tradisional via Supabase Auth
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        setProfile(data);
-        setFullName(data?.full_name || '');
+        if (data) {
+          setProfile(data);
+          setFullName(data.full_name || '');
+          return;
+        }
+      }
+
+      // 2. Fallback: Web3 Login (MetaMask)
+      const cookieWallet = getCookie('verified_wallet');
+      const localWallet = typeof window !== 'undefined' ? localStorage.getItem('connected_wallet') : null;
+      const verifiedWallet = cookieWallet || localWallet;
+      
+      if (verifiedWallet) {
+        const { data } = await supabase.from('profiles').select('*').ilike('wallet_address', verifiedWallet).single();
+        if (data) {
+          setProfile(data);
+          setFullName(data.full_name || '');
+        }
       }
     } catch (err) {
       console.error(err);
@@ -50,13 +76,22 @@ export default function ProfilePage() {
       const { supabase, updateProfile } = await import('@/lib/supabase');
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (user) {
-        const { error } = await updateProfile(user.id, { full_name: fullName });
+      let targetId = user?.id;
+      
+      // Fallback id profile jika user login via Web3
+      if (!targetId && profile?.id) {
+        targetId = profile.id;
+      }
+      
+      if (targetId) {
+        const { error } = await updateProfile(targetId, { full_name: fullName });
         if (error) throw error;
         
         setProfile({ ...profile, full_name: fullName });
         setIsEditing(false);
         alert('Profil berhasil diperbarui!');
+      } else {
+        throw new Error("Sesi pengguna tidak valid.");
       }
     } catch (err: any) {
       alert('Gagal menyimpan: ' + err.message);
