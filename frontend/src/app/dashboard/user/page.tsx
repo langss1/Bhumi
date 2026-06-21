@@ -95,7 +95,7 @@ function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, toke
               <div className="text-center">
                 <div className="w-20 h-20 bg-white p-1.5 border border-moss-200 mb-1 mx-auto">
                   {/* Placeholder QR */}
-                  <div className="w-full h-full bg-moss-900 flex items-center justify-center p-1.5 text-white">
+                  <div className="w-full h-full bg-moss-900 flex items-center justify-center p-1.5 text-white print:bg-transparent print:text-moss-900" style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2zm-3 3h2v2h-2v-2zm3-3h3v2h-3v-2zm-3 0h2v2h-2v-2zm3 3h3v2h-3v-2z" /></svg>
                   </div>
                 </div>

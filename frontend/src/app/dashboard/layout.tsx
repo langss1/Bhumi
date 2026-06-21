@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import { motion } from 'framer-motion';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { address } = useAccount();
+  const { connect, connectors } = useConnect();
   const [profile, setProfile] = useState<any>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -142,8 +143,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Verified Node
             </span>
           </div>
-          <button 
-            onClick={async () => {
+          <div className="flex items-center gap-2 sm:gap-4">
+            {!address && (
+              <button
+                onClick={() => connect({ connector: connectors[0] })}
+                className="px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-olive-600 text-white rounded-xl hover:bg-olive-700 transition-all shadow-md shrink-0"
+              >
+                Connect Wallet
+              </button>
+            )}
+            <button 
+              onClick={async () => {
               // Hapus cookie user_role
               document.cookie = "user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
               // Sign out Supabase Auth
@@ -157,6 +167,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
             <span>Keluar</span>
           </button>
+          </div>
         </header>
         
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-12 pb-24">
