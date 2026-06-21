@@ -17,12 +17,12 @@ function DigitalCertificate({ land, tokenId, owner, onClose }: { land: any, toke
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm print:absolute print:inset-0 print:p-0 print:bg-transparent print:items-start print:justify-start"
       onClick={onClose}
     >
       <motion.div 
         initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-        className="bg-[#F4F1E1] w-full max-w-[550px] max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm border-[8px] border-white relative print:border-0 custom-scrollbar"
+        className="bg-[#F4F1E1] w-full max-w-[550px] max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm border-[8px] border-white relative print:border-0 custom-scrollbar print:max-w-none print:max-h-none print:w-full print:h-[100vh] print:shadow-none print:rounded-none print:overflow-hidden print:m-0 print:p-12"
         onClick={e => e.stopPropagation()}
       >
         <div className="sticky top-0 right-0 p-4 flex justify-end z-10 print:hidden">
