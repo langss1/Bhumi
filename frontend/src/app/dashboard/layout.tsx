@@ -17,13 +17,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
+  const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       const { supabase } = await import('@/lib/supabase');
+      
+      // 1. Coba login tradisional via Supabase Auth
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        setProfile(data);
+        if (data) {
+          setProfile(data);
+          return;
+        }
+      }
+
+      // 2. Fallback: Web3 Login (MetaMask)
+      const cookieWallet = getCookie('verified_wallet');
+      const localWallet = typeof window !== 'undefined' ? localStorage.getItem('connected_wallet') : null;
+      const verifiedWallet = cookieWallet || localWallet;
+      
+      if (verifiedWallet) {
+        const { data } = await supabase.from('profiles').select('*').ilike('wallet_address', verifiedWallet).single();
+        if (data) {
+          setProfile(data);
+        }
       }
     };
     fetchProfile();
