@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { useSafeWriteContract as useWriteContract } from '@/hooks/useSafeWriteContract';
 import { LandRegistryABI } from '@/lib/abi';
 import { LAND_REGISTRY_ADDRESS } from '@/lib/wagmi';
@@ -14,6 +14,7 @@ import { useWalletGuard } from '@/hooks/useWalletGuard';
 export default function BpnWilayahDashboard() {
   useWalletGuard();
   const { address } = useAccount();
+  const publicClient = usePublicClient();
   const [activeTab, setActiveTab] = useState('daftar');
   
   // Form State
@@ -110,6 +111,29 @@ export default function BpnWilayahDashboard() {
     }
 
     try {
+      if (publicClient) {
+        setIsUploading(true);
+        setSearchStatus({ loading: true, message: 'Memverifikasi NIB di Blockchain...', type: 'info' });
+        try {
+          const result = await publicClient.readContract({
+            address: LAND_REGISTRY_ADDRESS,
+            abi: LandRegistryABI,
+            functionName: 'getTokenByNIB',
+            args: [nib]
+          }) as [bigint, boolean];
+          
+          if (result[1]) {
+            setSearchStatus({ loading: false, message: '', type: '' });
+            setIsUploading(false);
+            setNibError('Data ditolak: NIB ini sudah terdaftar di sistem Blockchain.');
+            return;
+          }
+        } catch (err) {
+          console.warn("Gagal cek NIB:", err);
+        }
+        setSearchStatus({ loading: false, message: '', type: '' });
+      }
+
       setIsUploading(true);
       
       // 1. Upload ke IPFS
